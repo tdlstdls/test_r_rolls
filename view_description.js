@@ -20,24 +20,24 @@ function generateDescriptionHTML() {
                     font-weight: bold;
                     display: inline-block;
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                ">&larr; テーブルに戻る</button>
+                ">&larr; ロールズに戻る</button>
             </div>
-            <h3 style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #007bff; display: inline-block;">【R_Rolls 使い方ガイド】</h3>
+            <h3 style="margin: 0 0 10px 0; color: #333; border-bottom: 2px solid #007bff; display: inline-block;">【概要】</h3>
             <p style="margin-bottom: 15px;">このツールは、自分の「シード値（SEED）」を元に、<strong>どのガチャをどの順番で引けば狙いのキャラが手に入るか</strong>を予測・計画するためのシミュレーターです。</p>
 
             <h4 style="margin: 10px 0 5px 0; color: #007bff;">1. まずはシード（SEED）を入力</h4>
             <p style="margin-bottom: 10px;">
-                上部の<strong>「SEED」</strong>を押し、現在の実行前シード値を入力してOKを押してください。画面に予測テーブルが表示されます。
+                上部の<strong>「SEED値変更」</strong>を押し、現在の実行前シード値を入力してOKを押してください。画面に予測テーブルが表示されます。
             </p>
 
             <h4 style="margin: 10px 0 5px 0; color: #007bff;">2. ガチャを選んで比較する</h4>
             <p style="margin-bottom: 10px;">
-                テーブル上のプルダウンメニューからガチャを切り替えられます。<strong>「＋列を追加」</strong>で複数のガチャを並べて比較できます。
+                ガチャ名の下のプルダウンメニューからガチャを切り替えられます。<strong>「＋列を追加」</strong>で複数のガチャを並べて比較できます。
             </p>
 
             <h4 style="margin: 10px 0 5px 0; color: #007bff;">3. Find（キャラ別検索）で狙い目を探す</h4>
             <p style="margin-bottom: 10px;">
-                <strong>「Find」</strong>を押すと、2000〜10000ロール先までの「伝説枠」や「限定キャラ」を自動で検索します。
+                <strong>「Find」</strong>を押すと、2000〜10000ロール先までの「伝説枠」や「限定キャラ」の出現位置を検索します。
                 <br>・<strong>リスト内のキャラ名</strong>をタップ：そのキャラをリストの一番上に表示します。
                 <br>・<strong>「other」</strong>をタップ：ロールズに表示しているガチャ以外の全ガチャシリーズでの出現位置をまとめて検索します。
             </p>
@@ -55,7 +55,7 @@ function generateDescriptionHTML() {
                 <strong>「skd」</strong>を押すと、近日開催予定のガチャ一覧が表示されます。「skdで一括追加」ボタンを使うと、開催予定のガチャをすべてテーブルに並べて比較できます。
             </p>
 
-            <h4 style="margin: 10px 0 5px 0; color: #007bff;">6. テーブルの便利な見方</h4>
+            <h4 style="margin: 10px 0 5px 0; color: #007bff;">6. セル背景色について</h4>
             <ul style="margin: 0 0 15px 0; padding-left: 20px; font-size: 0.9em; line-height: 1.6;">
                 <li><strong>No.列の背景色:</strong>
                     <ul style="padding-left: 15px; margin-top: 5px;">

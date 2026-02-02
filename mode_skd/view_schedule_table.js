@@ -50,7 +50,7 @@ function renderScheduleTable(tsvContent, containerId) {
                 color: white; 
                 font-weight: bold;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            ">&larr; テーブルに戻る</button>
+            ">&larr; ロールズに戻る</button>
         </div>
 
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-top: 1px solid #eee; padding-top: 10px;">
