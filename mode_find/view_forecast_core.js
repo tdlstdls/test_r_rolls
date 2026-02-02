@@ -17,14 +17,16 @@ function generateFastForecast(initialSeed, columnConfigs) {
     // ヘッダー（伝説枠・昇格枠・Target Listのラベル等）
     summaryHtml += generateForecastHeader(specialSlots, specialTargetStatus);
 
-    // 各ガチャの出現位置リスト
-    columnConfigs.forEach((config) => {
-        if (!config) return;
-        const gachaHtml = processGachaForecast(config, seeds, scanRows, extendedScanRows);
-        if (gachaHtml) summaryHtml += gachaHtml;
-    });
+    // FindがONの時だけ各ガチャの出現位置リストを生成
+    if (showFindInfo) {
+        columnConfigs.forEach((config) => {
+            if (!config) return;
+            const gachaHtml = processGachaForecast(config, seeds, scanRows, extendedScanRows);
+            if (gachaHtml) summaryHtml += gachaHtml;
+        });
 
-    if (globalSearchResults) summaryHtml += renderGlobalSearchResults();
+        if (globalSearchResults) summaryHtml += renderGlobalSearchResults();
+    }
 
     summaryHtml += '</div>';
     return summaryHtml;

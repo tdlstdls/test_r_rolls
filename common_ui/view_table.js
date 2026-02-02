@@ -46,7 +46,7 @@ function generateRollsTable() {
 
         // 1. FindエリアのHTMLを準備
         let findAreaHtml = '';
-        if (typeof generateFastForecast === 'function' && showFindInfo) {
+        if (typeof generateFastForecast === 'function') {
             findAreaHtml = generateFastForecast(initialSeed, columnConfigs);
         }
 

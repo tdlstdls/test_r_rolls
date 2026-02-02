@@ -4,17 +4,20 @@ function generateForecastHeader(slots, status) {
     const lStr = slots.legendSlots.length > 0 ? slots.legendSlots.join(", ") : "なし";
     const pStr = slots.promotedSlots.length > 0 ? slots.promotedSlots.join(", ") : "なし";
 
+    // 枠情報を横並びにするためのスタイル調整
     return `
-        <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #eee; font-size: 0.85em;">
-            <div style="margin-bottom: 4px;">
-                <span style="font-weight:bold; color:#e91e63; background:#ffe0eb; padding:1px 4px; border-radius:3px;">伝説枠</span>
-                <span style="font-family: monospace; margin-left: 5px;">${lStr}</span>
+        <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #eee; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline;">
+            <div style="display: flex; align-items: baseline; gap: 5px;">
+                <span style="font-weight:bold; color:#e91e63; background:#ffe0eb; padding:1px 4px; border-radius:3px; white-space: nowrap;">伝説枠</span>
+                <span style="font-family: monospace;">${lStr}</span>
             </div>
-            <div>
-                <span style="font-weight:bold; color:#9c27b0; background:#f3e5f5; padding:1px 4px; border-radius:3px;">昇格枠</span>
-                <span style="font-family: monospace; margin-left: 5px;">${pStr}</span>
+            <span style="color: #ccc;">/</span>
+            <div style="display: flex; align-items: baseline; gap: 5px;">
+                <span style="font-weight:bold; color:#9c27b0; background:#f3e5f5; padding:1px 4px; border-radius:3px; white-space: nowrap;">昇格枠</span>
+                <span style="font-family: monospace;">${pStr}</span>
             </div>
         </div>
+        ${showFindInfo ? `
         <div style="margin-bottom: 10px; text-align: left;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                 <span onclick="clearAllTargets()" class="text-btn" title="全て非表示">×</span>
@@ -31,7 +34,7 @@ function generateForecastHeader(slots, status) {
             <div style="font-size: 0.75em; color: #666; padding-left: 2px; line-height: 1.4;">
                 ※キャラ名をタップで先頭へ移動。×で削除。右のアドレスをタップでルート探索。
             </div>
-        </div>
+        </div>` : ''}
     `;
 }
 
