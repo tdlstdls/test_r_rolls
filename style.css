@@ -294,10 +294,18 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
  button { padding: 3px 8px; font-size: 11px; height: 24px; line-height: 1; }
  table { font-size: 10px; margin-top: 5px; }
  th, td { padding: 2px 3px; height: auto; font-size: 9px; }
- .gacha-column { min-width: 85px; max-width: 100px; overflow: hidden; }  
+ .gacha-column { width: 120px !important; min-width: 120px !important; max-width: 120px !important; overflow: hidden; }  
  .gacha-header-wrapper { gap: 2px; justify-content: flex-start !important; width: 100%; }
  th div[style*="margin-top"] { transform: scale(0.85); transform-origin: center top; width: 115%; margin-left: -7.5%; white-space: nowrap; }
  .gacha-cell { line-height: 1.1; }
+ 
+ /* モバイル時の横幅圧縮モードはさらに細く */
+ .narrow-mode .gacha-column,
+ .narrow-mode .gacha-cell {
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+ }
  .calc-column { font-size: 9px; width: auto; }
  .schedule-table th, .schedule-table td { padding: 2px 4px; font-size: 10px; }  
  .schedule-table td:nth-child(3) { min-width: 140px; }
@@ -306,6 +314,15 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
  .gantt-bar { height: 16px !important; top: 4px !important; font-size: 9px !important; }
  .gantt-date-cell { font-size: 9px !important; }
  #result { font-size: 10px; }
+ 
+ #master-info-area {
+    white-space: normal;
+    word-break: break-all;
+ }
+
+ .sticky-row th {
+    top: 0px; /* モバイルでのA/B行の高さに合わせて調整 */
+ }
 }
 
 /* =========================================
