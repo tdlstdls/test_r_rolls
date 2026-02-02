@@ -12,7 +12,7 @@ function generateFastForecast(initialSeed, columnConfigs) {
     const specialTargetStatus = getAvailableSpecialTargets(columnConfigs);
     
     // スタイル調整：下部の境界線を繋げるため、margin-bottomを0にし、border-radiusを調整
-    let summaryHtml = `<div id="forecast-summary-area" class="forecast-summary-container" style="padding: 10px; background: #fdfdfd; border: 1px solid #ddd; border-bottom: none; border-radius: 4px 4px 0 0; margin-top: 10px;">`;
+    let summaryHtml = ``;
     
     // ヘッダー（伝説枠・昇格枠・Target Listのラベル等）
     summaryHtml += generateForecastHeader(specialSlots, specialTargetStatus);
@@ -28,6 +28,5 @@ function generateFastForecast(initialSeed, columnConfigs) {
         if (globalSearchResults) summaryHtml += renderGlobalSearchResults();
     }
 
-    summaryHtml += '</div>';
     return summaryHtml;
 }

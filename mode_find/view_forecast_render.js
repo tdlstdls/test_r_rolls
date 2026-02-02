@@ -6,7 +6,7 @@ function generateForecastHeader(slots, status) {
 
     // 枠情報を横並びにするためのスタイル調整
     return `
-        <div style="margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px dashed #eee; font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline;">
+        <div style="font-size: 0.85em; display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline;">
             <div style="display: flex; align-items: baseline; gap: 5px;">
                 <span style="font-weight:bold; color:#e91e63; background:#ffe0eb; padding:1px 4px; border-radius:3px; white-space: nowrap;">伝説枠</span>
                 <span style="font-family: monospace;">${lStr}</span>

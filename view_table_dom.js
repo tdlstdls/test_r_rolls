@@ -18,7 +18,6 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     const simActive = (typeof isSimulationMode !== 'undefined' && isSimulationMode);
     const skdActive = (typeof isScheduleMode !== 'undefined' && isScheduleMode);
     const descActive = (typeof isDescriptionMode !== 'undefined' && isDescriptionMode);
-    const statusLabel = simActive ? "Simulation Mode: Active" : "Display Mode";
 
     let html = `<div class="table-horizontal-wrapper" style="display: flex; width: 100%;">`;
     
@@ -83,10 +82,8 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
             </th>
         </tr>
         <tr id="find-result-row">
-            <th colspan="${fullTableColSpan}" style="background: #fff; padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-weight: normal; max-width: 0;">
+            <th colspan="${fullTableColSpan}" style="background: #fff; text-align: left; font-weight: normal; max-width: 0; padding-top: 8px;">
                 <div id="result" class="result-box" style="font-size: 11px;">
-                    <div style="font-weight:bold; color:#007bff; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:12px;">${statusLabel}</div>
-                    
                     ${findAreaHtml || '<div style="color:#999;">Findボタンを押すとここにターゲット情報が表示されます。</div>'}
                     
                     ${masterInfoHtml}
