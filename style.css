@@ -144,11 +144,32 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
 
 /* ガチャ名称行を最上部に固定 */
 .sticky-row th {
+    position: -webkit-sticky; /* Safari対策 */
     position: sticky;
     top: 0; 
-    z-index: 30;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    z-index: 100; /* 十分に高い値に設定 */
+    background-color: #f8f9fa; /* 背景色がないと下の文字が透けます */
+    border-bottom: 2px solid #ddd !important;
+}
+
+/* 修正: A/Bトラック名(3行目)も固定したい場合は以下を追加 */
+.track-header {
+    position: sticky;
+    top: -40px; /* 上の行の高さ分マイナスにするか、一緒にstickyにする */
+    z-index: 90;
+    background: #f8f9fa;
+}
+
+/* iPhone/Safari対策: テーブル要素の sticky 動作を安定させる */
+#rolls-table-container {
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block; /* inline-block や flex を避ける */
+}
+
+table {
+    border-collapse: separate; /* collapse だと sticky が効かないブラウザが多い */
+    border-spacing: 0;
 }
 
 .control-row th { position: static; border-top: none; background-color: #f8f9fa; padding-top: 2px; padding-bottom: 4px; z-index: 1; }

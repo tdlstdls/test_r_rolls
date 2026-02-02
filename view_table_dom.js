@@ -60,12 +60,12 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
             </div>`;
     }
 
-    // テーブル外枠の構築開始
-    let html = `<div class="table-horizontal-wrapper" style="display: flex; width: auto; justify-content: flex-start;">`;
-    const narrowClass = isNarrowMode ? 'narrow-mode' : '';
+
+    // 修正: display: flex のラッパーが sticky を阻害するため、構造を単純化
+    let html = `<div class="table-container-inner" style="width: fit-content;">`;
     
-    // 圧縮モード時はテーブル自体の style に table-layout: fixed を直接注入するのも有効
-    const tableStyle = isNarrowMode ? "table-layout: fixed; width: auto;" : "table-layout: auto; width: auto;";
+    const narrowClass = isNarrowMode ? 'narrow-mode' : '';
+    const tableStyle = "border-spacing: 0; width: auto;"; // border-collapse: separate は CSS側で
     
     html += `<table class="${narrowClass}" style="${tableStyle}"><thead>`;
 
