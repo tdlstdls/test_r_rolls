@@ -171,7 +171,7 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     z-index: 55 !important;
 }
 .calc-column { background-color: #f0f8ff; font-size: 0.9em; color: #555; }
-/* 通常モード：通常列と確定列の幅をpxで統一 */
+/* 通常時の列幅設定（既存の 170px を維持） */
 .gacha-column, 
 .gacha-cell {
     width: 170px !important;
@@ -179,21 +179,37 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     max-width: 170px !important;
     box-sizing: border-box;
     text-align: left !important;
-    white-space: normal !important;   /* 折り返しを許可 */
-    word-break: break-all !important; /* 長い名前もセル内で改行 */
+    white-space: normal !important;
+    word-break: break-all !important;
     line-height: 1.2;
 }
 
-/* 横幅圧縮モード */
-/* 通常列・確定列ともにpxで強制固定 */
+/* 【修正】横幅圧縮モード（幅を半分：170px / 2 = 85px） */
 .narrow-mode .gacha-column,
 .narrow-mode .gacha-cell {
-    width: 100px !important;
-    min-width: 100px !important;
-    max-width: 100px !important;
+    width: 85px !important;      /* 半分の幅に設定 */
+    min-width: 85px !important;
+    max-width: 85px !important;
     padding: 2px 3px !important;
     white-space: normal !important;
     word-break: break-all !important;
+}
+
+/* 圧縮時の文字サイズ調整（視認性確保のため） */
+.narrow-mode .gacha-cell .char-link {
+    font-size: 10px !important; /* 文字を少し小さく */
+    display: block;
+    line-height: 1.1;
+}
+
+.narrow-mode .guaranteed-cell {
+    font-size: 10px !important;
+}
+
+/* 圧縮時、ヘッダーのボタン類を縦に並べるか折り返す設定 */
+.narrow-mode .gacha-column div[style*="display:flex"] {
+    flex-wrap: wrap !important;
+    gap: 1px !important;
 }
 
 /* 確定(G)列のフォントサイズは12pxを維持（前回のご要望） */

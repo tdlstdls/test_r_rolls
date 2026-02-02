@@ -92,7 +92,7 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
                     <button style="${baseBtnStyle} background-color: ${colors.skdAdd}; color: #fff; border: 1px solid ${colors.skdAdd};" onclick="addGachasFromSchedule()">skdで追加</button>
                     <button id="add-id-trigger" style="${baseBtnStyle} background-color: ${colors.idAdd}; color: #fff; border: 1px solid ${colors.idAdd};" onclick="showIdInput()">IDで追加</button>
                     <button onclick="resetToFirstGacha()" title="解除" style="${baseBtnStyle} background-color: ${colors.reset}; color: #fff; border: 1px solid ${colors.reset};">全て解除×</button>
-                    <button id="toggle-width-btn" onclick="toggleWidthMode()" style="${getToggleStyle(isNarrowMode, colors.width)}">幅変更</button>
+                    <button id="toggle-width-btn" onclick="toggleWidthMode()" style="${getToggleStyle(isNarrowMode, colors.width)}">横幅圧縮</button>
                     ${separatorHtml}
                     <button id="toggle-find-info-btn" onclick="toggleFindInfo()" style="${getToggleStyle(findActive, colors.find)}">Find</button>
                     <button id="mode-toggle-btn" onclick="toggleAppMode()" style="${getToggleStyle(simActive, colors.sim)}">Sim</button>
@@ -211,5 +211,18 @@ function applyDirectId() {
         } else {
             alert("無効なガチャIDです。");
         }
+    }
+}
+
+/**
+ * 幅変更ボタンのイベントハンドラ
+ */
+function toggleWidthMode() {
+    // グローバル変数 isNarrowMode を反転
+    isNarrowMode = !isNarrowMode;
+    
+    // テーブルの再生成（既存の generateRollsTable を呼び出す）
+    if (typeof generateRollsTable === 'function') {
+        generateRollsTable();
     }
 }
