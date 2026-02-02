@@ -61,7 +61,7 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     }
 
     // テーブル外枠の構築開始
-    let html = `<div class="table-horizontal-wrapper" style="display: flex; width: 100%;">`;
+    let html = `<div class="table-horizontal-wrapper" style="display: flex; width: auto; justify-content: flex-start;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
     html += `<table class="${narrowClass}" style="table-layout: auto; width: auto; max-width: 100%;"><thead>`;
 

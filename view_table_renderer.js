@@ -48,7 +48,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
                 sideHtml += renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap);
             } else {
                 // text-align: left, font-size: 12px
-                sideHtml += `<td class="gacha-cell gacha-column guaranteed-cell" style="border: 1px solid #ddd; background: #eee; font-size:12px; text-align:left;">-</td>`;
+                sideHtml += `<td class="gacha-cell gacha-column guaranteed-cell" style="border: 1px solid #ddd; background: #eee; text-align:left;">-</td>`;
             }
         }
     });
@@ -60,7 +60,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
  */
 function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap) {
     // font-size: 12px を指定し、クラス guaranteed-cell を追加
-    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; font-size: 12px; padding: 0; text-align: left;';
+    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left;';
     if (isSimulationMode && guarHighlightMap.get(seedIndex) === id) {
         cellStyle += `background-color: #66b2ff;`;
     } else {

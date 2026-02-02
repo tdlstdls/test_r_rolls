@@ -136,7 +136,7 @@ th, td {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    min-width: 100%;
+    /* min-width: 100%; を解除 */
 }
 
 th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; box-shadow: 0 1px 0 #ddd; }
@@ -196,31 +196,14 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
 }
 
 /* 圧縮時の文字サイズ調整（視認性確保のため） */
-.narrow-mode .gacha-cell .char-link {
-    font-size: 10px !important; /* 文字を少し小さく */
-    display: block;
-    line-height: 1.1;
-}
-
-.narrow-mode .guaranteed-cell {
-    font-size: 10px !important;
+.narrow-mode .gacha-cell:not(.guaranteed-cell) .char-link {
+    font-size: 11px !important; /* 文字を少し小さく */
 }
 
 /* 圧縮時、ヘッダーのボタン類を縦に並べるか折り返す設定 */
 .narrow-mode .gacha-column div[style*="display:flex"] {
     flex-wrap: wrap !important;
     gap: 1px !important;
-}
-
-/* 確定(G)列のフォントサイズは12pxを維持（前回のご要望） */
-.narrow-mode .guaranteed-cell .char-link,
-.narrow-mode .guaranteed-cell .cell-addr {
-    font-size: 12px !important;
-}
-
-/* 通常セルのフォントは圧縮時のみ少し下げる */
-.narrow-mode .gacha-cell:not(.guaranteed-cell) .char-link {
-    font-size: 11px !important;
 }
 
 .highlight { position: relative; }
