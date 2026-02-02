@@ -1,57 +1,84 @@
-/** @file view_table_dom.js @description テーブルのDOM構造構築（操作パネル・ボタン統一版） */
+/** @file view_table_dom.js @description テーブルのDOM構造構築（操作パネル・Txt表示統合版：完全版） */
 
 // グローバル変数の追加（他の場所で定義されていれば）
 let isNarrowMode = false;
 
 /**
  * テーブルDOM構築のメイン
+ * @param {number} numRolls - 表示行数
+ * @param {Array} columnConfigs - 列設定
+ * @param {Array} tableData - 計算済みデータ
+ * @param {Array} seeds - 乱数配列
+ * @param {Map} highlightMap - ハイライト
+ * @param {Map} guarHighlightMap - 確定枠ハイライト
+ * @param {string} findAreaHtml - Find（伝説枠等）のHTML
+ * @param {string} masterInfoHtml - キャラリストのHTML
+ * @param {string} txtRouteHtml - Txtモードの解析結果HTML（新規追加）
+ * @param {string} simNoticeHtml - Simモードの操作ガイドHTML（新規追加）
  */
-function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml) {
+function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml, txtRouteHtml = '', simNoticeHtml = '') {
     const totalTrackSpan = calculateTotalTrackSpan();
     const fullTableColSpan = 2 + totalTrackSpan * 2;
     const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
 
     const currentSeedVal = document.getElementById('seed')?.value || '-';
 
-    // モード判定用
+    // 各種モード判定
     const findActive = (typeof showFindInfo !== 'undefined' && showFindInfo);
     const simActive = (typeof isSimulationMode !== 'undefined' && isSimulationMode);
     const skdActive = (typeof isScheduleMode !== 'undefined' && isScheduleMode);
     const descActive = (typeof isDescriptionMode !== 'undefined' && isDescriptionMode);
 
+    // --- SimコントロールUI（操作パネル）の生成 ---
+    let simControlsHtml = '';
+    if (simActive) {
+        const txtActive = (typeof isTxtMode !== 'undefined' && isTxtMode);
+        // Txtボタンのスタイル
+        const txtActiveStyle = txtActive 
+            ? 'background-color: #fd7e14; color: #fff; border: 1px solid #fd7e14; font-weight: bold;' 
+            : 'background-color: #fff; color: #fd7e14; border: 1px solid #fd7e14;';
+
+        simControlsHtml = `
+            <div id="sim-control-wrapper" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 6px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
+                <button onclick="openSimConfigModal()" style="font-size: 11px; background: #17a2b8; color: white; border: none; padding: 3px 10px; border-radius: 3px; cursor: pointer; font-weight: bold;">テキスト入力</button>
+                <input type="hidden" id="sim-config" value="${(typeof lastSimConfig !== 'undefined') ? lastSimConfig : ''}">
+                <button onclick="backSimConfig()" style="font-size: 11px; min-width: 45px; padding: 2px 5px;">Back</button>
+                <button onclick="clearSimConfig()" style="font-size: 11px; padding: 2px 5px;">Clear</button>
+                
+                <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>
+                
+                <label style="font-size: 0.8em; color: #555;">MaxPlat:</label>
+                <input type="number" id="sim-max-plat" value="${(typeof lastMaxPlat !== 'undefined') ? lastMaxPlat : '0'}" min="0" max="5" style="width: 35px; font-size: 0.9em; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
+                <label style="font-size: 0.8em; color: #555; margin-left: 2px;">MaxG:</label>
+                <input type="number" id="sim-max-guar" value="${(typeof lastMaxGuar !== 'undefined') ? lastMaxGuar : '0'}" min="0" max="5" style="width: 35px; font-size: 0.9em; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
+                
+                <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>
+
+                <button id="toggle-txt-btn" onclick="toggleTxtMode()" style="font-size: 11px; padding: 2px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s; ${txtActiveStyle}">Txt</button>
+                
+                <div id="sim-error-msg" style="font-size: 11px; color: #dc3545; margin-left: 10px; font-weight: bold;"></div>
+            </div>`;
+    }
+
+    // テーブル外枠の構築開始
     let html = `<div class="table-horizontal-wrapper" style="display: flex; width: 100%;">`;
-    
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
     html += `<table class="${narrowClass}" style="table-layout: auto; width: auto; max-width: 100%;"><thead>`;
 
-    // ボタンの共通ベーススタイル
+    // 共通ボタンスタイル
     const baseBtnStyle = "font-size: 11px; padding: 2px 4px; min-width: 70px; height: 24px; box-sizing: border-box; text-align: center; cursor: pointer; border-radius: 4px; transition: all 0.2s;";
-    
-    // トグル状態に応じたスタイルを生成するヘルパー関数
-    const getToggleStyle = (isActive, activeColor) => {
-        if (isActive) {
-            return `${baseBtnStyle} background-color: ${activeColor}; color: #fff; border: 1px solid ${activeColor}; font-weight: bold;`;
-        } else {
-            return `${baseBtnStyle} background-color: #fff; color: ${activeColor}; border: 1px solid ${activeColor};`;
-        }
-    };
+    const getToggleStyle = (isActive, activeColor) => isActive 
+        ? `${baseBtnStyle} background-color: ${activeColor}; color: #fff; border: 1px solid ${activeColor}; font-weight: bold;` 
+        : `${baseBtnStyle} background-color: #fff; color: ${activeColor}; border: 1px solid ${activeColor};`;
 
-    // 各機能のテーマカラー
     const colors = {
-        seed: "#6c757d",      // グレー（設定系）
-        add: "#28a745",       // 緑（追加・ポジティブ）
-        skdAdd: "#17a2b8",    // シアン（スケジュール連携）
-        idAdd: "#545b62",     // ダークグレー（直接入力）
-        reset: "#dc3545",     // 赤（解除・危険）
-        width: "#218838",     // 濃い緑（レイアウト）
-        find: "#007bff",      // 青（検索・プライマリ）
-        sim: "#fd7e14",       // オレンジ（シミュレーション・警告色）
-        skd: "#6f42c1",       // 紫（スケジュール・特殊）
-        desc: "#20c997"       // ターコイズ（情報・概要）
+        seed: "#6c757d", add: "#28a745", skdAdd: "#17a2b8", idAdd: "#545b62", reset: "#dc3545",
+        width: "#218838", find: "#007bff", sim: "#fd7e14", skd: "#6f42c1", desc: "#20c997"
     };
 
     const separatorHtml = `<span style="border-left: 1px solid #ccc; height: 16px; margin: 0 5px;"></span>`;
 
+    // ヘッダー1行目（メインボタン群）
     html += `
         <tr>
             <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 8px; border-bottom: 1px solid #ddd; text-align: left;">
@@ -59,23 +86,17 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
                     <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
                     <button onclick="toggleSeedInput()" style="${baseBtnStyle} background-color: #fff; color: ${colors.seed}; border: 1px solid ${colors.seed};">SEED値変更</button>
-                    
                     ${separatorHtml}
-                    
                     <span style="font-weight: bold; font-size: 12px; color: #333;">列操作：</span>
                     <button onclick="addGachaColumn()" style="${baseBtnStyle} background-color: ${colors.add}; color: #fff; border: 1px solid ${colors.add};">＋列を追加</button>
                     <button style="${baseBtnStyle} background-color: ${colors.skdAdd}; color: #fff; border: 1px solid ${colors.skdAdd};" onclick="addGachasFromSchedule()">skdで追加</button>
                     <button id="add-id-trigger" style="${baseBtnStyle} background-color: ${colors.idAdd}; color: #fff; border: 1px solid ${colors.idAdd};" onclick="showIdInput()">IDで追加</button>
                     <button onclick="resetToFirstGacha()" title="解除" style="${baseBtnStyle} background-color: ${colors.reset}; color: #fff; border: 1px solid ${colors.reset};">全て解除×</button>
                     <button id="toggle-width-btn" onclick="toggleWidthMode()" style="${getToggleStyle(isNarrowMode, colors.width)}">幅変更</button>
-                    
                     ${separatorHtml}
-
                     <button id="toggle-find-info-btn" onclick="toggleFindInfo()" style="${getToggleStyle(findActive, colors.find)}">Find</button>
                     <button id="mode-toggle-btn" onclick="toggleAppMode()" style="${getToggleStyle(simActive, colors.sim)}">Sim</button>
-                    
                     ${separatorHtml}
-
                     <button id="toggle-schedule-btn" onclick="toggleSchedule()" style="${getToggleStyle(skdActive, colors.skd)}">skd</button>
                     <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
                 </div>
@@ -84,13 +105,13 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
         <tr id="find-result-row">
             <th colspan="${fullTableColSpan}" style="background: #f8f9fa; text-align: left; font-weight: normal; padding: 4px 8px; border-bottom: 1px solid #ddd;">
                 <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto;">
-                    ${findAreaHtml || '<div style="color:#999;">Findボタンを押すとここにターゲット情報が表示されます。</div>'}
-                    ${masterInfoHtml}
-                </div>
+                    ${simControlsHtml} ${txtRouteHtml}     ${simNoticeHtml}    ${findAreaHtml || (simActive ? '' : '<div style="color:#999;">Findボタンを押すとここにターゲット情報が表示されます。</div>')} ${masterInfoHtml}   </div>
             </th>
         </tr>`;
 
-    html += `<tr>
+    // ヘッダー（トラック名、NO、SEED等）
+    html += `
+        <tr>
             <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd; font-weight: bold;">A</th>
             <th class="col-no"></th>
@@ -114,51 +135,28 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
         </tr>
     </thead><tbody>`;
 
+    // テーブル本体のデータ行描画
     for (let i = 0; i < numRolls; i++) {
         const seedIndexA = i * 2, seedIndexB = i * 2 + 1;
         html += `<tr>${renderTableRowSide(i, seedIndexA, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, true)}`;
         html += `${renderTableRowSide(i, seedIndexB, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, false)}</tr>`;
     }
 
-    html += `<tr><td colspan="${fullTableColSpan}" style="padding: 10px; text-align: center;">
-        <div style="margin-bottom: 10px;">
-            <button onclick="addMoreRolls()">+100行</button>
-            <button id="toggle-seed-btn" class="secondary" onclick="toggleSeedColumns()">${showSeedColumns ? 'SEED非表示' : 'SEED表示'}</button>
-        </div>
-        <div id="seed-calc-explanation" class="${showSeedColumns ? '' : 'hidden'}" style="text-align: left; margin-top: 20px;">
-            ${typeof generateSeedExplanationHtml === 'function' ? generateSeedExplanationHtml() : ''}
-        </div>
-    </td></tr></tbody></table>`;
-    
-    // 4. 右側の余白を吸収するスペーサーを追加
-    html += `<div class="table-spacer" style="flex-grow: 1; background: transparent;"></div>`;
-    html += `</div>`; // .table-horizontal-wrapper の終了
+    // フッター（行追加ボタン、SEED説明）
+    html += `
+        <tr><td colspan="${fullTableColSpan}" style="padding: 10px; text-align: center;">
+            <div style="margin-bottom: 10px;">
+                <button onclick="addMoreRolls()">+100行</button>
+                <button id="toggle-seed-btn" class="secondary" onclick="toggleSeedColumns()">${showSeedColumns ? 'SEED非表示' : 'SEED表示'}</button>
+            </div>
+            <div id="seed-calc-explanation" class="${showSeedColumns ? '' : 'hidden'}" style="text-align: left; margin-top: 20px;">
+                ${typeof generateSeedExplanationHtml === 'function' ? generateSeedExplanationHtml() : ''}
+            </div>
+        </td></tr></tbody></table>
+        <div class="table-spacer" style="flex-grow: 1; background: transparent;"></div>
+    </div>`;
     
     return html;
-}
-
-/**
- * ガチャID入力フォームの表示
- * ボタンがクリックされたら、ボタンの中身を input 要素に書き換えます
- */
-function showIdInput() {
-    const trigger = document.getElementById('add-id-trigger');
-    if (!trigger) return;
-
-    // ボタンのクリックイベントを一時的に解除し、中身を書き換え
-    trigger.onclick = null;
-    trigger.innerHTML = `<input type="text" id="direct-id-input" placeholder="ID" style="width:50px; font-size:10px; border:none; outline:none; padding:0; margin:0; background:transparent; color:white; text-align:center;" onkeydown="if(event.key==='Enter') applyDirectId()">`;
-    
-    const input = document.getElementById('direct-id-input');
-    input.focus();
-
-    // フォーカスが外れたら元のボタン表示に戻す
-    input.onblur = () => { 
-        setTimeout(() => { 
-            trigger.innerText = 'IDで追加';
-            trigger.onclick = showIdInput; 
-        }, 200); 
-    };
 }
 
 /**
@@ -174,6 +172,27 @@ function calculateTotalTrackSpan() {
         }
     });
     return calcColSpan + gachaColSpan;
+}
+
+/**
+ * ガチャID入力フォームの表示
+ */
+function showIdInput() {
+    const trigger = document.getElementById('add-id-trigger');
+    if (!trigger) return;
+
+    trigger.onclick = null;
+    trigger.innerHTML = `<input type="text" id="direct-id-input" placeholder="ID" style="width:50px; font-size:10px; border:none; outline:none; padding:0; margin:0; background:transparent; color:white; text-align:center;" onkeydown="if(event.key==='Enter') applyDirectId()">`;
+    
+    const input = document.getElementById('direct-id-input');
+    input.focus();
+
+    input.onblur = () => { 
+        setTimeout(() => { 
+            trigger.innerText = 'IDで追加';
+            trigger.onclick = showIdInput; 
+        }, 200); 
+    };
 }
 
 /**
@@ -194,6 +213,3 @@ function applyDirectId() {
         }
     }
 }
-
-
-

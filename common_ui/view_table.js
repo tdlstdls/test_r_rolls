@@ -1,18 +1,12 @@
 /**
  * @file view_table.js
  * @description テーブル描画のメインオーケストレータ。計算・ハイライト・DOM構築を統合
- * @managed_state currentTableData (計算済み全行データ)
- * @dependency view_table_data.js, view_table_highlight.js, view_table_dom.js
  */
 
 const COLOR_ROUTE_HIGHLIGHT = '#aaddff';
 const COLOR_ROUTE_UBER = '#66b2ff';
 let currentTableData = null;
 
-/**
- * テーブル描画のメインエントリーポイント
- * ガチャデータの計算、Find予報エリア、および結果テーブルの構築を制御します。
- */
 function generateRollsTable() {
     try {
         if (Object.keys(gachaMasterData.gachas).length === 0) return;
@@ -35,50 +29,46 @@ function generateRollsTable() {
         const columnConfigs = prepareColumnConfigs();
         const tableData = executeTableSimulation(numRolls, columnConfigs, seeds);
 
-        // シミュレーション（ルート）のデータ取得
-        // logicPathMap: Txtモードの不整合チェック用（全経路）
-        // highlightMap / guarHighlightMap: テーブルの背景色用
         const { highlightMap, guarHighlightMap, logicPathMap, lastSeedValue } = preparePathHighlightMaps(initialSeed, seeds, numRolls);
         finalSeedForUpdate = lastSeedValue;
 
-        // --- HTML構築開始 ---
-        let finalContainerHtml = '';
-
-        // 1. FindエリアのHTMLを準備
+        // --- パーツごとのHTMLを準備 ---
+        
+        // 1. Findエリア
         let findAreaHtml = '';
         if (typeof generateFastForecast === 'function') {
             findAreaHtml = generateFastForecast(initialSeed, columnConfigs);
         }
 
-        // 2. 【修正】マスター情報のHTMLを準備 (直接 finalContainerHtml に足さない)
+        // 2. マスター情報
         let masterInfoHtml = '';
         if (typeof generateMasterInfoHtml === 'function' && showFindInfo && isMasterInfoVisible) {
-            // 後で識別・更新できるように ID="master-info-area" を持たせたままにします
             masterInfoHtml = `<div id="master-info-area" style="margin-top: 5px; padding-top: 5px;">${generateMasterInfoHtml()}</div>`;
         }
 
-        // --- Txt（テキストルートビュー）モードの表示 ---
-        // logicPathMap を追加で渡すことで、テーブルのハイライトとは独立して経路チェックを行います
-        if (isTxtMode && isSimulationMode) {
-            if (typeof generateTxtRouteView === 'function') {
-                const txtViewHtml = generateTxtRouteView(seeds, initialSeed, highlightMap, guarHighlightMap, logicPathMap);
-                if (!txtViewHtml.includes("ルートが入力されていません")) {
-                    finalContainerHtml += txtViewHtml;
-                }
+        // 3. Txt（テキストルートビュー）
+        let txtRouteHtml = '';
+        if (isTxtMode && isSimulationMode && typeof generateTxtRouteView === 'function') {
+            const html = generateTxtRouteView(seeds, initialSeed, highlightMap, guarHighlightMap, logicPathMap);
+            if (!html.includes("ルートが入力されていません")) {
+                txtRouteHtml = html;
             }
         }
 
-        // Simモード時の操作ガイド
+        // 4. 操作ガイド（※表のキャラ名をタップすると...）
+        let simNoticeHtml = '';
         if (isSimulationMode) {
-            finalContainerHtml += `
+            simNoticeHtml = `
                 <div id="sim-auto-calc-notice" style="font-size: 0.75em; color: #666; padding: 5px 10px; background: #fff; border-left: 3px solid #007bff; margin: 5px 0;">
                     ※表のキャラ名をタップするとそのセルまでのルートを自動計算します。
                 </div>`;
         }
 
-        // 3. 【修正】buildTableDOM に findAreaHtml と masterInfoHtml の両方を渡す
+        // --- 最終的なDOM構築 ---
+        let finalContainerHtml = '';
         if (typeof buildTableDOM === 'function') {
-            finalContainerHtml += buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml);
+            // 全てのパーツを buildTableDOM に渡して、適切な位置に配置させる
+            finalContainerHtml += buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml, txtRouteHtml, simNoticeHtml);
         }
 
         const container = document.getElementById('rolls-table-container');
@@ -86,7 +76,6 @@ function generateRollsTable() {
             container.innerHTML = finalContainerHtml;
         }
 
-        // 【重要】ここで textContent を設定すると中身が消えるため、styleのみ変更します
         const resultDiv = document.getElementById('result');
         if (resultDiv) {
             resultDiv.style.display = 'block';

@@ -65,8 +65,8 @@ function initializeDefaultGachas() {
  * モード変更時の共通処理
  */
 function onModeChange() {
-    updateModeButtonState();
     refreshModeView();
+    updateModeButtonState();
 }
 
 /**
@@ -105,17 +105,14 @@ function updateModeButtonState() {
         else btnSim.classList.remove('active');
     }
     
-    // Txtボタンとコピーボタン
+    // Txtボタン
     const btnTxt = document.getElementById('toggle-txt-btn');
-    const btnCopy = document.getElementById('copy-txt-btn');
     
     if (btnTxt) {
         if (isTxtMode && isSimulationMode) {
             btnTxt.classList.add('active');
-            if (btnCopy) btnCopy.classList.remove('hidden');
         } else {
             btnTxt.classList.remove('active');
-            if (btnCopy) btnCopy.classList.add('hidden');
         }
     }
 }
@@ -124,17 +121,27 @@ function updateModeButtonState() {
  * モードに応じたコントロールエリアの表示制御とテーブル再描画
  */
 function refreshModeView() {
-    const simWrapper = document.getElementById('sim-control-wrapper');
-    if (simWrapper) {
-        // スケジュールモードや概要モードでない、かつSimモードが有効な場合のみ表示
-        if (isSimulationMode && !isScheduleMode && !isDescriptionMode) {
-            simWrapper.classList.remove('hidden');
-        } else {
-            simWrapper.classList.add('hidden');
-        }
-    }
-    // テーブルの再生成を実行してTxtビューの表示有無を反映させる
     resetAndGenerateTable();
+}
+
+/**
+ * シミュレーションルートをクリップボードにコピーする
+ * 不適切な要素（操作ガイド等）ではなく、ルート文字列(#sim-config)を正確に取得します
+ */
+function copyTxtToClipboard() {
+    const configInput = document.getElementById('sim-config');
+    const routeText = configInput ? configInput.value : "";
+    
+    if (routeText && routeText.trim() !== "") {
+        navigator.clipboard.writeText(routeText).then(() => {
+            // 成功時のフィードバックが必要な場合はここで実行
+            console.log("Route copied to clipboard: " + routeText);
+        }).catch(err => {
+            console.error("Failed to copy route: ", err);
+        });
+    } else {
+        alert("コピーするルートがありません。");
+    }
 }
 
 /**
@@ -144,7 +151,6 @@ function toggleDescription() {
     const content = document.getElementById('description-content');
     const toggle = document.getElementById('toggle-description');
     const tableContainer = document.getElementById('rolls-table-container');
-    const simWrapper = document.getElementById('sim-control-wrapper');
     const resultDiv = document.getElementById('result');
     const mainControls = document.getElementById('main-controls');
     const scheduleContainer = document.getElementById('schedule-container');
@@ -156,10 +162,6 @@ function toggleDescription() {
         }
         if (toggle) toggle.classList.add('active');
         if (tableContainer) tableContainer.classList.add('hidden');
-        if (simWrapper) simWrapper.classList.add('hidden');
-        // Findの結果（resultDiv）は概要表示中も残すか、あるいは明示的に制御する
-        // ここではボタンの下に移動したため、概要表示時は隠す設定のままでOKですが
-        // Findと概要を同時に見たい場合はここをコメントアウトします。
         if (resultDiv) resultDiv.classList.add('hidden');
         if (mainControls) mainControls.classList.add('hidden');
         if (scheduleContainer) scheduleContainer.classList.add('hidden');
@@ -176,16 +178,9 @@ function toggleDescription() {
         if (toggle) toggle.classList.remove('active');
         if (content) {
             content.classList.add('hidden');
-            content.style.flexGrow = '';
-            content.style.overflowY = '';
-            content.style.height = '';
-            content.style.minHeight = '';
-            content.style.maxHeight = '';
-            content.style.webkitOverflowScrolling = '';
         }
         if (tableContainer) tableContainer.classList.remove('hidden');
         if (mainControls) mainControls.classList.remove('hidden');
-        if (isSimulationMode && simWrapper) simWrapper.classList.remove('hidden');
         if (showResultDisplay && resultDiv) resultDiv.classList.remove('hidden');
     }
 }
@@ -194,7 +189,6 @@ function toggleDescription() {
  * ルート入力用のモーダルを開く
  */
 function openSimConfigModal() {
-    // 既存の隠し入力欄から現在の値を取得
     const configInput = document.getElementById('sim-config');
     const currentConfig = configInput ? configInput.value : "";
     
@@ -212,7 +206,6 @@ function openSimConfigModal() {
             </div>
         </div>
     `;
-    // common_ui/ui_modal_service.js の機能を使用して表示
     showModal(contentHtml); 
 }
 
@@ -225,11 +218,9 @@ function applyModalSimConfig() {
     
     if (configInput) {
         configInput.value = inputVal;
-        
-        // データの更新を実行
         if (typeof updateUrlParams === 'function') updateUrlParams();
-        if (typeof resetAndGenerateTable === 'function') resetAndGenerateTable();
+        resetAndGenerateTable();
     }
     
-    closeModal(); // モーダルを閉じる
+    closeModal(); 
 }
