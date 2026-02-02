@@ -116,7 +116,7 @@ th, td {
     text-align: left; /* centerから変更 */
     white-space: nowrap;
     box-sizing: border-box;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 /* 操作パネルのスタイル（従来通りの表示を保証） */
@@ -274,7 +274,7 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
 /* =========================================
    モバイル用・高密度表示レイアウト
    ========================================= */
-/*@media (max-width: 768px) { 
+@media (max-width: 768px) { 
  html, body { height: 100%; margin: 0; padding: 0 !important; overflow: hidden; }
  .container { height: 100%; display: flex; flex-direction: column; padding: 4px; box-sizing: border-box; }
  .header-row, .controls, .description-box, #result, .forecast-summary-container { flex-shrink: 0; }
@@ -293,7 +293,7 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
  #seed, #sim-config { max-width: 120px; }
  button { padding: 3px 8px; font-size: 11px; height: 24px; line-height: 1; }
  table { font-size: 10px; margin-top: 5px; }
- th, td { padding: 2px 3px; height: auto; }
+ th, td { padding: 2px 3px; height: auto; font-size: 9px; }
  .gacha-column { min-width: 85px; max-width: 100px; overflow: hidden; }  
  .gacha-header-wrapper { gap: 2px; justify-content: flex-start !important; width: 100%; }
  th div[style*="margin-top"] { transform: scale(0.85); transform-origin: center top; width: 115%; margin-left: -7.5%; white-space: nowrap; }
@@ -306,7 +306,7 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
  .gantt-bar { height: 16px !important; top: 4px !important; font-size: 9px !important; }
  .gantt-date-cell { font-size: 9px !important; }
  #result { font-size: 10px; }
-}*/
+}
 
 /* =========================================
    SEED計算説明エリア（フォントサイズ調整版）
