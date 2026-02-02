@@ -63,7 +63,11 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     // テーブル外枠の構築開始
     let html = `<div class="table-horizontal-wrapper" style="display: flex; width: auto; justify-content: flex-start;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
-    html += `<table class="${narrowClass}" style="table-layout: auto; width: auto; max-width: 100%;"><thead>`;
+    
+    // 圧縮モード時はテーブル自体の style に table-layout: fixed を直接注入するのも有効
+    const tableStyle = isNarrowMode ? "table-layout: fixed; width: auto;" : "table-layout: auto; width: auto;";
+    
+    html += `<table class="${narrowClass}" style="${tableStyle}"><thead>`;
 
     // 共通ボタンスタイル
     const baseBtnStyle = "font-size: 11px; padding: 2px 4px; min-width: 70px; height: 24px; box-sizing: border-box; text-align: center; cursor: pointer; border-radius: 4px; transition: all 0.2s;";
@@ -78,11 +82,14 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
 
     const separatorHtml = `<span style="border-left: 1px solid #ccc; height: 16px; margin: 0 5px;"></span>`;
 
+    // ヘッダー内のボタンエリアも、圧縮モード時はフォントサイズを下げる
+    const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
+
     // ヘッダー1行目（メインボタン群）
     html += `
         <tr>
             <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 8px; border-bottom: 1px solid #ddd; text-align: left;">
-                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 8px;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle}">
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
                     <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
                     <button onclick="toggleSeedInput()" style="${baseBtnStyle} background-color: #fff; color: ${colors.seed}; border: 1px solid ${colors.seed};">SEED値変更</button>
