@@ -6,13 +6,18 @@ function generateFastForecast(initialSeed, columnConfigs) {
     const requiredSeeds = extendedScanRows * 2 + 10;
     const seeds = generateSeedsForForecast(initialSeed, requiredSeeds);
     
-    const visibilityClass = (typeof showFindInfo !== 'undefined' && showFindInfo) ? '' : 'hidden';
+    // showFindInfo のチェックは呼び出し側（view_table.js）で行うため、
+    // ここでは純粋に中身のHTMLを生成します
     const specialSlots = getSpecialSlotsInfo(seeds, scanRows * 2);
     const specialTargetStatus = getAvailableSpecialTargets(columnConfigs);
     
-    let summaryHtml = `<div id="forecast-summary-area" class="forecast-summary-container ${visibilityClass}" style="margin-bottom: 0; padding: 10px; background: #fdfdfd; border: 1px solid #ddd; border-bottom: none; border-radius: 4px 4px 0 0;">`;
+    // スタイル調整：下部の境界線を繋げるため、margin-bottomを0にし、border-radiusを調整
+    let summaryHtml = `<div id="forecast-summary-area" class="forecast-summary-container" style="padding: 10px; background: #fdfdfd; border: 1px solid #ddd; border-bottom: none; border-radius: 4px 4px 0 0; margin-top: 10px;">`;
+    
+    // ヘッダー（伝説枠・昇格枠・Target Listのラベル等）
     summaryHtml += generateForecastHeader(specialSlots, specialTargetStatus);
 
+    // 各ガチャの出現位置リスト
     columnConfigs.forEach((config) => {
         if (!config) return;
         const gachaHtml = processGachaForecast(config, seeds, scanRows, extendedScanRows);

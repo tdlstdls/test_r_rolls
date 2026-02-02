@@ -43,17 +43,18 @@ function generateRollsTable() {
 
         // --- HTML構築開始 ---
         let finalContainerHtml = '';
-        // Find（予報・ターゲット検索）エリアの生成
-        if (typeof generateFastForecast === 'function') {
-            finalContainerHtml += generateFastForecast(initialSeed, columnConfigs);
+
+        // 1. FindエリアのHTMLを準備
+        let findAreaHtml = '';
+        if (typeof generateFastForecast === 'function' && showFindInfo) {
+            findAreaHtml = generateFastForecast(initialSeed, columnConfigs);
         }
 
-        // ガチャのマスター詳細情報エリア
+        // 2. 【修正】マスター情報のHTMLを準備 (直接 finalContainerHtml に足さない)
+        let masterInfoHtml = '';
         if (typeof generateMasterInfoHtml === 'function' && showFindInfo && isMasterInfoVisible) {
-            finalContainerHtml += `<div id="master-info-area" style="padding: 10px; background: #fdfdfd; border: 1px solid #ddd; border-top: none; margin-top: -16px; border-radius: 0 0 4px 4px; font-size: 0.85em;">`;
-            finalContainerHtml += `<div style="border-top: 1px dashed #ccc; margin-bottom: 10px;"></div>`; 
-            finalContainerHtml += generateMasterInfoHtml();
-            finalContainerHtml += `</div>`;
+            // 後で識別・更新できるように ID="master-info-area" を持たせたままにします
+            masterInfoHtml = `<div id="master-info-area" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">${generateMasterInfoHtml()}</div>`;
         }
 
         // --- Txt（テキストルートビュー）モードの表示 ---
@@ -75,9 +76,9 @@ function generateRollsTable() {
                 </div>`;
         }
 
-        // メインテーブル本体の構築
+        // 3. 【修正】buildTableDOM に findAreaHtml と masterInfoHtml の両方を渡す
         if (typeof buildTableDOM === 'function') {
-            finalContainerHtml += buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap);
+            finalContainerHtml += buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml);
         }
 
         const container = document.getElementById('rolls-table-container');
@@ -85,10 +86,10 @@ function generateRollsTable() {
             container.innerHTML = finalContainerHtml;
         }
 
+        // 【重要】ここで textContent を設定すると中身が消えるため、styleのみ変更します
         const resultDiv = document.getElementById('result');
         if (resultDiv) {
             resultDiv.style.display = 'block';
-            resultDiv.textContent = isSimulationMode ? "Simulation Mode: Active" : "Display Mode";
         }
         
         updateUrlParams();

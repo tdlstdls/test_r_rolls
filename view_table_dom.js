@@ -6,12 +6,19 @@ let isNarrowMode = false;
 /**
  * テーブルDOM構築のメイン
  */
-function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap) {
+function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml) {
     const totalTrackSpan = calculateTotalTrackSpan();
     const fullTableColSpan = 2 + totalTrackSpan * 2;
     const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
 
     const currentSeedVal = document.getElementById('seed')?.value || '-';
+
+    // モード判定用
+    const findActive = (typeof showFindInfo !== 'undefined' && showFindInfo);
+    const simActive = (typeof isSimulationMode !== 'undefined' && isSimulationMode);
+    const skdActive = (typeof isScheduleMode !== 'undefined' && isScheduleMode);
+    const descActive = (typeof isDescriptionMode !== 'undefined' && isDescriptionMode);
+    const statusLabel = simActive ? "Simulation Mode: Active" : "Display Mode";
 
     let html = `<div class="table-horizontal-wrapper" style="display: flex; width: 100%;">`;
     
@@ -43,11 +50,6 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
         skd: "#6f42c1",       // 紫（スケジュール・特殊）
         desc: "#20c997"       // ターコイズ（情報・概要）
     };
-    
-    const findActive = (typeof showFindInfo !== 'undefined' && showFindInfo);
-    const simActive = (typeof isSimulationMode !== 'undefined' && isSimulationMode);
-    const skdActive = (typeof isScheduleMode !== 'undefined' && isScheduleMode);
-    const descActive = (typeof isDescriptionMode !== 'undefined' && isDescriptionMode);
 
     const separatorHtml = `<span style="border-left: 1px solid #ccc; height: 16px; margin: 0 5px;"></span>`;
 
@@ -79,14 +81,16 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
                     <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
                 </div>
             </th>
-        </tr>`;
-
-    // Find結果表示用の行
-    html += `
-        <tr id="find-result-row" class="${findActive ? '' : 'hidden'}">
+        </tr>
+        <tr id="find-result-row">
             <th colspan="${fullTableColSpan}" style="background: #fff; padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-weight: normal;">
                 <div id="result" class="result-box" style="font-size: 11px;">
-                    </div>
+                    <div style="font-weight:bold; color:#007bff; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:12px;">${statusLabel}</div>
+                    
+                    ${findAreaHtml || '<div style="color:#999;">Findボタンを押すとここにターゲット情報が表示されます。</div>'}
+                    
+                    ${masterInfoHtml}
+                </div>
             </th>
         </tr>`;
 

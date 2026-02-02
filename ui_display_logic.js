@@ -54,13 +54,10 @@ function toggleMasterInfo() {
         }
     }
 
-    // コンテナ要素（master-info-area）の表示状態を直接制御
-    const content = document.getElementById('master-info-area');
-    if (content) {
-        content.style.display = isMasterInfoVisible ? 'block' : 'none';
-    }
+    // 【削除】content.style.display = ... の処理は不要になったため削除します
+    // テーブルの再生成時に view_table.js 側のロジックで判定されるためです
 
-    // テーブル生成フローの中でHTML構造を再構築
+    // テーブル全体を再生成して表示状態を反映
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
     }
