@@ -82,10 +82,9 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
             </th>
         </tr>
         <tr id="find-result-row">
-            <th colspan="${fullTableColSpan}" style="background: #fff; text-align: left; font-weight: normal; max-width: 0; padding-top: 8px;">
-                <div id="result" class="result-box" style="font-size: 11px;">
+            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; text-align: left; font-weight: normal; padding: 4px 8px; border-bottom: 1px solid #ddd;">
+                <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto;">
                     ${findAreaHtml || '<div style="color:#999;">Findボタンを押すとここにターゲット情報が表示されます。</div>'}
-                    
                     ${masterInfoHtml}
                 </div>
             </th>

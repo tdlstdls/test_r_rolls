@@ -18,7 +18,7 @@ function generateForecastHeader(slots, status) {
             </div>
         </div>
         ${showFindInfo ? `
-        <div style="margin-bottom: 10px; text-align: left;">
+        <div style="margin: 5px 0; text-align: left;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                 <span onclick="clearAllTargets()" class="text-btn" title="全て非表示">×</span>
                 <span class="separator">|</span>

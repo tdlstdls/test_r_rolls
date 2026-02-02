@@ -54,7 +54,7 @@ function generateRollsTable() {
         let masterInfoHtml = '';
         if (typeof generateMasterInfoHtml === 'function' && showFindInfo && isMasterInfoVisible) {
             // 後で識別・更新できるように ID="master-info-area" を持たせたままにします
-            masterInfoHtml = `<div id="master-info-area" style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">${generateMasterInfoHtml()}</div>`;
+            masterInfoHtml = `<div id="master-info-area" style="margin-top: 5px; padding-top: 5px;">${generateMasterInfoHtml()}</div>`;
         }
 
         // --- Txt（テキストルートビュー）モードの表示 ---
