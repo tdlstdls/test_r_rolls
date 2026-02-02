@@ -23,7 +23,7 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     let html = `<div class="table-horizontal-wrapper" style="display: flex; width: 100%;">`;
     
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
-    html += `<table class="${narrowClass}" style="table-layout: auto; width: auto; min-width: max-content;"><thead>`;
+    html += `<table class="${narrowClass}" style="table-layout: auto; width: auto; max-width: 100%;"><thead>`;
 
     // ボタンの共通ベーススタイル
     const baseBtnStyle = "font-size: 11px; padding: 2px 4px; min-width: 70px; height: 24px; box-sizing: border-box; text-align: center; cursor: pointer; border-radius: 4px; transition: all 0.2s;";
@@ -83,7 +83,7 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
             </th>
         </tr>
         <tr id="find-result-row">
-            <th colspan="${fullTableColSpan}" style="background: #fff; padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-weight: normal;">
+            <th colspan="${fullTableColSpan}" style="background: #fff; padding: 10px; border-bottom: 1px solid #ddd; text-align: left; font-weight: normal; max-width: 0;">
                 <div id="result" class="result-box" style="font-size: 11px;">
                     <div style="font-weight:bold; color:#007bff; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px; font-size:12px;">${statusLabel}</div>
                     

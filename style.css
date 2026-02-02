@@ -68,15 +68,18 @@ button.active { background: #28a745; }
 .hidden { display: none !important; }
 .description-box { background: #e9ecef; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
 .result-box {
-    position: static; /* 固定を解除 */
+    position: static;
     width: auto;
-    max-height: 400px; /* 内容が長い場合に備えて */
-    overflow-y: auto;  /* スクロール可能に */
+    max-height: 400px;
+    overflow-y: auto;
     margin: 10px 0;
     border: 1px solid #ddd;
     background: #f9f9f9;
     padding: 8px;
-    display: block;    /* hidden解除時に正しく表示 */
+    display: block;
+    white-space: normal;
+    word-break: break-all;
+    overflow-x: hidden;
 }
 .error { color: red; font-weight: bold; }
 
