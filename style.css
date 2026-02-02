@@ -142,20 +142,10 @@ th, td {
 
 th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; box-shadow: 0 1px 0 #ddd; }
 
-/* 3行目（A/Bヘッダー）を最上部に固定 */
-.sticky-ab-row th {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    background-color: #f8f9fa;
-    border-bottom: none;
-}
-
-/* 4行目（ガチャ名称行）をA/B行の下に固定 */
-/* A/B行の高さを約30pxとして計算。環境に合わせて微調整してください */
+/* ガチャ名称行を最上部に固定 */
 .sticky-row th {
     position: sticky;
-    top: 28px; 
+    top: 0; 
     z-index: 30;
     background-color: #f8f9fa;
     box-shadow: 0 2px 2px rgba(0,0,0,0.1);
@@ -318,10 +308,6 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
  #master-info-area {
     white-space: normal;
     word-break: break-all;
- }
-
- .sticky-row th {
-    top: 0px; /* モバイルでのA/B行の高さに合わせて調整 */
  }
 }
 
