@@ -116,6 +116,7 @@ th, td {
     text-align: left; /* centerから変更 */
     white-space: nowrap;
     box-sizing: border-box;
+    font-size: 10px;
 }
 
 /* 操作パネルのスタイル（従来通りの表示を保証） */
@@ -184,6 +185,11 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     line-height: 1.2;
 }
 
+/* 確定枠はフォントを少し小さく */
+.guaranteed-cell {
+    font-size: 9px !important;
+}
+
 /* 【強化】横幅圧縮モードの定義 */
 .narrow-mode {
     /* ブラウザの自動計算を捨て、指定幅を強制するモード */
@@ -198,7 +204,6 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     min-width: 80px !important;
     max-width: 80px !important;
     padding: 2px 1px !important;
-    font-size: 10px !important; /* iPhoneでフォントが膨らむのを防ぐサイズ */
     overflow: hidden; /* はみ出した文字を隠す */
 }
 
@@ -209,18 +214,11 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     overflow: hidden;
     text-overflow: ellipsis; /* 長い名前は「...」にする */
     white-space: nowrap;
-    font-size: 10px !important;
 }
 
 /* 確定枠(G列)の調整 */
 .narrow-mode .guaranteed-cell {
-    font-size: 9px !important;
     padding: 1px !important;
-}
-
-/* 圧縮モード時のNO列のフォントサイズ調整 */
-.narrow-mode .col-no {
-    font-size: 10px !important;
 }
 
 /* 圧縮モード時、確定枠内のテキストは...にせず折り返す */
