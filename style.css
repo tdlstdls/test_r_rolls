@@ -184,26 +184,49 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     line-height: 1.2;
 }
 
-/* 【修正】横幅圧縮モード（幅を半分：170px / 2 = 85px） */
+/* 【強化】横幅圧縮モードの定義 */
+.narrow-mode {
+    /* ブラウザの自動計算を捨て、指定幅を強制するモード */
+    table-layout: fixed !important; 
+    width: auto !important;
+    min-width: 0 !important; /* max-content指定を解除 */
+}
+
 .narrow-mode .gacha-column,
 .narrow-mode .gacha-cell {
-    width: 85px !important;      /* 半分の幅に設定 */
-    min-width: 85px !important;
-    max-width: 85px !important;
-    padding: 2px 3px !important;
+    width: 80px !important; /* 少し余裕を持たせて80px */
+    min-width: 80px !important;
+    max-width: 80px !important;
+    padding: 2px 1px !important;
+    font-size: 10px !important; /* iPhoneでフォントが膨らむのを防ぐサイズ */
+    overflow: hidden; /* はみ出した文字を隠す */
+}
+
+/* セル内のリンク文字が押し広げるのを防ぐ */
+.narrow-mode .char-link {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 長い名前は「...」にする */
+    white-space: nowrap;
+    font-size: 10px !important;
+}
+
+/* 確定枠(G列)の調整 */
+.narrow-mode .guaranteed-cell {
+    font-size: 9px !important;
+    padding: 1px !important;
+}
+
+/* 圧縮モード時のNO列のフォントサイズ調整 */
+.narrow-mode .col-no {
+    font-size: 10px !important;
+}
+
+/* 圧縮モード時、確定枠内のテキストは...にせず折り返す */
+.narrow-mode .guaranteed-cell .char-link {
+    display: inline !important;
     white-space: normal !important;
-    word-break: break-all !important;
-}
-
-/* 圧縮時の文字サイズ調整（視認性確保のため） */
-.narrow-mode .gacha-cell:not(.guaranteed-cell) .char-link {
-    font-size: 11px !important; /* 文字を少し小さく */
-}
-
-/* 圧縮時、ヘッダーのボタン類を縦に並べるか折り返す設定 */
-.narrow-mode .gacha-column div[style*="display:flex"] {
-    flex-wrap: wrap !important;
-    gap: 1px !important;
 }
 
 .highlight { position: relative; }
