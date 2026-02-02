@@ -20,10 +20,10 @@
                 <button onclick="copySeedToClipboard()" class="secondary" style="padding: 1px 6px; font-size: 11px;">Copy</button>
                 <button onclick="cancelSeedInput()" class="secondary" style="padding: 1px 6px; font-size: 11px;">×</button>
             </div>
-            <div class="control-group hidden" id="sim-control-wrapper" style="margin-bottom: 0; display: flex; align-items: center; flex-wrap: wrap; width: 100%;">
+            <div id="sim-control-wrapper" class="control-group hidden" style="margin-bottom: 0; display: flex; align-items: center; flex-wrap: wrap; width: 100%;">
                 <div style="display: flex; align-items: center; width: 100%; gap: 5px; flex-wrap: wrap;">
-                    <label for="sim-config" style="font-size:0.9em;">ルート:</label>
-                    <input type="text" id="sim-config" placeholder="e.g. 1006 4 942 11g" onchange="updateUrlParams(); resetAndGenerateTable();" style="flex-grow: 1; min-width: 150px;">
+                    <button onclick="openSimConfigModal()" style="font-size: 11px; background: #17a2b8; color: white; border: none; padding: 2px 10px; border-radius: 3px; cursor: pointer;">テキスト入力</button>
+                    <input type="hidden" id="sim-config">
                     <button onclick="backSimConfig()" style="font-size: 11px; min-width: 40px;">Back</button>
                     <button onclick="clearSimConfig()" style="font-size: 11px;">Clear</button>
                     <label style="font-size: 0.8em; margin-left: 5px;">MaxPlat:</label>

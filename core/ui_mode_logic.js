@@ -189,3 +189,47 @@ function toggleDescription() {
         if (showResultDisplay && resultDiv) resultDiv.classList.remove('hidden');
     }
 }
+
+/**
+ * ルート入力用のモーダルを開く
+ */
+function openSimConfigModal() {
+    // 既存の隠し入力欄から現在の値を取得
+    const configInput = document.getElementById('sim-config');
+    const currentConfig = configInput ? configInput.value : "";
+    
+    const contentHtml = `
+        <div style="font-family: sans-serif;">
+            <h3 style="margin-top: 0; font-size: 15px; color: #17a2b8;">シミュレーションルート入力</h3>
+            <p style="font-size: 11px; color: #666; margin-bottom: 10px;">ルートを入力してください (例: 1006 4 942 11g)</p>
+            <textarea id="modal-sim-config-input" 
+                style="width: 100%; height: 100px; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; font-size: 12px;"
+                placeholder="1006 4 942 11g"
+            >${currentConfig}</textarea>
+            <div style="margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="closeModal()" style="padding: 5px 15px; border: 1px solid #ccc; background: #fff; cursor: pointer; border-radius: 4px; font-size: 12px;">キャンセル</button>
+                <button onclick="applyModalSimConfig()" style="padding: 5px 15px; border: none; background: #17a2b8; color: #fff; cursor: pointer; border-radius: 4px; font-size: 12px;">反映</button>
+            </div>
+        </div>
+    `;
+    // common_ui/ui_modal_service.js の機能を使用して表示
+    showModal(contentHtml); 
+}
+
+/**
+ * モーダルで入力された値を反映する
+ */
+function applyModalSimConfig() {
+    const inputVal = document.getElementById('modal-sim-config-input').value.trim();
+    const configInput = document.getElementById('sim-config');
+    
+    if (configInput) {
+        configInput.value = inputVal;
+        
+        // データの更新を実行
+        if (typeof updateUrlParams === 'function') updateUrlParams();
+        if (typeof resetAndGenerateTable === 'function') resetAndGenerateTable();
+    }
+    
+    closeModal(); // モーダルを閉じる
+}
