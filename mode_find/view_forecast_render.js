@@ -10,20 +10,15 @@ function generateForecastHeader(slots, status) {
     const pStr = slots.promotedSlots.length > 0 ? slots.promotedSlots.join(", ") : "なし";
 
     return `
-        <div style="font-size: 1.15em; display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; margin-bottom: 5px;">
-            <div style="display: flex; align-items: baseline; gap: 5px;">
-                <span style="font-weight:bold; color:#e91e63; background:#ffe0eb; padding:2px 5px; border-radius:3px; white-space: nowrap;">伝説枠</span>
-                <span style="font-family: monospace;">${lStr}</span>
-            </div>
-            <span style="color: #ccc;">/</span>
-            <div style="display: flex; align-items: baseline; gap: 5px;">
-                <span style="font-weight:bold; color:#9c27b0; background:#f3e5f5; padding:2px 5px; border-radius:3px; white-space: nowrap;">昇格枠</span>
-                <span style="font-family: monospace;">${pStr}</span>
-            </div>
+        <div style="font-size: 1.15em; margin-bottom: 5px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.4; text-align: left;">
+            <span style="font-weight:bold; color:#e91e63;">(伝説枠)</span>
+            <span style="font-family: monospace; margin-right: 10px;">${lStr}</span>
+            <span style="font-weight:bold; color:#9c27b0;">(昇格枠)</span>
+            <span style="font-family: monospace;">${pStr}</span>
         </div>
         ${showFindInfo ? `
         <div style="margin: 8px 0; text-align: left;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
                 <span onclick="clearAllTargets()" class="text-btn" style="font-size: 1.3em; cursor:pointer;" title="全て非表示">×</span>
                 <span class="separator">|</span>
                 <span onclick="toggleLegendTargets()" class="${status.isLegendActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">伝説</span>
@@ -37,7 +32,6 @@ function generateForecastHeader(slots, status) {
                 <span onclick="toggleRareTargets()" class="${status.isRareActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">レア</span>
                 <span class="separator">|</span>
                 <span id="toggle-master-info-btn" onclick="toggleMasterInfo()" class="${status.isMasterActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">マスター</span>
-                <span style="font-size: 1.0em; color: #666; margin-left: auto;">Target List</span>
             </div>
             <div style="font-size: 1.0em; color: #666; padding-left: 2px; line-height: 1.5;">
                 ※キャラ名をタップで追跡ON/OFF。×で削除。右のアドレスをタップでルート探索。
