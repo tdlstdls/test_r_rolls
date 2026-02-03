@@ -1,5 +1,10 @@
 /** @file view_forecast_core.js @description Find機能のメインエントリーポイント */
 
+// ガチャごとの開閉状態を管理するSet (閉じているガチャのIDを保持)
+if (typeof collapsedGachaIds === 'undefined') {
+    var collapsedGachaIds = new Set();
+}
+
 function generateFastForecast(initialSeed, columnConfigs) {
     const scanRows = 2000;
     const extendedScanRows = 10000;

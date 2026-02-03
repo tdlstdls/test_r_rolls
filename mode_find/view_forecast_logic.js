@@ -27,14 +27,17 @@ function getSpecialSlotsInfo(seeds, limit) {
     return { legendSlots, promotedSlots };
 }
 
+// 初期化が完了したかどうかを記録するフラグ（ファイル上部に追記）
+let isFindDefaultStateInitialized = false;
+
 /**
- * 特殊カテゴリ（伝説・限定・超激）の利用可能状況と現在の表示状態を取得
+ * 特殊カテゴリの利用可能状況取得と初期状態の設定
  */
 function getAvailableSpecialTargets(columnConfigs) {
     const processedGachaIds = new Set();
     let availableLegendIds = [];
     let availableLimitedIds = [];
-    let availableUberIds = []; 
+    let availableUberIds = [];
     const limitedSet = getLimitedSet();
 
     columnConfigs.forEach((config) => {
@@ -44,7 +47,6 @@ function getAvailableSpecialTargets(columnConfigs) {
         if (config.pool.legend) config.pool.legend.forEach(c => availableLegendIds.push(c.id));
         if (config.pool.uber) {
             config.pool.uber.forEach(c => {
-                // 限定キャラは超激リストから除外（限定カテゴリで扱うため）
                 if (!limitedSet.has(c.id) && !limitedSet.has(String(c.id))) {
                     availableUberIds.push(c.id);
                 }
@@ -58,10 +60,19 @@ function getAvailableSpecialTargets(columnConfigs) {
         });
     });
 
-    // 全てのボタン状態を「非表示（hidden）になっていないか」で判定するよう統一
+    // --- 初回のみ超激レアをデフォルトOFFに設定 ---
+    if (!isFindDefaultStateInitialized && availableUberIds.length > 0) {
+        availableUberIds.forEach(id => {
+            hiddenFindIds.add(id);
+            hiddenFindIds.add(String(id));
+        });
+        isFindDefaultStateInitialized = true;
+    }
+
     return {
         isLegendActive: availableLegendIds.length > 0 && availableLegendIds.some(id => !hiddenFindIds.has(id)),
         isLimitedActive: availableLimitedIds.length > 0 && availableLimitedIds.some(id => !hiddenFindIds.has(id)),
+        // 超激のActive判定も hiddenFindIds に基づくように修正
         isUberActive: availableUberIds.length > 0 && availableUberIds.some(id => !hiddenFindIds.has(id)),
         isMasterActive: (typeof isMasterInfoVisible !== 'undefined') ? isMasterInfoVisible : false,
         availableLegendIds,
@@ -150,15 +161,9 @@ function updateResultMap(resultMap, char, rarity, n, limitedSet, missingTargets)
  */
 function isAutomaticTarget(id) {
     const cid = String(id);
-    // 新キャラ
     if (cid.startsWith('sim-new-')) return true;
-    // 限定キャラ
     if (typeof limitedCats !== 'undefined' && (limitedCats.includes(id) || limitedCats.includes(parseInt(id)))) return true;
-    
     const cat = gachaMasterData.cats[id];
-    if (!cat) return false;
-    
-    // 伝説レア または 超激レアを自動抽出対象に含める
-    // これにより、ボタンONで「選択（next）」エリアに並ぶようになります
-    return cat.rarity === 'legend' || cat.rarity === 'uber';
+    // 伝説レア、または超激レアを候補リストの自動抽出対象とする
+    return cat && (cat.rarity === 'legend' || cat.rarity === 'uber');
 }

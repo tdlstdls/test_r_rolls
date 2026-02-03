@@ -33,15 +33,20 @@ function toggleUberTargets() {
     const status = getAvailableSpecialTargets(columnConfigs);
     const ids = status.availableUberIds;
 
-    // hiddenFindIds を使って表示状態を管理するように統一
+    // status.isUberActive は logic.js での修正により hiddenFindIds に基づいています
     if (status.isUberActive) {
-        // 現在ONなら -> すべて非表示リストへ追加
-        ids.forEach(id => hiddenFindIds.add(id));
+        // ON -> OFF : 非表示リスト(hiddenFindIds)に追加する
+        ids.forEach(id => {
+            hiddenFindIds.add(id);
+            hiddenFindIds.add(String(id));
+        });
     } else {
-        // 現在OFFなら -> 非表示リストから削除して表示させる
-        ids.forEach(id => hiddenFindIds.delete(id));
+        // OFF -> ON : 非表示リストから削除して表示させる
+        ids.forEach(id => {
+            hiddenFindIds.delete(id);
+            hiddenFindIds.delete(String(id));
+        });
     }
-    
     if (typeof generateRollsTable === 'function') generateRollsTable();
 }
 
@@ -81,36 +86,44 @@ function prioritizeChar(id) {
 }
 
 /**
- * 「選択（next）」エリアでキャラがクリックされた時の処理
- * キャラをターゲットリストに追加し、詳細表示側へ反映させる。
- * ルート検索（スクロール）はここでは行わず、ターゲットリストのアドレスクリック時に任せる。
+ * 「選択（next）」エリアでのキャラクリック処理（トグル動作）
  */
 function selectTargetAndHighlight(id, gachaId, address) {
-    // IDの型を調整
     const cid = (typeof id === 'string' && id.startsWith('sim-new-')) ? id : (isNaN(id) ? id : parseInt(id));
     
-    // 1. ターゲット状態を更新（追跡リストへ追加）
-    userTargetIds.add(cid);
-    hiddenFindIds.delete(cid); // 念のため非表示設定も解除
-    
-    // 2. 検索ターゲットリスト（UI上部のタグ用）にも同期
-    if (typeof searchTargets !== 'undefined' && !searchTargets.some(t => String(t.id) === String(cid))) {
-        const cat = gachaMasterData.cats[cid];
-        searchTargets.push({
-            id: String(cid),
-            name: cat ? cat.name : cid,
-            rarity: cat ? cat.rarity : 'uber'
-        });
+    // すでに追跡対象（ターゲットリスト）に含まれているか判定
+    const isAlreadyTarget = userTargetIds.has(cid);
+
+    if (isAlreadyTarget) {
+        // --- 解除処理 ---
+        userTargetIds.delete(cid);
+        // 上部のタグリスト (searchTargets) からも削除
+        if (typeof searchTargets !== 'undefined') {
+            searchTargets = searchTargets.filter(t => String(t.id) !== String(cid));
+        }
+    } else {
+        // --- 追加処理 ---
+        userTargetIds.add(cid);
+        hiddenFindIds.delete(cid); // 非表示リストに入っていた場合は解除
+        hiddenFindIds.delete(String(cid));
+        
+        // 上部のタグリストへ追加（ui_target_view用）
+        if (typeof searchTargets !== 'undefined' && !searchTargets.some(t => String(t.id) === String(cid))) {
+            const cat = gachaMasterData.cats[cid];
+            searchTargets.push({
+                id: String(cid),
+                name: cat ? cat.name : cid,
+                rarity: cat ? cat.rarity : 'uber'
+            });
+        }
     }
 
-    // 3. UIの再描画
-    // これにより、選択エリアのキャラが黄色くハイライトされ、
-    // 上部の Target List エリアに詳細情報が表示されるようになります
+    // UIの再描画
     if (typeof updateTargetListUI === 'function') updateTargetListUI();
     if (typeof generateRollsTable === 'function') generateRollsTable();
 
-    // 4. アドレスが渡されている場合のみルート検索を実行（現在は選択エリアからは null が渡される設定）
-    if (address && address !== "9999+") {
+    // アドレスが渡されている場合のみルート検索を実行（選択エリアからは基本 null が渡されます）
+    if (!isAlreadyTarget && address && address !== "9999+") {
         const isB = address.startsWith('B');
         const rowMatch = address.match(/\d+/);
         const row = rowMatch ? parseInt(rowMatch[0], 10) : 0;
@@ -120,4 +133,16 @@ function selectTargetAndHighlight(id, gachaId, address) {
             onGachaCellClick(sIdx, gachaId, catName, null, true, cid);
         }
     }
+}
+
+/**
+ * ガチャごとの表示/非表示（[+]/[-]）を切り替える
+ */
+function toggleGachaCollapse(gachaId) {
+    if (collapsedGachaIds.has(gachaId)) {
+        collapsedGachaIds.delete(gachaId);
+    } else {
+        collapsedGachaIds.add(gachaId);
+    }
+    if (typeof generateRollsTable === 'function') generateRollsTable();
 }

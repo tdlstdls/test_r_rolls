@@ -26,11 +26,12 @@ function clearAllTargets() {
     const columnConfigs = prepareColumnConfigs();
     const status = getAvailableSpecialTargets(columnConfigs);
 
-    // 2. 伝説・限定をOFFにする（hiddenFindIds に追加）
+    // 2. 全ての候補（伝説・限定・超激）をOFFにする（hiddenFindIds に追加）
     status.availableLegendIds.forEach(id => hiddenFindIds.add(id));
     status.availableLimitedIds.forEach(id => hiddenFindIds.add(id));
+    status.availableUberIds.forEach(id => hiddenFindIds.add(id)); // 超激も候補から隠す
 
-    // 3. 超激をOFFにし、その他手動追加されたターゲットもすべてクリア
+    // 3. すでに追跡中のターゲットもすべてクリア
     userTargetIds.clear();
 
     // 4. 優先表示リストをクリア
