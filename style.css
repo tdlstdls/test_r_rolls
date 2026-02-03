@@ -10,27 +10,19 @@ html, body {
     overflow: visible; /* auto から visible へ */
     -webkit-text-size-adjust: 100%;
 }
-body { font-family: "Helvetica Neue", Arial, sans-serif; padding: 20px; box-sizing: border-box; color: #333; background-color: #fff; display: flex; flex-direction: column; }
-
-.container {
-    height: auto; /* 固定ではなく中身に合わせる */
-    min-height: 100%;
-    display: inline-block; /* blockから変更：幅が中身（テーブル）の幅まで広がるようになる */
-    min-width: 100%; /* 最低でも画面幅、中身が大きければそれ以上 */
-}
+body { font-family: "Helvetica Neue", Arial, sans-serif; padding: 10px 15px; box-sizing: border-box; color: #333; background-color: #fff; }
 
 /* =========================================
    ヘッダー
    ========================================= */
 .header-row, 
-.controls, 
 .description-box, 
 #result, 
 .forecast-summary-container,
 #table-global-controls {
     flex-shrink: 0;
-    width: auto; /* 100%指定を解除 */
-    min-width: 100%; /* 親要素の幅いっぱいに広がる */
+    width: auto;
+    min-width: 100%;
     box-sizing: border-box;
 }
 
@@ -42,16 +34,6 @@ h1 { font-size: 20px; margin: 0; padding: 0; white-space: nowrap; }
 .text-btn:hover { color: #0056b3; background-color: #f0f8ff; border-radius: 3px; }
 .text-btn.active { color: #28a745; text-decoration: none; border: 1px solid #28a745; border-radius: 3px; padding: 1px 3px; }
 .separator { color: #ccc; font-size: 0.8em; margin: 0 2px; user-select: none; }
-
-/* =========================================
-   コントロールエリア
-   ========================================= */
-.controls { background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-.control-group { margin-bottom: 10px; }
-.control-group:last-child { margin-bottom: 0; }
-label { margin-right: 10px; font-weight: bold; }
-input[type="text"],
-input[type="number"] { padding: 5px; border: 1px solid #ccc; border-radius: 4px; }
 
 /* =========================================
    ボタン（通常）
@@ -144,12 +126,12 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
 
 /* ガチャ名称行を最上部に固定 */
 .sticky-row th {
-    position: -webkit-sticky; /* Safari対策 */
+    position: -webkit-sticky; /* iPhone/Safari対策 */
     position: sticky;
     top: 0; 
-    z-index: 100; /* 十分に高い値に設定 */
-    background-color: #f8f9fa; /* 背景色がないと下の文字が透けます */
-    border-bottom: 2px solid #ddd !important;
+    z-index: 100 !important; /* 他の要素より手前に */
+    background-color: #f8f9fa !important; /* 透け防止 */
+    border-bottom: 2px solid #ccc !important; /* 境界線を太くして固定感を出す */
 }
 
 /* 修正: A/Bトラック名(3行目)も固定したい場合は以下を追加 */
@@ -177,11 +159,12 @@ table {
 /* NO列など中央揃えを維持したい箇所のみ上書き */
 .col-no { text-align: center !important; background-color: #f8f9fa; width: 30px; z-index: 40 !important; }
 
-/* 固定行かつ固定列の場合は、さらに上のレイヤーにする */
-.sticky-row th.col-no,
-.sticky-ab-row th.col-no {
-    z-index: 55 !important;
+/* NO列（横固定）と名称（縦固定）が重なる角のセルを最前面に */
+.sticky-row th.col-no {
+    z-index: 110 !important;
+    left: 0;
 }
+
 .calc-column { background-color: #f0f8ff; font-size: 0.9em; color: #555; }
 /* 通常時の列幅設定（既存の 170px を維持） */
 .gacha-column, 
@@ -194,6 +177,7 @@ table {
     white-space: normal !important;
     word-break: break-all !important;
     line-height: 1.2;
+    font-size: 14px;
 }
 
 /* 【強化】横幅圧縮モードの定義 */
@@ -206,11 +190,12 @@ table {
 
 .narrow-mode .gacha-column,
 .narrow-mode .gacha-cell {
-    width: 80px !important; /* 少し余裕を持たせて80px */
-    min-width: 80px !important;
-    max-width: 80px !important;
+    width: 60px !important; /* 少し余裕を持たせて80px */
+    min-width: 60px !important;
+    max-width: 60px !important;
     padding: 2px 1px !important;
     overflow: hidden; /* はみ出した文字を隠す */
+    font-size: 10px;
 }
 
 /* セル内のリンク文字が押し広げるのを防ぐ */
@@ -281,115 +266,6 @@ table {
 .gantt-grid-line { position: absolute; top: 0; bottom: 0; border-right: 1px solid #f5f5f5; z-index: 0; }
 .gantt-grid-line.weekend { background-color: rgba(224, 247, 250, 0.3); }
 .gantt-current-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: #ff0000; z-index: 1; opacity: 0.7; pointer-events: none; }
-
-/* =========================================
-   モバイル用・高密度表示レイアウト
-   ========================================= */
-@media (max-width: 768px) { 
- html, body { height: 100%; margin: 0; padding: 0 !important; overflow: hidden; }
- .container { height: 100%; display: flex; flex-direction: column; padding: 4px; box-sizing: border-box; }
- .header-row, .controls, .description-box, #result, .forecast-summary-container { flex-shrink: 0; }
- .header-row { flex-direction: row !important; flex-wrap: nowrap !important; overflow-x: auto; align-items: center; padding-bottom: 5px; border-bottom: 1px solid #eee; margin-bottom: 5px; white-space: nowrap; }
- h1 { font-size: 16px !important; margin-right: 8px; display: inline-block; }
- .header-actions { width: auto; flex-wrap: nowrap; gap: 4px; }
- .text-btn { font-size: 11px; padding: 2px 3px; }
- .header-actions button, .header-actions span:not(.text-btn):not(.separator) { font-size: 10px !important; padding: 2px 6px !important; height: 24px; line-height: 20px; }
- #rolls-table-container { flex-grow: 1; max-height: none !important; margin-bottom: 0 !important; overflow-y: auto; border-bottom: none; width: 100%; }
- #schedule-container { flex-grow: 1; overflow-y: auto; padding-bottom: 0; width: 100%; max-width: 100vw; box-sizing: border-box; } 
- .schedule-scroll-wrapper { max-height: none !important; width: 100%; }
- .controls { padding: 8px; margin-bottom: 5px; }
- .control-group { margin-bottom: 4px; display: flex; flex-wrap: wrap; align-items: center; }
- label { font-size: 10px; margin-right: 5px; }
- input[type="text"], input[type="number"], select { font-size: 11px; padding: 2px 4px; height: 24px; }
- #seed, #sim-config { max-width: 120px; }
- button { padding: 3px 8px; font-size: 11px; height: 24px; line-height: 1; }
- table { font-size: 10px; margin-top: 5px; }
- th, td { padding: 2px 3px; height: auto; font-size: 9px; }
- .gacha-column { width: 120px !important; min-width: 120px !important; max-width: 120px !important; overflow: hidden; }  
- .gacha-header-wrapper { gap: 2px; justify-content: flex-start !important; width: 100%; }
- th div[style*="margin-top"] { transform: scale(0.85); transform-origin: center top; width: 115%; margin-left: -7.5%; white-space: nowrap; }
- .gacha-cell { line-height: 1.1; }
- 
- /* モバイル時の横幅圧縮モードはさらに細く */
- .narrow-mode .gacha-column,
- .narrow-mode .gacha-cell {
-    width: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
- }
- .calc-column { font-size: 9px; width: auto; }
- .schedule-table th, .schedule-table td { padding: 2px 4px; font-size: 10px; }  
- .schedule-table td:nth-child(3) { min-width: 140px; }
- .gantt-row { height: 24px !important; }
- .gantt-label-col { width: 100px !important; min-width: 100px !important; font-size: 10px !important; line-height: 24px !important; padding: 0 2px !important; }
- .gantt-bar { height: 16px !important; top: 4px !important; font-size: 9px !important; }
- .gantt-date-cell { font-size: 9px !important; }
- #result { font-size: 10px; }
- 
- #master-info-area {
-    white-space: normal;
-    word-break: break-all;
- }
-}
-
-/* =========================================
-   SEED計算説明エリア（フォントサイズ調整版）
-   ========================================= */
-.seed-explanation-container {
-    margin: 25px auto;
-    padding: 25px;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-left: 6px solid #17a2b8;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    max-width: 100%;
-    box-sizing: border-box;
-    white-space: normal;
-    overflow-wrap: break-word;
-    word-break: normal;
-}
-
-.seed-explanation-container h4 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.4em; /* タイトルを大きく */
-}
-
-.explanation-content {
-    font-size: 1.15em; /* 全体のフォントサイズを大きく調整（旧0.95em） */
-    line-height: 1.7;
-    color: #222;
-}
-
-.seed-explanation-container ul, 
-.seed-explanation-container ol {
-    margin: 10px 0;
-}
-
-.seed-explanation-container ul li {
-    margin-bottom: 12px;
-}
-
-/* リンクやヒントの強調 */
-.seed-explanation-container strong {
-    color: #111;
-}
-
-/* モバイル対応の調整 */
-/*@media (max-width: 768px) {
-    .seed-explanation-container {
-        padding: 15px;
-        margin: 15px 4px;
-        border-left-width: 4px;
-    }
-    .explanation-content {
-        font-size: 1.05em;
-    }
-    .seed-explanation-container h4 {
-        font-size: 1.25em;
-    }
-}*/
 
 /* style.css に追記 */
 .track-header {

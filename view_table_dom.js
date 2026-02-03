@@ -16,6 +16,9 @@ let isNarrowMode = false;
  * @param {string} txtRouteHtml - Txtモードの解析結果HTML（新規追加）
  * @param {string} simNoticeHtml - Simモードの操作ガイドHTML（新規追加）
  */
+/**
+ * テーブルDOM構築のメイン (修正版: #find-result-rowを削除し、ボタンエリアへ統合)
+ */
 function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml, txtRouteHtml = '', simNoticeHtml = '') {
     const totalTrackSpan = calculateTotalTrackSpan();
     const fullTableColSpan = 2 + totalTrackSpan * 2;
@@ -29,11 +32,10 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     const skdActive = (typeof isScheduleMode !== 'undefined' && isScheduleMode);
     const descActive = (typeof isDescriptionMode !== 'undefined' && isDescriptionMode);
 
-    // --- SimコントロールUI（操作パネル）の生成 ---
+    // SimコントロールUIの生成
     let simControlsHtml = '';
     if (simActive) {
         const txtActive = (typeof isTxtMode !== 'undefined' && isTxtMode);
-        // Txtボタンのスタイル
         const txtActiveStyle = txtActive 
             ? 'background-color: #fd7e14; color: #fff; border: 1px solid #fd7e14; font-weight: bold;' 
             : 'background-color: #fff; color: #fd7e14; border: 1px solid #fd7e14;';
@@ -44,32 +46,23 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
                 <input type="hidden" id="sim-config" value="${(typeof lastSimConfig !== 'undefined') ? lastSimConfig : ''}">
                 <button onclick="backSimConfig()" style="font-size: 11px; min-width: 45px; padding: 2px 5px;">Back</button>
                 <button onclick="clearSimConfig()" style="font-size: 11px; padding: 2px 5px;">Clear</button>
-                
                 <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>
-                
                 <label style="font-size: 0.8em; color: #555;">MaxPlat:</label>
                 <input type="number" id="sim-max-plat" value="${(typeof lastMaxPlat !== 'undefined') ? lastMaxPlat : '0'}" min="0" max="5" style="width: 35px; font-size: 0.9em; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
                 <label style="font-size: 0.8em; color: #555; margin-left: 2px;">MaxG:</label>
                 <input type="number" id="sim-max-guar" value="${(typeof lastMaxGuar !== 'undefined') ? lastMaxGuar : '0'}" min="0" max="5" style="width: 35px; font-size: 0.9em; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
-                
                 <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>
-
                 <button id="toggle-txt-btn" onclick="toggleTxtMode()" style="font-size: 11px; padding: 2px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s; ${txtActiveStyle}">Txt</button>
-                
                 <div id="sim-error-msg" style="font-size: 11px; color: #dc3545; margin-left: 10px; font-weight: bold;"></div>
             </div>`;
     }
 
-
-    // 修正: display: flex のラッパーが sticky を阻害するため、構造を単純化
-    let html = `<div class="table-container-inner" style="width: fit-content;">`;
-    
+    let html = `<div class="table-horizontal-wrapper" style="display: block; width: fit-content;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
-    const tableStyle = "border-spacing: 0; width: auto;"; // border-collapse: separate は CSS側で
+    const tableStyle = isNarrowMode ? "table-layout: fixed; width: auto;" : "table-layout: auto; width: auto;";
     
     html += `<table class="${narrowClass}" style="${tableStyle}"><thead>`;
 
-    // 共通ボタンスタイル
     const baseBtnStyle = "font-size: 11px; padding: 2px 4px; min-width: 70px; height: 24px; box-sizing: border-box; text-align: center; cursor: pointer; border-radius: 4px; transition: all 0.2s;";
     const getToggleStyle = (isActive, activeColor) => isActive 
         ? `${baseBtnStyle} background-color: ${activeColor}; color: #fff; border: 1px solid ${activeColor}; font-weight: bold;` 
@@ -81,15 +74,13 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     };
 
     const separatorHtml = `<span style="border-left: 1px solid #ccc; height: 16px; margin: 0 5px;"></span>`;
-
-    // ヘッダー内のボタンエリアも、圧縮モード時はフォントサイズを下げる
     const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
 
-    // ヘッダー1行目（メインボタン群）
+    // ヘッダー1行目（統合版）
     html += `
         <tr>
-            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 8px; border-bottom: 1px solid #ddd; text-align: left;">
-                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle}">
+            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle} margin-bottom: 6px;">
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
                     <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
                     <button onclick="toggleSeedInput()" style="${baseBtnStyle} background-color: #fff; color: ${colors.seed}; border: 1px solid ${colors.seed};">SEED値変更</button>
@@ -107,16 +98,15 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
                     <button id="toggle-schedule-btn" onclick="toggleSchedule()" style="${getToggleStyle(skdActive, colors.skd)}">skd</button>
                     <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
                 </div>
-            </th>
-        </tr>
-        <tr id="find-result-row">
-            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; text-align: left; font-weight: normal; padding: 4px 8px; border-bottom: 1px solid #ddd;">
                 <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto;">
-                    ${simControlsHtml} ${txtRouteHtml}     ${simNoticeHtml}    ${findAreaHtml || (simActive ? '' : '<div style="color:#999;">Findボタンを押すとここにターゲット情報が表示されます。</div>')} ${masterInfoHtml}   </div>
+                    ${simControlsHtml} ${txtRouteHtml} ${simNoticeHtml} ${findAreaHtml || ''} ${masterInfoHtml}
+                </div>
             </th>
         </tr>`;
 
-    // ヘッダー（トラック名、NO、SEED等）
+    // 2行目（以前の #find-result-row）は削除されました
+
+    // トラック名(A/B)行以降
     html += `
         <tr>
             <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
