@@ -24,22 +24,24 @@ function toggleLimitedTargets() {
     if (typeof generateRollsTable === 'function') generateRollsTable();
 }
 
+/**
+ * 超激レアボタンのトグル処理
+ * 伝説・限定と同じく、候補リスト（選択エリア）への表示・非表示を切り替える
+ */
 function toggleUberTargets() {
     const columnConfigs = prepareColumnConfigs();
     const status = getAvailableSpecialTargets(columnConfigs);
     const ids = status.availableUberIds;
 
-    // isUberActiveは、userTargetIdsにIDが一つでもあればtrueになる
+    // hiddenFindIds を使って表示状態を管理するように統一
     if (status.isUberActive) {
-        // ON -> OFF : userTargetIdsから全ての超激レアを削除
-        ids.forEach(id => userTargetIds.delete(id));
+        // 現在ONなら -> すべて非表示リストへ追加
+        ids.forEach(id => hiddenFindIds.add(id));
     } else {
-        // OFF -> ON : userTargetIdsに全ての超激レアを追加
-        ids.forEach(id => userTargetIds.add(id));
-        // 同時に限定もONにする（hiddenFindIdsから限定IDを削除する）
-        const limitedIds = status.availableLimitedIds;
-        limitedIds.forEach(id => hiddenFindIds.delete(id));
+        // 現在OFFなら -> 非表示リストから削除して表示させる
+        ids.forEach(id => hiddenFindIds.delete(id));
     }
+    
     if (typeof generateRollsTable === 'function') generateRollsTable();
 }
 
@@ -76,4 +78,46 @@ function prioritizeChar(id) {
     }
     
     if (typeof generateRollsTable === 'function') generateRollsTable();
+}
+
+/**
+ * 「選択（next）」エリアでキャラがクリックされた時の処理
+ * キャラをターゲットリストに追加し、詳細表示側へ反映させる。
+ * ルート検索（スクロール）はここでは行わず、ターゲットリストのアドレスクリック時に任せる。
+ */
+function selectTargetAndHighlight(id, gachaId, address) {
+    // IDの型を調整
+    const cid = (typeof id === 'string' && id.startsWith('sim-new-')) ? id : (isNaN(id) ? id : parseInt(id));
+    
+    // 1. ターゲット状態を更新（追跡リストへ追加）
+    userTargetIds.add(cid);
+    hiddenFindIds.delete(cid); // 念のため非表示設定も解除
+    
+    // 2. 検索ターゲットリスト（UI上部のタグ用）にも同期
+    if (typeof searchTargets !== 'undefined' && !searchTargets.some(t => String(t.id) === String(cid))) {
+        const cat = gachaMasterData.cats[cid];
+        searchTargets.push({
+            id: String(cid),
+            name: cat ? cat.name : cid,
+            rarity: cat ? cat.rarity : 'uber'
+        });
+    }
+
+    // 3. UIの再描画
+    // これにより、選択エリアのキャラが黄色くハイライトされ、
+    // 上部の Target List エリアに詳細情報が表示されるようになります
+    if (typeof updateTargetListUI === 'function') updateTargetListUI();
+    if (typeof generateRollsTable === 'function') generateRollsTable();
+
+    // 4. アドレスが渡されている場合のみルート検索を実行（現在は選択エリアからは null が渡される設定）
+    if (address && address !== "9999+") {
+        const isB = address.startsWith('B');
+        const rowMatch = address.match(/\d+/);
+        const row = rowMatch ? parseInt(rowMatch[0], 10) : 0;
+        const sIdx = (row - 1) * 2 + (isB ? 1 : 0);
+        const catName = gachaMasterData.cats[cid]?.name || cid;
+        if (typeof onGachaCellClick === 'function') {
+            onGachaCellClick(sIdx, gachaId, catName, null, true, cid);
+        }
+    }
 }

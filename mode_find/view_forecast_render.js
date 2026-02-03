@@ -38,7 +38,110 @@ function generateForecastHeader(slots, status) {
     `;
 }
 
-function processGachaForecast(config, seeds, scanRows, extendedScanRows) {
+
+
+/**
+ * ガチャごとの検索結果をレンダリングする
+ * @param {Object} config ガチャ設定
+ * @param {Map} resultMap 検索結果
+ * @param {boolean} isSelectionMode 「選択（next）」エリア用の簡略表示かどうか
+ */
+/**
+ * ガチャごとの検索結果をレンダリングする
+ */
+function renderGachaForecastList(config, resultMap, isSelectionMode = false) {
+    if (resultMap.size === 0) return '';
+    let allItems = Array.from(resultMap.entries()).map(([id, data]) => ({ id, ...data }));
+    
+    const rarityOrder = { 'legend': 1, 'uber': 3, 'super': 4, 'rare': 5 };
+    allItems.sort((a, b) => {
+        const getPriority = (char) => {
+            if (char.isLimited) return 2;
+            return rarityOrder[char.rarity] || 99;
+        };
+        const pA = getPriority(a), pB = getPriority(b);
+        if (pA !== pB) return pA - pB;
+        return (a.name || '').localeCompare(b.name || '');
+    });
+
+    if (isSelectionMode) {
+        const itemsHtml = allItems.map(data => {
+            const firstHit = data.hits[0] || "---";
+            // 指定の配色を適用
+            let color = '#333';
+            if (data.isLegend) color = '#9c27b0';      // 伝説: 紫
+            else if (data.isLimited) color = '#007bff'; // 限定: 青
+            else if (data.rarity === 'uber') color = '#dc3545'; // 超激: 赤
+            
+            // 選択済みの場合は背景を黄色にしてハイライト
+            const bgStyle = data.isActive ? 'background-color: #ffffcc; border-radius: 3px; padding: 0 2px;' : '';
+            
+            // クリック時はターゲット追加のみ（selectTargetAndHighlight を修正予定）
+            return `<span class="next-char-item" style="cursor:pointer; color:${color}; ${bgStyle}" onclick="selectTargetAndHighlight('${data.id}', '${config.id}', null)">${data.name} <span style="font-size:0.9em; font-family:monospace; font-weight:bold;">${firstHit}</span></span>`;
+        }).join('<span style="color:#ccc; margin:0 4px;">,</span> ');
+
+        return `
+            <div style="margin-bottom: 5px; font-size: 0.9em; line-height: 1.5;">
+                <span style="color: #666; font-weight: bold;">＜${config.name}＞</span>
+                ${itemsHtml}
+            </div>
+        `;
+    }
+
+    // ターゲットリスト（詳細表示）側も色を更新
+    const prioritizedSet = new Set(userPrioritizedTargets.map(id => String(id)));
+    const prioritizedItems = allItems.filter(item => prioritizedSet.has(String(item.id)));
+    const normalItems = allItems.filter(item => !prioritizedSet.has(String(item.id)));
+
+    let prioritizedHtml = prioritizedItems.map(data => renderTargetItem(data, config)).join('');
+    let normalHtml = normalItems.map(data => renderTargetItem(data, config)).join('');
+    let separatorHtml = (prioritizedItems.length > 0 && normalItems.length > 0) ? '<hr style="border: none; border-top: 1px dashed #ccc; margin: 4px 0;">' : '';
+
+    return `
+        <div style="margin-bottom: 8px;">
+            <div style="font-weight: bold; background: #eee; padding: 2px 5px; margin-bottom: 3px; font-size: 0.85em;">${config.name}</div>
+            <div style="font-family: monospace; font-size: 1em;">
+                ${prioritizedHtml}${separatorHtml}${normalHtml}
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * ターゲットリスト用の各アイテム描画（色を更新）
+ */
+function renderTargetItem(data, config) {
+    let color = '#333';
+    if (data.isLegend) color = '#9c27b0';       // 紫
+    else if (data.isLimited) color = '#007bff';  // 青
+    else if (data.rarity === 'uber') color = '#dc3545'; // 赤
+    
+    let nameStyle = `font-weight:bold; font-size: 0.9em; cursor:pointer; color:${color};`;
+
+    const hitLinks = data.hits.map(addr => {
+        if (addr === "9999+") return `<span style="color:#999; font-weight:normal;">${addr}</span>`;
+        const isB = addr.startsWith('B'), rowMatch = addr.match(/\d+/);
+        const row = rowMatch ? parseInt(rowMatch[0], 10) : 0;
+        const sIdx = (row - 1) * 2 + (isB ? 1 : 0);
+        // ここでのアドレスクリックは、従来どおりルート計算(onGachaCellClick)を行う
+        return `<span class="char-link" style="cursor:pointer; text-decoration:underline; margin-right:4px;" onclick="onGachaCellClick(${sIdx}, '${config.id}', '${data.name.replace(/'/g, "\\'")}', null, true, '${data.id}')">${addr}</span>`;
+    }).join("");
+
+    const otherBtn = `<span onclick="searchInAllGachas('${data.id}', '${data.name.replace(/'/g, "\\'")}')" style="cursor:pointer; margin-left:8px; color:#009688; font-size:0.8em; text-decoration:underline;" title="他ガチャを検索">other</span>`;
+    
+    return `
+        <div style="margin-bottom: 2px; line-height: 1.3;">
+            <span onclick="toggleCharVisibility('${data.id}')" style="cursor:pointer; margin-right:6px; color:#999; font-weight:bold;">×</span>
+            <span style="${nameStyle}" onclick="prioritizeChar('${data.id}')">${data.name}</span>: 
+            <span style="font-size: 0.85em; color: #555;">${hitLinks}${otherBtn}</span>
+        </div>
+    `;
+}
+
+/**
+ * データの振り分け処理を修正（選択エリアでも全キャラ表示し、状態だけ付与）
+ */
+function processGachaForecast(config, seeds, scanRows, extendedScanRows, isSelectionMode = false) {
     const targets = getTargetInfoForConfig(config);
     if (targets.ids.size === 0) return '';
 
@@ -54,100 +157,39 @@ function processGachaForecast(config, seeds, scanRows, extendedScanRows) {
         if (!resultMap.has(cid)) {
             resultMap.set(cid, {
                 name: gachaMasterData.cats[cid]?.name || cid,
-                hits: ["9999+"], isLegend: false, isNew: String(cid).startsWith('sim-new-'), isLimited: false
+                hits: ["9999+"], 
+                rarity: gachaMasterData.cats[cid]?.rarity || 'rare',
+                isLegend: (gachaMasterData.cats[cid]?.rarity === 'legend'),
+                isNew: String(cid).startsWith('sim-new-'), 
+                isLimited: false // 暫定
             });
         }
     });
 
-    return renderGachaForecastList(config, resultMap);
-}
-
-function renderGachaForecastList(config, resultMap) {
-    if (resultMap.size === 0) return '';
-    let allItems = Array.from(resultMap.entries()).map(([id, data]) => ({ id, ...data }));
-    
-    // ユーザーが優先指定したターゲットとそれ以外を分離
-    const prioritizedItems = [];
-    const normalItems = [];
+    const filteredMap = new Map();
     const prioritizedSet = new Set(userPrioritizedTargets.map(id => String(id)));
+    const manualSet = userTargetIds;
 
-    allItems.forEach(item => {
-        if (prioritizedSet.has(String(item.id))) {
-            prioritizedItems.push(item);
-        } else {
-            normalItems.push(item);
-        }
-    });
-
-    // 優先リストを userPrioritizedTargets の順に並び替え
-    prioritizedItems.sort((a, b) => {
-        return userPrioritizedTargets.indexOf(a.id) - userPrioritizedTargets.indexOf(b.id);
-    });
-
-    // 通常リストのソート（ユーザー指定の優先順位）
-    const rarityOrder = { 'legend': 1, 'uber': 3, 'super': 4, 'rare': 5 };
-    normalItems.sort((a, b) => {
-        const getPriority = (char) => {
-            if (char.isLimited) return 2; // 限定キャラ
-            return rarityOrder[char.rarity] || 99;
-        };
-        const priorityA = getPriority(a);
-        const priorityB = getPriority(b);
+    resultMap.forEach((data, id) => {
+        const isTargeted = prioritizedSet.has(String(id)) || manualSet.has(id) || manualSet.has(parseInt(id));
         
-        if (priorityA !== priorityB) {
-            return priorityA - priorityB;
+        if (isSelectionMode) {
+            // 選択モード：フィルタリングせず、ターゲット済みかどうかのフラグだけ渡す
+            filteredMap.set(id, { ...data, isActive: isTargeted });
+        } else if (isTargeted) {
+            // リストモード：ターゲット済みのものだけ表示
+            filteredMap.set(id, data);
         }
-        // 同じ優先度内では名前順などでソート
-        return (a.name || '').localeCompare(b.name || '');
     });
 
-    // HTMLを生成
-    let prioritizedHtml = prioritizedItems.map(data => renderTargetItem(data, config)).join('');
-    let normalHtml = normalItems.map(data => renderTargetItem(data, config)).join('');
-    
-    let separatorHtml = '';
-    if (prioritizedItems.length > 0 && normalItems.length > 0) {
-        separatorHtml = '<hr style="border: none; border-top: 1px dashed #ccc; margin: 4px 0;">';
-    }
-
-    return `
-        <div style="margin-bottom: 8px;">
-            <div style="font-weight: bold; background: #eee; padding: 2px 5px; margin-bottom: 3px; font-size: 0.85em;">${config.name}</div>
-            <div style="font-family: monospace; font-size: 1em;">
-                ${prioritizedHtml}
-                ${separatorHtml}
-                ${normalHtml}
-            </div>
-        </div>
-    `;
+    return renderGachaForecastList(config, filteredMap, isSelectionMode);
 }
 
-function renderTargetItem(data, config) {
-    let nameStyle = 'font-weight:bold; font-size: 0.9em; cursor:pointer;';
-    if (data.isNew) nameStyle += ' color:#007bff;';
-    else if (data.isLegend) nameStyle += ' color:#e91e63;';
-    else if (data.isLimited) nameStyle += ' color:#d35400;';
-    else nameStyle += ' color:#333;';
 
-    const hitLinks = data.hits.map(addr => {
-        if (addr === "9999+") return `<span style="color:#999; font-weight:normal;">${addr}</span>`;
-        const isB = addr.startsWith('B'), rowMatch = addr.match(/\d+/);
-        const row = rowMatch ? parseInt(rowMatch[0], 10) : 0;
-        const sIdx = (row - 1) * 2 + (isB ? 1 : 0);
-        if (row > 10000) return `<span style="margin-right:4px; color: #999; font-size: 0.9em;">${addr}</span>`;
-        return `<span class="char-link" style="cursor:pointer; text-decoration:underline; margin-right:4px;" onclick="onGachaCellClick(${sIdx}, '${config.id}', '${data.name.replace(/'/g, "\\'")}', null, true, '${data.id}')">${addr}</span>`;
-    }).join("");
 
-    const otherBtn = `<span onclick="searchInAllGachas('${data.id}', '${data.name.replace(/'/g, "\\'")}')" style="cursor:pointer; margin-left:8px; color:#009688; font-size:0.8em; text-decoration:underline;" title="他ガチャを検索">other</span>`;
-    
-    return `
-        <div style="margin-bottom: 2px; line-height: 1.3;">
-            <span onclick="toggleCharVisibility('${data.id}')" style="cursor:pointer; margin-right:6px; color:#999; font-weight:bold;">×</span>
-            <span style="${nameStyle}" onclick="prioritizeChar('${data.id}')">${data.name}</span>: 
-            <span style="font-size: 0.85em; color: #555;">${hitLinks}${otherBtn}</span>
-        </div>
-    `;
-}
+
+
+
 
 function renderGlobalSearchResults() {
     let html = `<div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #009688;">

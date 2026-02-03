@@ -19,11 +19,39 @@ function generateFastForecast(initialSeed, columnConfigs) {
 
     // FindがONの時だけ各ガチャの出現位置リストを生成
     if (showFindInfo) {
+        // --- 1. 「Target List」エリア（詳細表示）を先に生成 ---
+        let targetListHtml = '';
         columnConfigs.forEach((config) => {
             if (!config) return;
-            const gachaHtml = processGachaForecast(config, seeds, scanRows, extendedScanRows);
-            if (gachaHtml) summaryHtml += gachaHtml;
+            // 第5引数に false を渡し、選択済みキャラの詳細（全アドレス）を表示
+            targetListHtml += processGachaForecast(config, seeds, scanRows, extendedScanRows, false);
         });
+
+        if (targetListHtml) {
+            summaryHtml += `
+                <div style="margin-top: 8px; border-bottom: 1px dashed #ccc; padding-bottom: 8px;">
+                    <div style="font-weight: bold; color: #333; font-size: 0.85em; margin-bottom: 5px;">Target List</div>
+                    ${targetListHtml}
+                </div>`;
+        }
+
+        // --- 2. 「選択（next）」エリア（候補リスト）を後に生成 ---
+        let nextHtml = '';
+        columnConfigs.forEach((config) => {
+            if (!config) return;
+            // 第5引数に true を渡し、候補キャラをコンパクトに表示
+            nextHtml += processGachaForecast(config, seeds, scanRows, extendedScanRows, true);
+        });
+
+        if (nextHtml) {
+            summaryHtml += `
+                <div style="margin-top: 12px; padding: 6px; border: 1px solid #cce5ff; border-radius: 6px; background: #f8fbff;">
+                    <div style="font-weight: bold; color: #004085; font-size: 0.85em; margin-bottom: 4px; border-bottom: 1px solid #b8daff;">選択（next）</div>
+                    <div style="max-height: 150px; overflow-y: auto;">
+                        ${nextHtml}
+                    </div>
+                </div>`;
+        }
 
         if (globalSearchResults) summaryHtml += renderGlobalSearchResults();
     }
