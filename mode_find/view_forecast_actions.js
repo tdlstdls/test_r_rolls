@@ -50,6 +50,54 @@ function toggleUberTargets() {
     if (typeof generateRollsTable === 'function') generateRollsTable();
 }
 
+/**
+ * 激レアボタンのトグル処理
+ */
+function toggleSuperTargets() {
+    const columnConfigs = prepareColumnConfigs();
+    const status = getAvailableSpecialTargets(columnConfigs);
+    const ids = status.availableSuperIds;
+
+    if (status.isSuperActive) {
+        // ON -> OFF : 非表示リストに追加
+        ids.forEach(id => {
+            hiddenFindIds.add(id);
+            hiddenFindIds.add(String(id));
+        });
+    } else {
+        // OFF -> ON : 非表示リストから削除
+        ids.forEach(id => {
+            hiddenFindIds.delete(id);
+            hiddenFindIds.delete(String(id));
+        });
+    }
+    if (typeof generateRollsTable === 'function') generateRollsTable();
+}
+
+/**
+ * レアボタンのトグル処理
+ */
+function toggleRareTargets() {
+    const columnConfigs = prepareColumnConfigs();
+    const status = getAvailableSpecialTargets(columnConfigs);
+    const ids = status.availableRareIds;
+
+    if (status.isRareActive) {
+        // ON -> OFF : 非表示リストに追加
+        ids.forEach(id => {
+            hiddenFindIds.add(id);
+            hiddenFindIds.add(String(id));
+        });
+    } else {
+        // OFF -> ON : 非表示リストから削除
+        ids.forEach(id => {
+            hiddenFindIds.delete(id);
+            hiddenFindIds.delete(String(id));
+        });
+    }
+    if (typeof generateRollsTable === 'function') generateRollsTable();
+}
+
 function toggleCharVisibility(id) {
     const cid = isNaN(id) ? id : parseInt(id);
     if (hiddenFindIds.has(cid)) {

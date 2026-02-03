@@ -27,6 +27,8 @@ function getRarityColor(rarity) {
     switch (rarity) {
         case 'legend': return '#ff55cc';
         case 'uber': return '#ffaa00';
+        case 'super': return '#e67e22'; // 激レア用
+        case 'rare': return '#2ecc71';  // レア用
         case 'limited': return '#00bbff';
         default: return '#666';
     }

@@ -28,15 +28,6 @@ function generateMasterInfoHtml() {
     
     if (uniqueIds.length === 0) return '<p>ガチャが選択されていません</p>';
 
-    // --- Findターゲット判定用のセットを準備 ---
-    const limitedSet = new Set();
-    if (typeof limitedCats !== 'undefined' && Array.isArray(limitedCats)) {
-        limitedCats.forEach(id => {
-            limitedSet.add(id);
-            limitedSet.add(String(id));
-        });
-    }
-
     let html = '';
     uniqueIds.forEach(id => {
         const config = gachaMasterData.gachas[id];
@@ -85,30 +76,9 @@ function generateMasterInfoHtml() {
 
             if (count === 0 && rateVal === 0) return;
 
-            // キャラリスト生成
+            // キャラリスト生成（クリック機能やスタイル判定を削除した単純な文字列）
             const listStr = charList.map((c, idx) => {
-                const cid = c.id;
-                const cStr = String(cid);
-                
-                // --- 状態チェック ---
-                const isHidden = hiddenFindIds.has(cid) || (typeof cid === 'number' && hiddenFindIds.has(cid));
-                const isManual = userTargetIds.has(cid) || (typeof cid === 'number' && userTargetIds.has(cid));
-                const isPrioritized = userPrioritizedTargets.includes(cid) || (typeof cid === 'number' && userPrioritizedTargets.includes(cid));
-
-                // ハイライト条件:
-                const isFindTarget = ((isAutomaticTarget(cid) && !isHidden) || isManual);
-
-                let style = '';
-                let titleText = 'クリックで優先表示に登録/解除';
-
-                if (isPrioritized) {
-                    style = 'background-color: #6EFF72; border: 1px solid #28a745; padding: 1px 3px; border-radius: 3px; font-weight: bold;';
-                    titleText = '優先表示を解除';
-                } else if (isFindTarget) {
-                    style = 'background-color: #ffffcc; border: 1px solid #ff9800; padding: 1px 3px; border-radius: 3px; font-weight: bold;';
-                }
-
-                return `<span style="cursor:pointer; ${style}" onclick="prioritizeChar('${cid}')" title="${titleText}">${idx}&nbsp;${c.name}</span>`;
+                return `${idx}&nbsp;${c.name}`;
             }).join(', ');
 
             html += `<div style="margin-bottom: 3px;">`;
@@ -118,7 +88,6 @@ function generateMasterInfoHtml() {
         });
 
         html += `</div>`; // master-section-${id} の閉じタグ
-
         html += `</div>`;
     });
 

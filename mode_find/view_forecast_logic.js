@@ -38,6 +38,8 @@ function getAvailableSpecialTargets(columnConfigs) {
     let availableLegendIds = [];
     let availableLimitedIds = [];
     let availableUberIds = [];
+    let availableSuperIds = []; // 追加
+    let availableRareIds = [];  // 追加
     const limitedSet = getLimitedSet();
 
     columnConfigs.forEach((config) => {
@@ -45,13 +47,23 @@ function getAvailableSpecialTargets(columnConfigs) {
         processedGachaIds.add(config.id);
 
         if (config.pool.legend) config.pool.legend.forEach(c => availableLegendIds.push(c.id));
-        if (config.pool.uber) {
-            config.pool.uber.forEach(c => {
-                if (!limitedSet.has(c.id) && !limitedSet.has(String(c.id))) {
-                    availableUberIds.push(c.id);
-                }
-            });
-        }
+        
+        // 各レアリティのIDを収集（限定キャラは除く）
+        const rarityMapping = [
+            { key: 'uber', list: availableUberIds },
+            { key: 'super', list: availableSuperIds },
+            { key: 'rare', list: availableRareIds }
+        ];
+
+        rarityMapping.forEach(map => {
+            if (config.pool[map.key]) {
+                config.pool[map.key].forEach(c => {
+                    if (!limitedSet.has(c.id) && !limitedSet.has(String(c.id))) {
+                        map.list.push(c.id);
+                    }
+                });
+            }
+        });
         
         ['rare', 'super', 'uber'].forEach(r => {
             if (config.pool[r]) config.pool[r].forEach(c => {
@@ -60,24 +72,30 @@ function getAvailableSpecialTargets(columnConfigs) {
         });
     });
 
-    // --- 初回のみ超激レアをデフォルトOFFに設定 ---
-    if (!isFindDefaultStateInitialized && availableUberIds.length > 0) {
-        availableUberIds.forEach(id => {
-            hiddenFindIds.add(id);
-            hiddenFindIds.add(String(id));
-        });
-        isFindDefaultStateInitialized = true;
+    // --- 初回のみデフォルトOFFに設定（超激・激レア・レア） ---
+    if (!isFindDefaultStateInitialized) {
+        const defaultOffIds = [...availableUberIds, ...availableSuperIds, ...availableRareIds];
+        if (defaultOffIds.length > 0) {
+            defaultOffIds.forEach(id => {
+                hiddenFindIds.add(id);
+                hiddenFindIds.add(String(id));
+            });
+            isFindDefaultStateInitialized = true;
+        }
     }
 
     return {
         isLegendActive: availableLegendIds.length > 0 && availableLegendIds.some(id => !hiddenFindIds.has(id)),
         isLimitedActive: availableLimitedIds.length > 0 && availableLimitedIds.some(id => !hiddenFindIds.has(id)),
-        // 超激のActive判定も hiddenFindIds に基づくように修正
         isUberActive: availableUberIds.length > 0 && availableUberIds.some(id => !hiddenFindIds.has(id)),
+        isSuperActive: availableSuperIds.length > 0 && availableSuperIds.some(id => !hiddenFindIds.has(id)), // 追加
+        isRareActive: availableRareIds.length > 0 && availableRareIds.some(id => !hiddenFindIds.has(id)),   // 追加
         isMasterActive: (typeof isMasterInfoVisible !== 'undefined') ? isMasterInfoVisible : false,
         availableLegendIds,
         availableLimitedIds,
-        availableUberIds
+        availableUberIds,
+        availableSuperIds, // 追加
+        availableRareIds   // 追加
     };
 }
 
@@ -164,6 +182,11 @@ function isAutomaticTarget(id) {
     if (cid.startsWith('sim-new-')) return true;
     if (typeof limitedCats !== 'undefined' && (limitedCats.includes(id) || limitedCats.includes(parseInt(id)))) return true;
     const cat = gachaMasterData.cats[id];
-    // 伝説レア、または超激レアを候補リストの自動抽出対象とする
-    return cat && (cat.rarity === 'legend' || cat.rarity === 'uber');
+    // 伝説、限定に加えて、超激・激レア・レアを候補リストの自動抽出対象とする
+    return cat && (
+        cat.rarity === 'legend' || 
+        cat.rarity === 'uber' || 
+        cat.rarity === 'super' || 
+        cat.rarity === 'rare'
+    );
 }
