@@ -92,21 +92,19 @@ function initDescriptionView() {
 }
 
 /**
- * 概要の表示/非表示を切り替える（既存機能の補完）
- * 以前のui_...ファイルに同名関数がある場合はそちらが優先されます
+ * 概要（使い方ガイド）の表示/非表示を切り替える
  */
-window.toggleDescription = function() {
+function toggleDescription() {
     const el = document.getElementById('description-content');
-    if (el) {
-        const isHidden = el.classList.contains('hidden');
-        if (isHidden) {
-            el.classList.remove('hidden');
-            // 表示した際に確実に中身が入っているようにする
-            if (!el.innerHTML || el.innerHTML === "") {
-                initDescriptionView();
-            }
-        } else {
-            el.classList.add('hidden');
-        }
+    if (!el) return;
+
+    const isHidden = el.classList.toggle('hidden');
+    
+    // 表示に切り替わった際、中身が空であれば初期化する
+    if (!isHidden && (!el.innerHTML || el.innerHTML.trim() === "")) {
+        initDescriptionView();
     }
-};
+}
+
+// グローバルスコープから呼び出せるように公開
+window.toggleDescription = toggleDescription;

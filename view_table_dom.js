@@ -40,10 +40,9 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
             ? 'background-color: #fd7e14; color: #fff; border: 1px solid #fd7e14; font-weight: bold;' 
             : 'background-color: #fff; color: #fd7e14; border: 1px solid #fd7e14;';
 
-        simControlsHtml = `
+simControlsHtml = `
             <div id="sim-control-wrapper" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 6px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
                 <button onclick="openSimConfigModal()" style="font-size: 11px; background: #17a2b8; color: white; border: none; padding: 3px 10px; border-radius: 3px; cursor: pointer; font-weight: bold;">テキスト入力</button>
-                <input type="hidden" id="sim-config" value="${(typeof lastSimConfig !== 'undefined') ? lastSimConfig : ''}">
                 <button onclick="backSimConfig()" style="font-size: 11px; min-width: 45px; padding: 2px 5px;">Back</button>
                 <button onclick="clearSimConfig()" style="font-size: 11px; padding: 2px 5px;">Clear</button>
                 <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>

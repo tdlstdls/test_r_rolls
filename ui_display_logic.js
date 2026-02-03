@@ -16,16 +16,6 @@ function toggleSeedColumns() {
     
     // ボタンのラベル表示を更新
     updateToggleButtons();
-
-    // 【追加】計算方法の説明文エリアの表示切り替え
-    const explanationArea = document.getElementById('seed-calc-explanation');
-    if (explanationArea) {
-        if (showSeedColumns) {
-            explanationArea.classList.remove('hidden');
-        } else {
-            explanationArea.classList.add('hidden');
-        }
-    }
 }
 
 /**

@@ -66,11 +66,6 @@ function applySeedInput() {
     // ヘッダー表示を最新の入力値に同期
     updateSeedDisplay();
 
-    // 旧UIコンテナが残っている場合は隠す
-    const container = document.getElementById('seed-input-container');
-    const trigger = document.getElementById('seed-input-trigger');
-    if (container) container.classList.add('hidden');
-    if (trigger) trigger.classList.remove('active');
 }
 
 /**

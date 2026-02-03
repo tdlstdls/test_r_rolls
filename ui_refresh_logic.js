@@ -52,12 +52,6 @@ function clearSimConfig() {
         errorEl.style.display = 'none';
     }
     
-    const notifEl = document.getElementById('sim-notif-msg');
-    if (notifEl) {
-        notifEl.textContent = '';
-        notifEl.style.display = 'none';
-    }
-    
     resetAndGenerateTable();
 }
 

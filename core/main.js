@@ -28,17 +28,19 @@ window.onload = async function() {
     try {
         if (typeof processUrlParams === 'function') processUrlParams();
         if (typeof initializeDefaultGachas === 'function') initializeDefaultGachas();
+        
+        // スケジュールUIの準備（テーブル外の要素のため維持）
         if (typeof setupScheduleUI === 'function') setupScheduleUI();
         
-        // 初回描画（テーブル生成など）
+        // 初回描画（テーブル生成：この中でテーブル内のコントロールも初期化されます）
         if (typeof onModeChange === 'function') onModeChange();
 
-        // ヘッダーのSEED値をURLパラメータに基づいて同期表示
+        // データ保持用要素(hidden)の値をヘッダー表示に反映
         if (typeof updateSeedDisplay === 'function') {
             updateSeedDisplay();
         }
 
-        console.log("Application fully initialized.");
+        console.log("Application fully initialized with table-first layout.");
     } catch (e) {
         console.error("Initialization Flow Error:", e);
     }
