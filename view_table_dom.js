@@ -59,7 +59,8 @@ simControlsHtml = `
 
     let html = `<div class="table-horizontal-wrapper" style="display: block; width: fit-content;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
-    const tableStyle = isNarrowMode ? "table-layout: fixed; width: auto;" : "table-layout: auto; width: auto;";
+    // narrow-mode時は width: 100% (CSS側) と table-layout: fixed を組み合わせて余白をfillerに押し出す
+    const tableStyle = isNarrowMode ? "table-layout: fixed; width: 100%;" : "table-layout: auto; width: auto;";
     
     html += `<table class="${narrowClass}" style="${tableStyle}"><thead>`;
 

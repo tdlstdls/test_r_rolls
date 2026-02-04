@@ -162,17 +162,22 @@ table {
     border-spacing: 0;
 }
 
-/* NO列：背景色の !important を削除 */
+/* NO列：横方向に確実に固定 */
 .col-no {
     position: -webkit-sticky !important;
     position: sticky !important;
     left: 0 !important;
     text-align: center !important;
-    background-color: #f8f9fa; /* !important を削除 */
-    width: 30px;
-    min-width: 30px;
+    background-color: #f8f9fa !important;
+    /* 幅を30pxに厳格に固定 */
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
     z-index: 40 !important;
     box-shadow: 1px 0 0 #ddd;
+    /* 文字が溢れないように隠す */
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 /* 操作行：!important なし（JS側の指定を優先させる） */
