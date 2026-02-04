@@ -166,12 +166,19 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
 /* =========================================
    余白吸収（Filler）設定
    ========================================= */
-.table-filler {
+.table-filler,
+th.table-filler,
+td.table-filler {
     width: auto !important;
     min-width: 0 !important;
     max-width: none !important;
     border: none !important;
-    background: transparent !important;
+    /* 背景色を透明にし、!important で他の指定を上書きします */
+    background: transparent !important; 
+    background-color: transparent !important;
+    /* 影や境界線も完全に除去します */
+    box-shadow: none !important;
+    outline: none !important;
     pointer-events: none;
 }
 

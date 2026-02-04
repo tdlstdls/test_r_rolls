@@ -11,7 +11,7 @@
 function generateNameHeaderHTML(isLeftSide) {
     let html = "";
     const bgColor = isLeftSide ? "#f8f9fa" : "#eef9ff";
-    // border-right に !important を追加し、背景が線を上書きしないように設定
+    // フィラー領域に色が漏れないよう、背景色と境界線の指定を整理
     const commonStyle = `background-color: ${bgColor} !important; background-clip: padding-box; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
@@ -39,7 +39,8 @@ function generateNameHeaderHTML(isLeftSide) {
 
         if (isGCol) {
             let gText = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : '7G');
-            html += `<th colspan="2" class="gacha-column" style="vertical-align: bottom; padding: 2px; border-right: 1px solid #ddd;">
+            // G列側にも背景色を明示的に適用し、かつ右端の線を背景が隠さないように設定
+            html += `<th colspan="2" class="gacha-column" style="vertical-align: bottom; padding: 2px; ${commonStyle}">
                         <div style="display:flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap:2px; overflow:hidden;">
                             <div style="font-weight:bold; background:#d0e8ff; border-radius:3px; font-size:8px; padding:0px 2px; width:fit-content;">${gText}</div>
                             <div style="text-align: left; line-height: 1.1; font-size: 0.9em; word-break: break-all;">${displayHTML}</div>
@@ -55,12 +56,13 @@ function generateNameHeaderHTML(isLeftSide) {
 }
 
 /**
- * 操作ヘッダーの生成 (右側の縦線表示を強化)
+ * 操作ヘッダーの生成 (背景色の漏れ防止と重複関数の統合)
  */
 function generateControlHeaderHTML(isInteractive) {
     let html = "";
+    // isInteractive が true なら左側(#f8f9fa)、false なら右側(#eef9ff)
     const bgColor = isInteractive ? "#f8f9fa" : "#eef9ff";
-    // border-right に !important を追加
+    // 背景色が境界線を上書きせず、かつフィラーに漏れないよう設定
     const commonStyle = `background-color: ${bgColor} !important; background-clip: padding-box; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
@@ -75,80 +77,30 @@ function generateControlHeaderHTML(isInteractive) {
             select += `<option value="${opt.value}" ${String(opt.value) === id ? 'selected' : ''}>${opt.label}</option>`;
         });
         select += `</select>`;
+        
         const btnCommonStyle = "font-size:9px; padding:0 2px; height:16px; line-height:14px; display:inline-flex; align-items:center; justify-content:center;";
         const pullDownBtn = `<div style="position:relative; width:16px; height:16px; background:#eee; border:1px solid #999; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:9px;">▼${select}</div>`;
+        
         let gLabel = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : (suffix === 's' ? '7G' : 'G'));
         const gBtn = `<button onclick="toggleGStep(${index})" style="${btnCommonStyle} min-width:22px;">${gLabel}</button>`;
+        
         const curAdd = uberAdditionCounts[index] || 0;
         const addLabel = curAdd > 0 ? `+${curAdd}` : `add`;
         const addBtn = `<button id="add-trigger-${index}" onclick="showAddInput(${index})" style="${btnCommonStyle} min-width:24px; color:#007bff; border:1px solid #007bff; background:#fff;">${addLabel}</button>`;
+        
         let addSelect = `<span id="add-select-wrapper-${index}" style="display:none;"><select class="uber-add-select" onchange="updateUberAddition(this, ${index})" style="width:32px; font-size:9px; height:16px;">`;
         for(let k=0; k<=20; k++) addSelect += `<option value="${k}" ${k===curAdd?'selected':''}>${k}</option>`;
         addSelect += `</select></span>`;
+        
         const delBtn = `<button class="remove-btn" onclick="removeGachaColumn(${index})" style="${btnCommonStyle} min-width:16px; padding:0 4px;">×</button>`;
+        
         controlArea = `<div style="display:flex; justify-content:flex-start; align-items:center; gap:2px; flex-wrap:wrap;">${pullDownBtn}${gBtn}${addBtn}${addSelect}${delBtn}</div>`;
 
         if (isGCol) {
+            // colspan="2" の時も commonStyle を適用
             html += `<th colspan="2" class="gacha-column" style="padding: 2px; ${commonStyle}">${controlArea}</th>`;
         } else {
             html += `<th class="gacha-column" style="padding: 2px; ${commonStyle}">${controlArea}</th>`;
-        }
-    });
-    return html;
-}
-
-/**
- * 操作ヘッダーの生成
- */
-function generateControlHeaderHTML(isInteractive) {
-    let html = "";
-    // isInteractive が false の時はBトラック(右側)と判定して色を変える
-    const bgColor = isInteractive ? "#f8f9fa" : "#eef9ff"; 
-    
-    tableGachaIds.forEach((idWithSuffix, index) => {
-        let id = idWithSuffix.replace(/[gfs]$/, '');
-        let suffix = idWithSuffix.match(/[gfs]$/)?.[0] || '';
-        const isGCol = suffix !== '';
-
-        let controlArea = "";
-        if (isInteractive) {
-            const options = (typeof getGachaSelectorOptions === 'function') ? getGachaSelectorOptions(id) : [];
-            let select = `<select onchange="updateGachaSelection(this, ${index})" style="width:100%; height:100%; opacity:0; position:absolute; left:0; top:0; cursor:pointer;">`;
-            options.forEach(opt => {
-                select += `<option value="${opt.value}" ${String(opt.value) === id ? 'selected' : ''}>${opt.label}</option>`;
-            });
-            select += `</select>`;
-            
-            // 各種パーツの小型化調整
-            const btnCommonStyle = "font-size:9px; padding:0 2px; height:16px; line-height:14px; display:inline-flex; align-items:center; justify-content:center;";
-            
-            // プルダウン (▼)
-            const pullDownBtn = `<div style="position:relative; width:16px; height:16px; background:#eee; border:1px solid #999; border-radius:3px; display:flex; align-items:center; justify-content:center; font-size:9px;">▼${select}</div>`;
-            
-            // Gボタン (11Gなど)
-            let gLabel = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : (suffix === 's' ? '7G' : 'G'));
-            const gBtn = `<button onclick="toggleGStep(${index})" style="${btnCommonStyle} min-width:22px;">${gLabel}</button>`;
-            
-            // addボタン (スパンからボタン形式に変更)
-            const curAdd = uberAdditionCounts[index] || 0;
-            const addLabel = curAdd > 0 ? `+${curAdd}` : `add`;
-            const addBtn = `<button id="add-trigger-${index}" onclick="showAddInput(${index})" style="${btnCommonStyle} min-width:24px; color:#007bff; border:1px solid #007bff; background:#fff;">${addLabel}</button>`;
-            
-            let addSelect = `<span id="add-select-wrapper-${index}" style="display:none;"><select class="uber-add-select" onchange="updateUberAddition(this, ${index})" style="width:32px; font-size:9px; height:16px;">`;
-            for(let k=0; k<=20; k++) addSelect += `<option value="${k}" ${k===curAdd?'selected':''}>${k}</option>`;
-            addSelect += `</select></span>`;
-            
-            // 削除ボタン
-            const delBtn = `<button class="remove-btn" onclick="removeGachaColumn(${index})" style="${btnCommonStyle} min-width:16px; padding:0 4px;">×</button>`;
-            
-            // ボタンエリアも左寄せにする
-            controlArea = `<div style="display:flex; justify-content:flex-start; align-items:center; gap:2px; flex-wrap:wrap;">${pullDownBtn}${gBtn}${addBtn}${addSelect}${delBtn}</div>`;
-        }
-
-        if (isGCol) {
-            html += `<th colspan="2" class="gacha-column" style="padding: 2px; border-right: 1px solid #ddd; background-color: ${bgColor} !important;">${controlArea}</th>`;
-        } else {
-            html += `<th class="gacha-column" style="padding: 2px; border-right: 1px solid #ddd; background-color: ${bgColor} !important;">${controlArea}</th>`;
         }
     });
     return html;
