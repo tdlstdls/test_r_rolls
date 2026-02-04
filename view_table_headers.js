@@ -39,10 +39,10 @@ function generateNameHeaderHTML(isLeftSide) {
 
         if (isGCol) {
             let gText = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : '7G');
-            html += `<th colspan="2" class="gacha-column" style="vertical-align: bottom; padding: 4px; ${commonStyle}">
-                        <div style="display:flex; align-items:center; justify-content:flex-start; gap:4px;">
-                            <div style="text-align: left; line-height: 1.2;">${displayHTML}</div>
-                            <div style="font-weight:bold; background:#d0e8ff; border-radius:3px; font-size:9px; padding:1px 4px; white-space:nowrap;">${gText}</div>
+            html += `<th colspan="2" class="gacha-column" style="vertical-align: bottom; padding: 2px; border-right: 1px solid #ddd;">
+                        <div style="display:flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap:2px; overflow:hidden;">
+                            <div style="font-weight:bold; background:#d0e8ff; border-radius:3px; font-size:8px; padding:0px 2px; width:fit-content;">${gText}</div>
+                            <div style="text-align: left; line-height: 1.1; font-size: 0.9em; word-break: break-all;">${displayHTML}</div>
                         </div>
                      </th>`;
         } else {

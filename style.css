@@ -251,17 +251,7 @@ table {
     table-layout: fixed !important; 
     width: auto !important;
     min-width: 0 !important; /* max-content指定を解除 */
-    font-size: 10.5px;
-}
-
-.narrow-mode .gacha-column,
-.narrow-mode .gacha-cell {
-    width: 60px !important; /* 少し余裕を持たせて80px */
-    min-width: 60px !important;
-    max-width: 60px !important;
-    padding: 2px 1px !important;
-    overflow: hidden; /* はみ出した文字を隠す */
-    font-size: 10.5px;
+    font-size: 12px !important;
 }
 
 /* セル内のリンク文字が押し広げるのを防ぐ */
@@ -271,6 +261,7 @@ table {
     overflow: hidden;
     text-overflow: ellipsis; /* 長い名前は「...」にする */
     white-space: nowrap;
+    font-size: 12px !important;
 }
 
 /* 確定枠(G列)の調整 */
@@ -284,12 +275,27 @@ table {
     white-space: normal !important;
 }
 
+/* 縮小モード時のNO列の設定 */
 .narrow-mode .col-no {
-    font-size: 11px;
-    width: 28px !important;
-    min-width: 28px !important;
-    max-width: 28px !important;
-}  
+    font-size: 12px !important;
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    padding: 2px 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* 縮小モード時のキャラ名列・セル */
+.narrow-mode .gacha-column,
+.narrow-mode .gacha-cell,
+.narrow-mode td,
+.narrow-mode th {
+    font-size: 12px !important; /* 明示的に全セルに適用 */
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
+    line-height: 1.1 !important;
+}
 
 .highlight { position: relative; }
 .highlight-uber { font-weight: bold; color: #c2185b; }
