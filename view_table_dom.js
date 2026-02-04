@@ -56,8 +56,7 @@ simControlsHtml = `
             </div>`;
     }
 
-    // iPhoneでのsticky動作（特に横固定）を安定させるため、widthを100%に変更
-    let html = `<div class="table-horizontal-wrapper" style="display: block; width: 100%;">`;
+    let html = `<div class="table-horizontal-wrapper" style="display: block; width: fit-content;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
     const tableStyle = isNarrowMode ? "table-layout: fixed; width: auto;" : "table-layout: auto; width: auto;";
     
@@ -115,7 +114,7 @@ simControlsHtml = `
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold;">B</th>
         </tr>
         <tr class="sticky-row">
-            <th class="col-no" style="background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
+            <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 40; background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
             <th class="${calcColClass}">SEED</th>
             ${generateNameHeaderHTML()}
             <th class="col-no" style="border-left: 1px solid #ddd;">NO.</th>
@@ -123,7 +122,7 @@ simControlsHtml = `
             ${generateNameHeaderHTML()}
         </tr>
         <tr class="control-row">
-            <th class="col-no" style="background: #f8f9fa; border-right: 1px solid #ddd;"></th>
+            <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
             <th class="${calcColClass}"></th>
             ${generateControlHeaderHTML(true)}
             <th class="col-no" style="border-left: 1px solid #ddd;"></th>

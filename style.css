@@ -3,21 +3,14 @@
 /* =========================================
    基本設定
    ========================================= */
-html {
-    height: 100%;
-}
-body {
-    min-height: 100%;
+/* 固定が効かない場合のみ適用してください */
+html, body {
+    height: auto; /* 100% から auto へ */
     margin: 0;
-    overflow-x: hidden; /* 横揺れによるガタつきを防止 */
-    overflow-y: visible; /* ページ全体のスクロールを許可 */
+    overflow: visible; /* auto から visible へ */
     -webkit-text-size-adjust: 100%;
-    font-family: "Helvetica Neue", Arial, sans-serif;
-    padding: 10px 15px;
-    box-sizing: border-box;
-    color: #333;
-    background-color: #fff;
 }
+body { font-family: "Helvetica Neue", Arial, sans-serif; padding: 10px 15px; box-sizing: border-box; color: #333; background-color: #fff; }
 
 /* =========================================
    ヘッダー
@@ -74,14 +67,10 @@ button.active { background: #28a745; }
 }
 .error { color: red; font-weight: bold; }
 
-/* 新しい4行構成に対応:
-   1行目: ボタン類 / 2行目: トラック(A/B) / 4行目: 操作パネル
-   これらは固定しない(static)に設定
-*/
-thead tr:nth-child(1) th,
+/* ガチャ名称行(1行目)は固定するため除外し、2行目(操作行)および3行目(トラック名行)を非固定(static)に設定 */
 thead tr:nth-child(2) th,
-thead tr:nth-child(4) th {
-    position: static !important;
+thead tr:nth-child(3) th {
+    position: static;
     z-index: 1;
 }
 
@@ -125,15 +114,17 @@ th, td {
     box-sizing: border-box;
 }
 
-/* テーブルとスペーサーを横に並べるラッパー */
+/* 追加：テーブルとスペーサーを横に並べるラッパー */
 .table-horizontal-wrapper {
-    display: block; /* flexだとiOSでstickyが効かない場合があるため解除 */
-    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    /* min-width: 100%; を解除 */
 }
 
 th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; box-shadow: 0 1px 0 #ddd; }
 
-/* ガチャ名称行(3行目)を最上部に確実に固定 */
+/* ガチャ名称行(1行目)を最上部に確実に固定 */
 .sticky-row th {
     position: -webkit-sticky !important;
     position: sticky !important;
@@ -143,9 +134,6 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     border-bottom: 2px solid #ccc !important;
     /* 固定時の重なりを安定させる設定 */
     background-clip: padding-box;
-    /* iOS Safari向けのレンダリング安定化（追加） */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
 }
 
 /* A/Bトラック名行の固定を解除 */
@@ -161,56 +149,25 @@ table {
 
 .control-row th { position: static; border-top: none; background-color: #f8f9fa; padding-top: 2px; padding-bottom: 4px; z-index: 1; }
 
-/* NO列：横方向に確実に固定（iOS Safari対応強化） */
+/* NO列：横方向に確実に固定 */
 .col-no {
     position: -webkit-sticky !important;
-    position: sticky !important;/* NO列：共通デザイン（幅や背景色のみ） */
-.col-no {
+    position: sticky !important;
+    left: 0 !important;
     text-align: center !important;
-    background-color: #f8f9fa !important;
+    background-color: #f8f9fa !important; /* スクロール時に後ろの文字が透けるのを防止 */
     width: 30px;
     min-width: 30px;
-    box-shadow: 1px 0 0 #ddd;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-}
-
-/* 「一番左端」のNO列だけを横方向に固定する */
-tr th.col-no:first-child,
-tr td.col-no:first-child {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    left: 0 !important;
     z-index: 40 !important;
+    /* 右側に薄い影をつけて、境界線をわかりやすくする（任意） */
+    box-shadow: 1px 0 0 #ddd;
 }
 
-/* それ以外のNO列（Bトラック用など）は横固定を解除 */
-tr th.col-no:not(:first-child),
-tr td.col-no:not(:first-child) {
-    position: static !important;
+/* NO列（横固定）と名称（縦固定）が重なる角のセルを最前面に */
+.sticky-row th.col-no {
+    z-index: 110 !important;
+    left: 0;
 }
-
-/* 左上端の「NO.」見出し（縦横固定が重なる角）を最前面に固定 */
-.sticky-row th.col-no:first-child {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 120 !important;
-    background-color: #f8f9fa !important;
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-}
-
-/* Bトラック側のNO見出しは、上端固定のみ有効にし、横固定は解除 */
-.sticky-row th.col-no:not(:first-child) {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    left: auto !important;
-    z-index: 100 !important; /* ガチャ名称と同じ高さ */
-}
-
 .narrow-mode .col-no { font-size: 11px;}  
 
 .calc-column { background-color: #f0f8ff; font-size: 14px; color: #555; }

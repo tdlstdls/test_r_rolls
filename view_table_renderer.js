@@ -18,8 +18,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         noColBgColor = '#FFDAB9';
     }
 
-    // インラインの sticky 指定を削除し、CSS（.col-no）の定義に任せます
-    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; ${isLeftSide ? 'border-right: 1px solid #ddd;' : ''}">${rowIndex + 1}</td>`;
+    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5; border-right: 1px solid #ddd;' : ''}">${rowIndex + 1}</td>`;
 
     // 詳細計算セルの描画
     if (typeof generateDetailedCalcCells === 'function') {
