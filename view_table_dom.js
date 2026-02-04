@@ -77,17 +77,17 @@ simControlsHtml = `
     const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
 
     // ヘッダー1行目（統合版・メニュー開閉機能付き）
+    // ヘッダー1行目（[+][-]ボタンから始まる構成）
     html += `
         <tr>
-            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 4px 8px; border-bottom: none; text-align: left;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                    <button onclick="toggleHeaderArea()" style="font-size: 10px; padding: 2px 8px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">操作メニュー 表示/非表示</button>
-                    <span id="minimal-seed-info" class="${isHeaderCollapsed ? '' : 'hidden'}" style="font-size: 11px; font-weight: bold; color: #555;">SEED: ${currentSeedVal}</span>
-                </div>
-                <div id="header-controls-wrapper" class="${isHeaderCollapsed ? 'header-collapsed' : ''}">
-                    <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle} margin-bottom: 6px;">
-                        <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
-                        <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
+            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 6px 8px; border-bottom: none; text-align: left;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle}">
+                    <span id="header-toggle-btn" class="toggle-icon-btn" onclick="toggleHeaderArea()">${isHeaderCollapsed ? '+' : '-'}</span>
+                    
+                    <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
+                    <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 8px;" title="クリックでコピー">${currentSeedVal}</span>
+                    
+                    <div id="header-controls-group" class="${isHeaderCollapsed ? 'header-collapsed' : ''}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
                         <button onclick="toggleSeedInput()" style="${baseBtnStyle} background-color: #fff; color: ${colors.seed}; border: 1px solid ${colors.seed};">SEED値変更</button>
                         ${separatorHtml}
                         <span style="font-weight: bold; font-size: 12px; color: #333;">列操作：</span>
@@ -103,7 +103,10 @@ simControlsHtml = `
                         <button id="toggle-schedule-btn" onclick="toggleSchedule()" style="${getToggleStyle(skdActive, colors.skd)}">skd</button>
                         <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
                     </div>
-                    <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto;">
+                </div>
+                
+                <div id="header-results-group" class="${isHeaderCollapsed ? 'header-collapsed' : ''}">
+                    <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto; margin-top: 6px;">
                         ${simControlsHtml} ${txtRouteHtml} ${simNoticeHtml} ${findAreaHtml || ''} ${masterInfoHtml}
                     </div>
                 </div>
@@ -121,7 +124,7 @@ simControlsHtml = `
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold;">B</th>
         </tr>
         <tr class="sticky-row">
-            <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 40; background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
+            <th class="col-no" style="position: sticky; left: 0; z-index: 110; background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
             <th class="${calcColClass}">SEED</th>
             ${generateNameHeaderHTML()}
             <th class="col-no" style="border-left: 1px solid #ddd;">NO.</th>
@@ -236,13 +239,18 @@ function toggleWidthMode() {
 function toggleHeaderArea() {
     isHeaderCollapsed = !isHeaderCollapsed;
     
-    // クラスの切り替えで表示・非表示を制御
-    const wrapper = document.getElementById('header-controls-wrapper');
-    const minimal = document.getElementById('minimal-seed-info');
+    const controls = document.getElementById('header-controls-group');
+    const results = document.getElementById('header-results-group');
+    const toggleBtn = document.getElementById('header-toggle-btn');
     
-    if (wrapper) wrapper.classList.toggle('header-collapsed');
-    if (minimal) minimal.classList.toggle('hidden');
+    if (controls) controls.classList.toggle('header-collapsed');
+    if (results) results.classList.toggle('header-collapsed');
     
-    // iPhone等のブラウザに表示の変化を通知し、stickyの再計算を促す（念のため）
+    // 記号を切り替え
+    if (toggleBtn) {
+        toggleBtn.innerText = isHeaderCollapsed ? '+' : '-';
+    }
+    
+    // レイアウト変更をブラウザに通知
     window.dispatchEvent(new Event('resize'));
 }

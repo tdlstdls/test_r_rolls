@@ -124,7 +124,7 @@ th, td {
 
 th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; box-shadow: 0 1px 0 #ddd; }
 
-/* ガチャ名称行と操作行を上部に固定 (iPhone対応版) */
+/* ガチャ名称行の固定設定（シンプル版） */
 .sticky-row th {
     position: -webkit-sticky !important;
     position: sticky !important;
@@ -132,14 +132,32 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     z-index: 100 !important;
     background-color: #f8f9fa !important;
     border-bottom: 2px solid #ccc !important;
-    background-clip: padding-box;
-    /* iPhone/Safari用の安定化設定 */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-    will-change: transform;
 }
 
+/* 開閉ボタン([+])のスタイル */
+.toggle-icon-btn {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #6c757d;
+    background: #fff;
+    color: #6c757d;
+    border-radius: 4px;
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 1;
+    user-select: none;
+    margin-right: 6px;
+}
 
+/* ヘッダーのボタンエリアを折りたたむ設定 */
+.header-collapsed {
+    display: none !important;
+}
 /* ヘッダーのボタンエリアを折りたたむ設定 */
 .header-collapsed {
     display: none !important;
