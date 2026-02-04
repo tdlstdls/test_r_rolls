@@ -104,30 +104,30 @@ simControlsHtml = `
             </th>
         </tr>`;
 
-    // トラック名(A/B)行（左端セルをスイッチに：z-indexを整理）
+    // トラック名(A/B)行（Bトラック側の背景色を #eef9ff に設定）
     html += `
         <tr>
             <th id="header-toggle-cell" onclick="toggleHeaderArea()" class="col-no" style="position: sticky; left: 0; z-index: 50; background: #f8f9fa; text-align: center;">
                 ${isHeaderCollapsed ? '+' : '-'}
             </th>
-            <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd; font-weight: bold;">A</th>
-            <th class="col-no"></th>
-            <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold;">B</th>
+            <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd !important; font-weight: bold; background-color: #f8f9fa;">A</th>
+            <th class="col-no" style="background-color: #eef9ff !important; border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; background-clip: padding-box;"></th>
+            <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold; background-color: #eef9ff; border-right: 1px solid #ddd !important; background-clip: padding-box;">B</th>
         </tr>
         <tr class="sticky-row">
-            <th class="col-no" style="position: sticky; left: 0; z-index: 110; background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
-            <th class="${calcColClass}">SEED</th>
-            ${generateNameHeaderHTML()}
-            <th class="col-no" style="border-left: 1px solid #ddd;">NO.</th>
-            <th class="${calcColClass}">SEED</th>
-            ${generateNameHeaderHTML()}
+            <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 110; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">NO.</th>
+            <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">SEED</th>
+            ${generateNameHeaderHTML(true)}
+            <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-color: #eef9ff !important; background-clip: padding-box;">NO.</th>
+            <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">SEED</th>
+            ${generateNameHeaderHTML(false)}
         </tr>
         <tr class="control-row">
-            <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
-            <th class="${calcColClass}"></th>
+            <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
+            <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
             ${generateControlHeaderHTML(true)}
-            <th class="col-no" style="border-left: 1px solid #ddd;"></th>
-            <th class="${calcColClass}"></th>
+            <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-color: #eef9ff !important; background-clip: padding-box;"></th>
+            <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
             ${generateControlHeaderHTML(false)}
         </tr>
     </thead><tbody>`;

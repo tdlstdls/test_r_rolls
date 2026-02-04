@@ -7,9 +7,9 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
     const rowData = tableData[seedIndex];
     if (!rowData) return ''; 
 
-    // No列の背景色を決定
+    // No列の背景色を決定（isLeftSideがfalseならBトラック用カラーに）
     const rowInfo = rowData.rowInfo || {};
-    let noColBgColor = '#f8f9fa';
+    let noColBgColor = isLeftSide ? '#f8f9fa' : '#eef9ff';
     if (rowInfo.isNormalReroll) {
         noColBgColor = '#FFFF00';
     } else if (rowInfo.isCrossReroll) {
