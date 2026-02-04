@@ -127,9 +127,10 @@ simControlsHtml = `
     const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
 
     // ヘッダー1行目（全体が折りたたみの対象）
+    // colspan を -1 して、右端に透明セル(table-filler)を入れる隙間を作ります
     html += `
         <tr id="header-collapsible-root" class="${isHeaderCollapsed ? 'header-collapsed' : ''}">
-            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
+            <th colspan="${fullTableColSpan - 1}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle} margin-bottom: 6px;">
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
                     <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
@@ -152,6 +153,7 @@ simControlsHtml = `
                     ${simControlsHtml} ${txtRouteHtml} ${simNoticeHtml} ${findAreaHtml || ''} ${masterInfoHtml}
                 </div>
             </th>
+            <th class="table-filler" style="background: transparent !important; border: none !important; width: auto;"></th>
         </tr>`;
 
     // トラック名(A/B)行（Bトラック側の背景色を #eef9ff に設定）
@@ -163,7 +165,7 @@ simControlsHtml = `
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd !important; font-weight: bold; background-color: #f8f9fa;">A</th>
             <th class="col-no" style="background-color: #eef9ff !important; border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; background-clip: padding-box;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold; background-color: #eef9ff; border-right: 1px solid #ddd !important; background-clip: padding-box;">B</th>
-            <th class="table-filler" style="background: transparent; border: none !important;"></th>
+            <th class="table-filler" style="background: transparent !important; background-color: transparent !important; border: none !important; box-shadow: none !important;"></th>
         </tr>
         <tr class="sticky-row">
             <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 110; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">NO.</th>
