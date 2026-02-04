@@ -134,31 +134,19 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
     border-bottom: 2px solid #ccc !important;
 }
 
-/* 開閉ボタン([+])のスタイル */
-.toggle-icon-btn {
+/* トラック行の左端セル（開閉スイッチ）のスタイル */
+#header-toggle-cell {
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border: 1px solid #6c757d;
-    background: #fff;
-    color: #6c757d;
-    border-radius: 4px;
-    font-family: monospace;
-    font-weight: bold;
-    font-size: 16px;
-    line-height: 1;
     user-select: none;
-    margin-right: 6px;
+    font-size: 16px;
+    color: #333;
+    transition: background-color 0.2s;
+}
+#header-toggle-cell:hover {
+    background-color: #e9ecef !important;
 }
 
-/* ヘッダーのボタンエリアを折りたたむ設定 */
-.header-collapsed {
-    display: none !important;
-}
-/* ヘッダーのボタンエリアを折りたたむ設定 */
+/* ヘッダー全体を折りたたむ設定 */
 .header-collapsed {
     display: none !important;
 }

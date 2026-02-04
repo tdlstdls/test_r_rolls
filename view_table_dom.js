@@ -76,49 +76,40 @@ simControlsHtml = `
     const separatorHtml = `<span style="border-left: 1px solid #ccc; height: 16px; margin: 0 5px;"></span>`;
     const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
 
-    // ヘッダー1行目（統合版・メニュー開閉機能付き）
-    // ヘッダー1行目（[+][-]ボタンから始まる構成）
+    // ヘッダー1行目（全体が折りたたみの対象）
     html += `
-        <tr>
-            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 6px 8px; border-bottom: none; text-align: left;">
-                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle}">
-                    <span id="header-toggle-btn" class="toggle-icon-btn" onclick="toggleHeaderArea()">${isHeaderCollapsed ? '+' : '-'}</span>
-                    
+        <tr id="header-collapsible-root" class="${isHeaderCollapsed ? 'header-collapsed' : ''}">
+            <th colspan="${fullTableColSpan}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle} margin-bottom: 6px;">
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
-                    <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 8px;" title="クリックでコピー">${currentSeedVal}</span>
-                    
-                    <div id="header-controls-group" class="${isHeaderCollapsed ? 'header-collapsed' : ''}" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px;">
-                        <button onclick="toggleSeedInput()" style="${baseBtnStyle} background-color: #fff; color: ${colors.seed}; border: 1px solid ${colors.seed};">SEED値変更</button>
-                        ${separatorHtml}
-                        <span style="font-weight: bold; font-size: 12px; color: #333;">列操作：</span>
-                        <button onclick="addGachaColumn()" style="${baseBtnStyle} background-color: ${colors.add}; color: #fff; border: 1px solid ${colors.add};">＋列を追加</button>
-                        <button style="${baseBtnStyle} background-color: ${colors.skdAdd}; color: #fff; border: 1px solid ${colors.skdAdd};" onclick="addGachasFromSchedule()">skdで追加</button>
-                        <button id="add-id-trigger" style="${baseBtnStyle} background-color: ${colors.idAdd}; color: #fff; border: 1px solid ${colors.idAdd};" onclick="showIdInput()">IDで追加</button>
-                        <button onclick="resetToFirstGacha()" title="解除" style="${baseBtnStyle} background-color: ${colors.reset}; color: #fff; border: 1px solid ${colors.reset};">全て解除×</button>
-                        <button id="toggle-width-btn" onclick="toggleWidthMode()" style="${getToggleStyle(isNarrowMode, colors.width)}">縮小表示</button>
-                        ${separatorHtml}
-                        <button id="toggle-find-info-btn" onclick="toggleFindInfo()" style="${getToggleStyle(findActive, colors.find)}">Find</button>
-                        <button id="mode-toggle-btn" onclick="toggleAppMode()" style="${getToggleStyle(simActive, colors.sim)}">Sim</button>
-                        ${separatorHtml}
-                        <button id="toggle-schedule-btn" onclick="toggleSchedule()" style="${getToggleStyle(skdActive, colors.skd)}">skd</button>
-                        <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
-                    </div>
+                    <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
+                    <button onclick="toggleSeedInput()" style="${baseBtnStyle} background-color: #fff; color: ${colors.seed}; border: 1px solid ${colors.seed};">SEED値変更</button>
+                    ${separatorHtml}
+                    <span style="font-weight: bold; font-size: 12px; color: #333;">列操作：</span>
+                    <button onclick="addGachaColumn()" style="${baseBtnStyle} background-color: ${colors.add}; color: #fff; border: 1px solid ${colors.add};">＋列を追加</button>
+                    <button style="${baseBtnStyle} background-color: ${colors.skdAdd}; color: #fff; border: 1px solid ${colors.skdAdd};" onclick="addGachasFromSchedule()">skdで追加</button>
+                    <button id="add-id-trigger" style="${baseBtnStyle} background-color: ${colors.idAdd}; color: #fff; border: 1px solid ${colors.idAdd};" onclick="showIdInput()">IDで追加</button>
+                    <button onclick="resetToFirstGacha()" title="解除" style="${baseBtnStyle} background-color: ${colors.reset}; color: #fff; border: 1px solid ${colors.reset};">全て解除×</button>
+                    <button id="toggle-width-btn" onclick="toggleWidthMode()" style="${getToggleStyle(isNarrowMode, colors.width)}">縮小表示</button>
+                    ${separatorHtml}
+                    <button id="toggle-find-info-btn" onclick="toggleFindInfo()" style="${getToggleStyle(findActive, colors.find)}">Find</button>
+                    <button id="mode-toggle-btn" onclick="toggleAppMode()" style="${getToggleStyle(simActive, colors.sim)}">Sim</button>
+                    ${separatorHtml}
+                    <button id="toggle-schedule-btn" onclick="toggleSchedule()" style="${getToggleStyle(skdActive, colors.skd)}">skd</button>
+                    <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
                 </div>
-                
-                <div id="header-results-group" class="${isHeaderCollapsed ? 'header-collapsed' : ''}">
-                    <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto; margin-top: 6px;">
-                        ${simControlsHtml} ${txtRouteHtml} ${simNoticeHtml} ${findAreaHtml || ''} ${masterInfoHtml}
-                    </div>
+                <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto;">
+                    ${simControlsHtml} ${txtRouteHtml} ${simNoticeHtml} ${findAreaHtml || ''} ${masterInfoHtml}
                 </div>
             </th>
         </tr>`;
 
-    // 2行目（以前の #find-result-row）は削除されました
-
-    // トラック名(A/B)行以降
+    // トラック名(A/B)行（左端セルをスイッチに）
     html += `
         <tr>
-            <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
+            <th id="header-toggle-cell" onclick="toggleHeaderArea()" class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd; text-align: center;">
+                ${isHeaderCollapsed ? '+' : '-'}
+            </th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd; font-weight: bold;">A</th>
             <th class="col-no"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold;">B</th>
@@ -234,23 +225,22 @@ function toggleWidthMode() {
 }
 
 /**
- * ヘッダーのボタンエリアを表示/非表示に切り替える
+ * ヘッダー全体の表示/非表示に切り替える（-/+切り替え）
  */
 function toggleHeaderArea() {
     isHeaderCollapsed = !isHeaderCollapsed;
     
-    const controls = document.getElementById('header-controls-group');
-    const results = document.getElementById('header-results-group');
-    const toggleBtn = document.getElementById('header-toggle-btn');
+    const root = document.getElementById('header-collapsible-root');
+    const toggleCell = document.getElementById('header-toggle-cell');
     
-    if (controls) controls.classList.toggle('header-collapsed');
-    if (results) results.classList.toggle('header-collapsed');
-    
-    // 記号を切り替え
-    if (toggleBtn) {
-        toggleBtn.innerText = isHeaderCollapsed ? '+' : '-';
+    if (root) {
+        root.classList.toggle('header-collapsed');
     }
     
-    // レイアウト変更をブラウザに通知
+    // 記号（▲/△）を切り替え
+    if (toggleCell) {
+        toggleCell.innerText = isHeaderCollapsed ? '+' : '-';
+    }
+    
     window.dispatchEvent(new Event('resize'));
 }
