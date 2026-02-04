@@ -279,7 +279,13 @@ table {
     white-space: normal !important;
 }
 
-.narrow-mode .col-no { font-size: 11px;}  
+.narrow-mode .col-no {
+    font-size: 11px;
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+
+}  
 
 .highlight { position: relative; }
 .highlight-uber { font-weight: bold; color: #c2185b; }
