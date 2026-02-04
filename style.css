@@ -3,105 +3,52 @@
 /* =========================================
    基本設定
    ========================================= */
-/* 固定が効かない場合のみ適用してください */
 html, body {
-    height: auto; /* 100% から auto へ */
+    height: auto;
     margin: 0;
-    overflow: visible; /* auto から visible へ */
+    overflow: visible;
     -webkit-text-size-adjust: 100%;
 }
-body { font-family: "Helvetica Neue", Arial, sans-serif; padding: 10px 15px; box-sizing: border-box; color: #333; background-color: #fff; }
+body { 
+    font-family: "Helvetica Neue", Arial, sans-serif; 
+    padding: 10px 15px; 
+    box-sizing: border-box; 
+    color: #333; 
+    background-color: #fff; 
+}
 
 /* =========================================
-   ヘッダー
+   レイアウトコンテナ
    ========================================= */
 .header-row, 
 .description-box, 
 #result, 
 .forecast-summary-container,
 #table-global-controls {
-    flex-shrink: 1; /* 縮むことを許可 */
+    flex-shrink: 1;
     width: 100%;
-    max-width: 100vw; /* 画面幅を超えない */
+    max-width: 100vw;
     box-sizing: border-box;
-    word-break: break-word; /* 強制折り返し */
+    word-break: break-word;
     overflow-wrap: break-word;
 }
 
+/* 横スクロールを制御するラッパー */
+.table-horizontal-wrapper {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* iOSでの滑らかなスクロール */
+    padding-bottom: 10px;
+}
+
+/* =========================================
+   ヘッダー・操作パネル
+   ========================================= */
 .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: nowrap; gap: 10px; }
 h1 { font-size: 20px; margin: 0; padding: 0; white-space: nowrap; }
 .header-actions { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
 
-.text-btn { cursor: pointer; color: #007bff; font-weight: bold; font-size: 0.9em; text-decoration: underline; white-space: nowrap; padding: 2px 4px; user-select: none; }
-.text-btn:hover { color: #0056b3; background-color: #f0f8ff; border-radius: 3px; }
-.text-btn.active { color: #28a745; text-decoration: none; border: 1px solid #28a745; border-radius: 3px; padding: 1px 3px; }
-.separator { color: #ccc; font-size: 0.8em; margin: 0 2px; user-select: none; }
-
-/* =========================================
-   ボタン（通常）
-   ========================================= */
-button { cursor: pointer; padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 14px; }
-button:hover { background: #0056b3; }
-button.secondary { background: #6c757d; }
-button.secondary:hover { background: #545b62; }
-button.active { background: #28a745; }
-
-/* =========================================
-   ユーティリティ
-   ========================================= */
-.hidden { display: none !important; }
-.description-box { background: #e9ecef; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
-.result-box {
-    position: static;
-    width: auto;
-    max-height: 400px;
-    overflow-y: auto;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    background: #f9f9f9;
-    padding: 8px;
-    display: block;
-    white-space: normal;
-    word-break: break-all;
-    overflow-x: hidden;
-}
-.error { color: red; font-weight: bold; }
-
-/* ガチャ名称行(1行目)は固定するため除外し、2行目(操作行)および3行目(トラック名行)を非固定(static)に設定 */
-thead tr:nth-child(2) th,
-thead tr:nth-child(3) th {
-    position: static;
-    z-index: 1;
-}
-
-/* テーブル本体のスタイル */
-table {
-    border-collapse: separate;
-    border-spacing: 0;
-    width: auto;
-    /* min-width: max-content; を削除または auto に変更 */
-    min-width: auto; 
-}
-
-/* Findエリア内の個別のキャラ名スパンが突き抜けないようにする */
-.next-char-item {
-    display: inline-block; /* wrapしやすくする */
-    white-space: normal;
-    margin-bottom: 2px;
-}
-
-/* [修正] 全てのセルを常に左揃えに */
-th, td {
-    border-right: 1px solid #ddd !important;
-    border-bottom: 1px solid #ddd !important;
-    padding: 6px;
-    text-align: left; /* centerから変更 */
-    white-space: nowrap;
-    box-sizing: border-box;
-    font-size: 13px;
-}
-
-/* 操作パネルのスタイル（従来通りの表示を保証） */
 #table-global-controls {
     display: flex;
     flex-wrap: wrap;
@@ -110,282 +57,306 @@ th, td {
     padding: 8px;
     background: #f8f9fa;
     border-bottom: 1px solid #ddd;
-    width: 100%; /* 横幅いっぱいに広げる */
+    width: 100%;
     box-sizing: border-box;
 }
 
-/* 追加：テーブルとスペーサーを横に並べるラッパー */
-.table-horizontal-wrapper {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    /* min-width: 100%; を解除 */
-}
-
-th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; box-shadow: 0 1px 0 #ddd; }
-
-/* ガチャ名称行の固定設定（シンプル版） */
-.sticky-row th {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 100 !important;
-    background-color: #f8f9fa !important;
-    border-bottom: 2px solid #ccc !important;
-}
-
-/* トラック行の左端セル（開閉スイッチ）のスタイル */
-#header-toggle-cell {
-    cursor: pointer;
-    user-select: none;
-    font-size: 16px;
-    color: #333;
-    transition: background-color 0.2s;
-}
-#header-toggle-cell:hover {
-    background-color: #e9ecef !important;
-}
-
-/* ヘッダー全体を折りたたむ設定 */
-.header-collapsed {
-    display: none !important;
-}
-
-/* A/Bトラック名行の固定を解除 */
-.track-header {
-    position: static;
-    background: #f8f9fa;
-}
-
+/* =========================================
+   テーブル基本設定（通常表示：170px）
+   ========================================= */
 table {
-    border-collapse: separate; /* collapse だと sticky が効かないブラウザが多い */
+    border-collapse: separate !important;
     border-spacing: 0;
+    width: auto;
+    table-layout: auto;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
-/* NO列：横方向に確実に固定 */
+th, td {
+    border-right: 1px solid #ddd !important;
+    border-bottom: 1px solid #ddd !important;
+    padding: 6px;
+    text-align: left;
+    white-space: nowrap;
+    box-sizing: border-box;
+    font-size: 13px;
+}
+
+th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
+
+/* 通常時の列幅 */
+.gacha-column, 
+.gacha-cell,
+.calc-column {
+    width: 170px !important;
+    min-width: 170px !important;
+    max-width: 170px !important;
+    white-space: normal;
+    word-break: break-all;
+    line-height: 1.2;
+}
+
+/* NO列（常に30px固定） */
 .col-no {
     position: -webkit-sticky !important;
     position: sticky !important;
     left: 0 !important;
-    text-align: center !important;
-    background-color: #f8f9fa !important;
-    /* 幅を30pxに厳格に固定 */
     width: 30px !important;
     min-width: 30px !important;
     max-width: 30px !important;
     z-index: 40 !important;
-    box-shadow: 1px 0 0 #ddd;
-    /* 文字が溢れないように隠す */
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-/* 操作行：!important なし（JS側の指定を優先させる） */
-.control-row th { 
-    position: static; 
-    border-top: none; 
-    background-color: #f8f9fa; 
-    padding-top: 2px; 
-    padding-bottom: 4px; 
-    z-index: 1; 
-}
-
-/* ガチャ名称行の固定設定（Safari安定版） */
-.sticky-row th {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 100 !important;
-    background-color: #f8f9fa !important;
-    /* 境界線が消えるのを防ぐため、box-shadowで線を引く */
-    box-shadow: 0 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd;
-    border: none !important;
-}
-
-/* NO列：背景色の !important を削除 */
-.col-no {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    left: 0 !important;
+    background-color: #f8f9fa;
     text-align: center !important;
-    background-color: #f8f9fa; /* !important を削除 */
-    width: 30px;
-    min-width: 30px;
-    z-index: 40 !important;
     box-shadow: 1px 0 0 #ddd;
+    overflow: hidden;
 }
 
-/* 横固定と縦固定が交差する「角」のセル（最優先） */
-.sticky-row th.col-no {
-    z-index: 120 !important;
-    box-shadow: 1px 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd !important;
-}
-
-/* テーブル自体の設定：Safariでのガタつきを抑える */
-table {
-    border-collapse: separate !important;
-    border-spacing: 0;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden; /* ← 標準プロパティを追記 */
-}
-
-.calc-column { background-color: #f0f8ff; font-size: 14px; color: #555; }
-
-/* 通常時の列幅設定（既存の 170px を維持） */
-.gacha-column, 
-.gacha-cell {
-    width: 170px !important;
-    min-width: 170px !important;
-    max-width: 170px !important;
-    box-sizing: border-box;
-    text-align: left !important;
-    white-space: normal !important;
-    word-break: break-all !important;
-    line-height: 1.2;
-    font-size: 14px;
-}
-
-/* 【強化】横幅圧縮モードの定義 */
+/* =========================================
+   縮小表示モード（narrow-mode：80px）
+   ========================================= */
 .narrow-mode {
-    /* ブラウザの自動計算を捨て、指定幅を強制するモード */
-    table-layout: fixed !important; 
-    width: auto !important;
-    min-width: 0 !important; /* max-content指定を解除 */
-    font-size: 12px !important;
+    table-layout: fixed !important; /* 幅を厳格に守る */
+    font-size: 11px !important;
 }
 
-/* セル内のリンク文字が押し広げるのを防ぐ */
+/* 縮小時のガチャ列・SEED列 */
+.narrow-mode .gacha-column,
+.narrow-mode .gacha-cell,
+.narrow-mode .calc-column,
+.narrow-mode th.gacha-column,
+.narrow-mode td.gacha-cell {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    flex: none !important;
+}
+
+/* 縮小時のNO列（30pxを死守） */
+.narrow-mode .col-no,
+.narrow-mode th.col-no,
+.narrow-mode td.col-no {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    padding: 2px 0 !important;
+}
+
+/* 縮小時のリンクテキスト */
 .narrow-mode .char-link {
     display: inline-block;
     max-width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis; /* 長い名前は「...」にする */
+    text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 12px !important;
 }
 
 /* 確定枠(G列)の調整 */
 .narrow-mode .guaranteed-cell {
     padding: 1px !important;
 }
-
-/* 圧縮モード時、確定枠内のテキストは...にせず折り返す */
 .narrow-mode .guaranteed-cell .char-link {
     display: inline !important;
     white-space: normal !important;
 }
 
-/* 縮小モード時のNO列の設定 */
-.narrow-mode .col-no {
-    font-size: 12px !important;
-    width: 30px !important;
-    min-width: 30px !important;
-    max-width: 30px !important;
-    padding: 2px 0 !important;
-    box-sizing: border-box !important;
+/* =========================================
+   余白吸収（Filler）設定
+   ========================================= */
+.table-filler {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    border: none !important;
+    background: transparent !important;
+    pointer-events: none;
 }
 
-/* 縮小モード時のキャラ名列・セル */
-.narrow-mode .gacha-column,
-.narrow-mode .gacha-cell,
-.narrow-mode td,
-.narrow-mode th {
-    font-size: 12px !important; /* 明示的に全セルに適用 */
-    width: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-    line-height: 1.1 !important;
+/* =========================================
+   Sticky（固定）表示設定
+   ========================================= */
+/* ガチャ名称行 */
+.sticky-row th {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background-color: #f8f9fa !important;
+    box-shadow: 0 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd;
+    border: none !important;
 }
 
-.highlight { position: relative; }
-.highlight-uber { font-weight: bold; color: #c2185b; }
-.char-link:hover { color: #0056b3; }
-.remove-btn { background: #dc3545; padding: 2px 6px; font-size: 10px; margin-left: 5px; }
-.add-gacha-btn { background: #28a745; padding: 2px 8px; font-size: 11px; }
-.uber-add-select { cursor: pointer; border: 1px solid #ccc; border-radius: 3px; background-color: #fff; }
+/* 角（NO列かつ名称行） */
+.sticky-row th.col-no {
+    z-index: 120 !important;
+    box-shadow: 1px 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd !important;
+}
 
 /* =========================================
-   スケジュール表 & ガントチャート共通
+   ボタン・UIパーツ
    ========================================= */
-#schedule-container { padding: 20px; background-color: #fff; border-top: 1px solid #ddd; max-width: 100%; box-sizing: border-box; flex-grow: 1; overflow-y: auto; }
-.schedule-scroll-wrapper { overflow-x: auto; max-height: none; border: 1px solid #ddd; max-width: 100%; }
-.schedule-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 0; font-size: 14px; }
-.schedule-table th,
-.schedule-table td { border: 1px solid #ddd; padding: 8px; text-align: center; white-space: nowrap; }
-.schedule-table td:nth-child(3) { white-space: normal; text-align: left; min-width: 250px; }
-.schedule-table th { background-color: #eee; position: sticky; top: 0; z-index: 10; border-top: 1px solid #ddd; border-bottom: 1px solid #ccc; }
-.row-ended { background-color: #e0e0e0 !important; color: #666; }
-.row-ended .gantt-bar { filter: grayscale(100%); opacity: 0.6; }
-.row-guaranteed { background-color: #ffffe0 !important; }
+button { cursor: pointer; padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 14px; }
+button:hover { background: #0056b3; }
+button.secondary { background: #6c757d; }
+button.secondary:hover { background: #545b62; }
+button.active { background: #28a745; }
+
+.text-btn { cursor: pointer; color: #007bff; font-weight: bold; font-size: 0.9em; text-decoration: underline; white-space: nowrap; padding: 2px 4px; user-select: none; }
+.text-btn:hover { color: #0056b3; background-color: #f0f8ff; border-radius: 3px; }
+.text-btn.active { color: #28a745; text-decoration: none; border: 1px solid #28a745; border-radius: 3px; padding: 1px 3px; }
+.separator { color: #ccc; font-size: 0.8em; margin: 0 2px; user-select: none; }
+
+.hidden { display: none !important; }
+.description-box { background: #e9ecef; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
+.error { color: red; font-weight: bold; }
 
 /* =========================================
-   ガントチャート
+   スケジュール表
    ========================================= */
-.gantt-outer-wrapper * { box-sizing: border-box; }
+#schedule-container { 
+    padding: 20px; 
+    background-color: #fff; 
+    border-top: 1px solid #ddd; 
+    max-width: 100%; 
+    box-sizing: border-box; 
+    flex-grow: 1; 
+    overflow-y: auto; 
+}
+.schedule-scroll-wrapper { 
+    overflow-x: auto; 
+    max-height: none; 
+    border: 1px solid #ddd; 
+    max-width: 100%; 
+}
+.schedule-table { 
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0; 
+    margin-top: 0; 
+    font-size: 14px; 
+}
+/* スケジュール表は中央揃えを維持 */
+.schedule-table th, 
+.schedule-table td { 
+    border: 1px solid #ddd !important; 
+    padding: 8px; 
+    text-align: center !important; 
+    white-space: nowrap; 
+}
+.schedule-table td:nth-child(3) { 
+    white-space: normal; 
+    text-align: left !important; 
+    min-width: 250px; 
+}
+.schedule-table th { 
+    background-color: #eee; 
+    position: sticky; 
+    top: 0; 
+    z-index: 10; 
+}
+
+/* =========================================
+   ガントチャート（詳細レイアウト）
+   ========================================= */
 .gantt-outer-wrapper { display: inline-block; max-width: 100%; vertical-align: top; width: 100%; }
 .gantt-chart-container { border: 1px solid #ccc; background: #fff; font-size: 12px; margin-bottom: 20px; max-width: 100%; }
 .gantt-scroll-wrapper { overflow-x: auto; position: relative; padding-bottom: 10px; width: 100%; }
-.gantt-header { display: flex; border-bottom: 1px solid #ccc; background: #f9f9f9; position: sticky; left: 0; z-index: 6; }
-.gantt-label-col { width: 160px; min-width: 160px; padding: 5px; border-right: 1px solid #ccc; background-color: inherit; position: sticky; left: 0; z-index: 5; display: flex; align-items: center; justify-content: center; font-weight: bold; border-bottom: 1px solid #eee; }
-.gantt-header .gantt-label-col { background-color: #f9f9f9; }
-.gantt-date-cell { border-right: 1px solid #eee; text-align: center; padding: 5px 0; font-size: 10px; flex-shrink: 0; }
+
+.gantt-header { 
+    display: flex; 
+    border-bottom: 1px solid #ccc; 
+    background: #f9f9f9; 
+    position: sticky; 
+    left: 0; 
+    z-index: 6; 
+}
+
+.gantt-label-col { 
+    width: 160px; 
+    min-width: 160px; 
+    padding: 5px; 
+    border-right: 1px solid #ccc; 
+    background-color: inherit; 
+    position: sticky; 
+    left: 0; 
+    z-index: 5; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-weight: bold; 
+    border-bottom: 1px solid #eee; 
+}
+
+.gantt-date-cell { 
+    border-right: 1px solid #eee; 
+    text-align: center; 
+    padding: 5px 0; 
+    font-size: 10px; 
+    flex-shrink: 0; 
+}
 .gantt-date-cell.today { background-color: #ffeb3b; }
 .gantt-date-cell.weekend { background-color: #e0f7fa; }
+
 .gantt-body { position: relative; }
 .gantt-row { display: flex; border-bottom: 1px solid #eee; height: 30px; background-color: #fff; }
 .gantt-row:hover { filter: brightness(0.95); }
-.gantt-row .gantt-label-col { font-weight: normal; text-align: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; line-height: 20px; }
+
+/* ガントチャート内の行ラベル設定 */
+.gantt-row .gantt-label-col { 
+    font-weight: normal; 
+    text-align: center; 
+    justify-content: center; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+    display: block; 
+    line-height: 20px; 
+}
+
 .gantt-bar-area { position: relative; height: 100%; flex-grow: 1; }
-.gantt-bar { position: absolute; top: 5px; height: 20px; background-color: #4caf50; border: 1px solid #4caf50; box-shadow: none; border-radius: 3px; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; z-index: 2; }
+
+/* ガントバーの基本スタイル */
+.gantt-bar { 
+    position: absolute; 
+    top: 5px; 
+    height: 20px; 
+    background-color: #4caf50; 
+    border: 1px solid #4caf50; 
+    border-radius: 3px; 
+    color: #fff; 
+    font-size: 10px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    overflow: hidden; 
+    white-space: nowrap; 
+    z-index: 2; 
+}
+
+/* ガントチャート色分け */
 .gantt-bar.g-kyoku { background-color: #e91e63; border-color: #e91e63; }
 .gantt-bar.g-cho { background-color: #9c27b0; border-color: #9c27b0; }
 .gantt-bar.g-fest { background-color: #ff9800; border-color: #ff9800; }
 .gantt-bar.g-collab { background-color: #2196f3; border-color: #2196f3; }
-.gantt-bar-text { padding: 0 4px; }
-.gantt-grid-line { position: absolute; top: 0; bottom: 0; border-right: 1px solid #f5f5f5; z-index: 0; }
-.gantt-grid-line.weekend { background-color: rgba(224, 247, 250, 0.3); }
-.gantt-current-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: #ff0000; z-index: 1; opacity: 0.7; pointer-events: none; }
 
-/* style.css に追記 */
-.track-header {
-    /* min-width: 280px; /* Aトラックの操作エリアが1行で収まる程度の幅 */
-    box-sizing: border-box;
+/* グリッド線と現在時刻線 */
+.gantt-grid-line { 
+    position: absolute; 
+    top: 0; 
+    bottom: 0; 
+    border-right: 1px solid #f5f5f5; 
+    z-index: 0; 
 }
-
-/* ボタンがアクティブな時の色（任意） */
-#toggle-width-btn.active {
-    background-color: #28a745;
-    color: white;
-}
-
-/* テーブルコンテナ：ページ全体のスクロールに同期させて sticky を機能させるため overflow を visible に設定 */
-#rolls-table-container {
-    overflow: visible !important;
-    width: 100%;
-    display: block;
-    border: 1px solid #ddd;
-    box-sizing: border-box;
-}
-
-/* 右端の余白吸収用セルの設定 */
-.table-filler {
-    width: 100%;             /* 利用可能な残りの幅をすべて占有する */
-    min-width: 0;            /* 最小幅を制限しない */
-    border: none !important; /* 枠線を表示しない */
-    background: transparent !important; /* 背景を透明にする */
-    pointer-events: none;    /* クリックなどの操作を無効化 */
-}
-
-/* 縮小モード時、画面幅が狭い場合（目安800px以下）のみ幅100%を適用する */
-@media screen and (max-width: 800px) {
-    .narrow-mode {
-        width: 100% !important;
-    }
-}
-
-/* PCなどの広い画面では、縮小モードでもテーブル幅を自動（内容に合わせる）にする */
-@media screen and (min-width: 801px) {
-    .narrow-mode {
-        width: auto !important;
-    }
+.gantt-current-line { 
+    position: absolute; 
+    top: 0; 
+    bottom: 0; 
+    width: 2px; 
+    background-color: #ff0000; 
+    z-index: 1; 
+    opacity: 0.7; 
+    pointer-events: none; 
 }

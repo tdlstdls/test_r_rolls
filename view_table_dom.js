@@ -22,18 +22,64 @@ let isHeaderCollapsed = false; // 追加：メニューの開閉状態
  */
 function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml, txtRouteHtml = '', simNoticeHtml = '') {
     const totalTrackSpan = calculateTotalTrackSpan();
-    const fullTableColSpan = 2 + totalTrackSpan * 2;
+    // NO列(2本) + 各トラック列(A/B) + フィラー(1本) の合計を colspan に設定
+    const fullTableColSpan = 2 + (totalTrackSpan * 2) + 1;
     const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
 
+    // --- 1. 幅の決定とテーブルスタイルの設定 ---
+    const winWidth = window.innerWidth;
+    const noWidth = 30; // NO列は常に30px
+    // 縮小モードなら80px、通常モードなら170pxを使用
+    const unitWidth = isNarrowMode ? 80 : 170; 
+    
+    const oneSideWidth = noWidth + (totalTrackSpan * unitWidth);
+    const totalContentWidth = oneSideWidth * 2;
+    
+    // テーブル全体のレイアウト設定
+    let tableFinalStyle = "";
+    if (isNarrowMode) {
+        const isNarrowerThanWindow = totalContentWidth < (winWidth - 40);
+        tableFinalStyle = `table-layout: fixed; width: ${isNarrowerThanWindow ? '100%' : 'max-content'}; border-spacing: 0;`;
+    } else {
+        // 通常表示時はブラウザの自動計算(auto)に任せる
+        tableFinalStyle = "table-layout: auto; width: auto; border-spacing: 0;";
+    }
+
+    // --- 2. サイジング行の生成（1回だけ宣言します） ---
+    let sizingRowHtml = `<tr style="height: 0; line-height: 0; visibility: hidden; border: none;">`;
+    const addSideSizing = () => {
+        // NO.列
+        sizingRowHtml += `<th class="col-no" style="width: ${noWidth}px !important; min-width: ${noWidth}px !important; max-width: ${noWidth}px !important; height: 0; padding: 0; border: none; margin: 0;"></th>`;
+        
+        // SEED列・ガチャ列
+        if (showSeedColumns) {
+            sizingRowHtml += `<th class="gacha-column" style="width: ${unitWidth}px !important; min-width: ${unitWidth}px !important; max-width: ${unitWidth}px !important; height: 0; padding: 0; border: none; margin: 0;"></th>`;
+        }
+        tableGachaIds.forEach(idWithSuffix => {
+            const hasG = /[gfs]$/.test(idWithSuffix);
+            sizingRowHtml += `<th class="gacha-column" style="width: ${unitWidth}px !important; min-width: ${unitWidth}px !important; max-width: ${unitWidth}px !important; height: 0; padding: 0; border: none; margin: 0;"></th>`;
+            if (hasG) {
+                sizingRowHtml += `<th class="gacha-column" style="width: ${unitWidth}px !important; min-width: ${unitWidth}px !important; max-width: ${unitWidth}px !important; height: 0; padding: 0; border: none; margin: 0;"></th>`;
+            }
+        });
+    };
+    addSideSizing(); // A側
+    addSideSizing(); // B側
+    
+    // フィラー列
+    sizingRowHtml += `<th class="table-filler" style="width: auto; height: 0; padding: 0; border: none; margin: 0;"></th>`;
+    sizingRowHtml += `</tr>`;
+
+    // --- 3. DOM構築の組み立て ---
     const currentSeedVal = document.getElementById('seed')?.value || '-';
 
-    // 各種モード判定
+    // 各種モード判定（既存のコードを維持）
     const findActive = (typeof showFindInfo !== 'undefined' && showFindInfo);
     const simActive = (typeof isSimulationMode !== 'undefined' && isSimulationMode);
     const skdActive = (typeof isScheduleMode !== 'undefined' && isScheduleMode);
     const descActive = (typeof isDescriptionMode !== 'undefined' && isDescriptionMode);
 
-    // SimコントロールUIの生成
+    // SimコントロールUIの生成（既存のコードを維持）
     let simControlsHtml = '';
     if (simActive) {
         const txtActive = (typeof isTxtMode !== 'undefined' && isTxtMode);
@@ -57,12 +103,15 @@ simControlsHtml = `
             </div>`;
     }
 
-    let html = `<div class="table-horizontal-wrapper" style="display: block; width: fit-content;">`;
+    let html = `<div class="table-horizontal-wrapper" style="display: block; width: 100%;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
     // narrow-mode時は width: 100% (CSS側) と table-layout: fixed を組み合わせて余白をfillerに押し出す
     const tableStyle = isNarrowMode ? "table-layout: fixed; width: 100%;" : "table-layout: auto; width: auto;";
     
-    html += `<table class="${narrowClass}" style="${tableStyle}"><thead>`;
+    html += `<table class="${narrowClass}" style="${tableFinalStyle}"><thead>`;
+    
+    // サイジング行を一番最初に入れてブラウザに幅を教える
+    html += sizingRowHtml;
 
     const baseBtnStyle = "font-size: 11px; padding: 2px 4px; min-width: 70px; height: 24px; box-sizing: border-box; text-align: center; cursor: pointer; border-radius: 4px; transition: all 0.2s;";
     const getToggleStyle = (isActive, activeColor) => isActive 
@@ -114,6 +163,7 @@ simControlsHtml = `
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd !important; font-weight: bold; background-color: #f8f9fa;">A</th>
             <th class="col-no" style="background-color: #eef9ff !important; border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; background-clip: padding-box;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold; background-color: #eef9ff; border-right: 1px solid #ddd !important; background-clip: padding-box;">B</th>
+            <th class="table-filler" style="background: transparent; border: none !important;"></th>
         </tr>
         <tr class="sticky-row">
             <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 110; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">NO.</th>
@@ -122,6 +172,7 @@ simControlsHtml = `
             <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-color: #eef9ff !important; background-clip: padding-box;">NO.</th>
             <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">SEED</th>
             ${generateNameHeaderHTML(false)}
+            <th class="table-filler" style="background: transparent; border: none !important;"></th>
         </tr>
         <tr class="control-row">
             <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
@@ -130,6 +181,7 @@ simControlsHtml = `
             <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-color: #eef9ff !important; background-clip: padding-box;"></th>
             <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
             ${generateControlHeaderHTML(false)}
+            <th class="table-filler" style="background: transparent; border: none !important;"></th>
         </tr>
     </thead><tbody>`;
 
