@@ -284,7 +284,6 @@ table {
     width: 28px !important;
     min-width: 28px !important;
     max-width: 28px !important;
-
 }  
 
 .highlight { position: relative; }
@@ -355,4 +354,27 @@ table {
     display: block;
     border: 1px solid #ddd;
     box-sizing: border-box;
+}
+
+/* 右端の余白吸収用セルの設定 */
+.table-filler {
+    width: 100%;             /* 利用可能な残りの幅をすべて占有する */
+    min-width: 0;            /* 最小幅を制限しない */
+    border: none !important; /* 枠線を表示しない */
+    background: transparent !important; /* 背景を透明にする */
+    pointer-events: none;    /* クリックなどの操作を無効化 */
+}
+
+/* 縮小モード時、画面幅が狭い場合（目安800px以下）のみ幅100%を適用する */
+@media screen and (max-width: 800px) {
+    .narrow-mode {
+        width: 100% !important;
+    }
+}
+
+/* PCなどの広い画面では、縮小モードでもテーブル幅を自動（内容に合わせる）にする */
+@media screen and (min-width: 801px) {
+    .narrow-mode {
+        width: auto !important;
+    }
 }

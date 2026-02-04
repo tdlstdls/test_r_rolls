@@ -136,7 +136,9 @@ simControlsHtml = `
     for (let i = 0; i < numRolls; i++) {
         const seedIndexA = i * 2, seedIndexB = i * 2 + 1;
         html += `<tr>${renderTableRowSide(i, seedIndexA, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, true)}`;
-        html += `${renderTableRowSide(i, seedIndexB, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, false)}</tr>`;
+        html += `${renderTableRowSide(i, seedIndexB, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, false)}`;
+        // 右側に余白吸収用のセルを追加
+        html += `<td class="table-filler" style="border:none !important; background:transparent !important;"></td></tr>`;
     }
 
     // フッター（行追加ボタン、SEED説明）
