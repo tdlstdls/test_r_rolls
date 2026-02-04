@@ -128,11 +128,15 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; b
 .sticky-row th {
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: 0 !important; /* JSで動的に調整されるため、基本は0 */
+    top: 0 !important;
     z-index: 100 !important;
     background-color: #f8f9fa !important;
     border-bottom: 2px solid #ccc !important;
     background-clip: padding-box;
+    /* iPhone/Safari用の安定化設定 */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    will-change: transform;
 }
 
 

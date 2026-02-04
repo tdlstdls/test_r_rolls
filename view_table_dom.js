@@ -121,7 +121,7 @@ simControlsHtml = `
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold;">B</th>
         </tr>
         <tr class="sticky-row">
-            <th class="col-no" style="position: sticky; left: 0; z-index: 40; background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
+            <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 40; background: #f8f9fa; border-right: 1px solid #ddd;">NO.</th>
             <th class="${calcColClass}">SEED</th>
             ${generateNameHeaderHTML()}
             <th class="col-no" style="border-left: 1px solid #ddd;">NO.</th>
