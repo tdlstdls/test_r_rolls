@@ -104,10 +104,10 @@ simControlsHtml = `
             </th>
         </tr>`;
 
-    // トラック名(A/B)行（左端セルをスイッチに）
+    // トラック名(A/B)行（左端セルをスイッチに：z-indexを整理）
     html += `
         <tr>
-            <th id="header-toggle-cell" onclick="toggleHeaderArea()" class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa; border-right: 1px solid #ddd; text-align: center;">
+            <th id="header-toggle-cell" onclick="toggleHeaderArea()" class="col-no" style="position: sticky; left: 0; z-index: 50; background: #f8f9fa; text-align: center;">
                 ${isHeaderCollapsed ? '+' : '-'}
             </th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd; font-weight: bold;">A</th>
