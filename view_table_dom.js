@@ -2,7 +2,6 @@
 
 // グローバル変数の追加
 let isNarrowMode = false;
-let isHeaderCollapsed = false; // 追加：メニューの開閉状態
 
 /**
  * テーブルDOM構築のメイン
@@ -129,7 +128,7 @@ simControlsHtml = `
     // ヘッダー1行目（全体が折りたたみの対象）
     // colspan を -1 して、右端に透明セル(table-filler)を入れる隙間を作ります
     html += `
-        <tr id="header-collapsible-root" class="${isHeaderCollapsed ? 'header-collapsed' : ''}">
+        <tr>
             <th colspan="${fullTableColSpan - 1}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle} margin-bottom: 6px;">
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
@@ -154,14 +153,9 @@ simControlsHtml = `
                 </div>
             </th>
             <th class="table-filler" style="background: transparent !important; border: none !important; width: auto;"></th>
-        </tr>`;
-
-    // トラック名(A/B)行（Bトラック側の背景色を #eef9ff に設定）
-    html += `
+        </tr>
         <tr>
-            <th id="header-toggle-cell" onclick="toggleHeaderArea()" class="col-no" style="position: sticky; left: 0; z-index: 50; background: #f8f9fa; text-align: center;">
-                ${isHeaderCollapsed ? '+' : '-'}
-            </th>
+            <th class="col-no" style="position: sticky; left: 0; z-index: 50; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd !important; font-weight: bold; background-color: #f8f9fa;">A</th>
             <th class="col-no" style="background-color: #eef9ff !important; border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; background-clip: padding-box;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold; background-color: #eef9ff; border-right: 1px solid #ddd !important; background-clip: padding-box;">B</th>
@@ -281,23 +275,3 @@ function toggleWidthMode() {
     }
 }
 
-/**
- * ヘッダー全体の表示/非表示に切り替える（-/+切り替え）
- */
-function toggleHeaderArea() {
-    isHeaderCollapsed = !isHeaderCollapsed;
-    
-    const root = document.getElementById('header-collapsible-root');
-    const toggleCell = document.getElementById('header-toggle-cell');
-    
-    if (root) {
-        root.classList.toggle('header-collapsed');
-    }
-    
-    // 記号（▲/△）を切り替え
-    if (toggleCell) {
-        toggleCell.innerText = isHeaderCollapsed ? '+' : '-';
-    }
-    
-    window.dispatchEvent(new Event('resize'));
-}
