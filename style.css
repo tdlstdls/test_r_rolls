@@ -124,16 +124,29 @@ th, td {
 
 th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; box-shadow: 0 1px 0 #ddd; }
 
-/* ガチャ名称行(1行目)を最上部に確実に固定 */
+/* ガチャ名称行と操作行を上部に固定 (iPhone対応版) */
 .sticky-row th {
     position: -webkit-sticky !important;
     position: sticky !important;
-    top: 0 !important;
+    top: 0 !important; /* JSで動的に調整されるため、基本は0 */
     z-index: 100 !important;
     background-color: #f8f9fa !important;
     border-bottom: 2px solid #ccc !important;
-    /* 固定時の重なりを安定させる設定 */
     background-clip: padding-box;
+}
+
+/* 操作行(プルダウン等)も一緒に固定する場合 */
+.control-row th {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 40px; /* ガチャ名称行の高さ分（後ほどJSで自動調整されるのが理想ですが一旦設定） */
+    z-index: 90 !important;
+    background-color: #f8f9fa !important;
+}
+
+/* ヘッダーのボタンエリアを折りたたむ設定 */
+.header-collapsed {
+    display: none !important;
 }
 
 /* A/Bトラック名行の固定を解除 */
