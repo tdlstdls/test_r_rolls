@@ -21,34 +21,23 @@ function generateNameHeaderHTML() {
         const foundOption = options.find(o => o.value == id);
         if (foundOption) selectedLabel = foundOption.label;
 
-        // --- 追加: add情報の表示文字列を作成 ---
         const addCount = uberAdditionCounts[index] || 0;
-        let addInfoStr = '';
-        if (addCount > 0) {
-            // 赤字で目立たせて表示 (例: add:1)
-            addInfoStr = ` <span style="font-size:0.85em; color:#d9534f; font-weight:normal;">(add:${addCount})</span>`;
-        }
-        // ---------------------------------------
+        let addInfoStr = (addCount > 0) ? ` <span style="font-size:0.85em; color:#d9534f; font-weight:normal;">(add:${addCount})</span>` : '';
 
         let displayHTML = "";
         const firstSpaceIdx = selectedLabel.indexOf(' ');
-    
         if (firstSpaceIdx !== -1) {
-            const part1 = selectedLabel.substring(0, firstSpaceIdx);
-            const part2 = selectedLabel.substring(firstSpaceIdx + 1);
-            // ガチャ名の後ろにadd情報を付与
-            displayHTML = `<span style="font-size:0.85em; color:#333;">${part1}</span><br><span style="font-weight:bold; font-size:0.95em;">${part2}${addInfoStr}</span>`;
+            displayHTML = `<span style="font-size:0.85em; color:#333;">${selectedLabel.substring(0, firstSpaceIdx)}</span><br><span style="font-weight:bold; font-size:0.95em;">${selectedLabel.substring(firstSpaceIdx + 1)}${addInfoStr}</span>`;
         } else {
             displayHTML = `${selectedLabel}${addInfoStr}`;
         }
 
-        // 確定列の場合はクラスを外す（下のセルが幅を規定するため）か、
-        // または幅制限のない別のクラスを検討します。
-        // 今回は「下のセル（td）が幅を持つ」ため、ヘッダーは colspan のみを活かす形が安全です。
         const cls = isGuaranteed ? '' : 'class="gacha-column"'; 
 
-        // 名前行なので ControlArea は出力しない
-        html += `<th ${cls} ${isGuaranteed?'colspan="2"':''} style="vertical-align: bottom; padding-bottom: 2px;">
+        // isStickyがtrueの場合、position: sticky スタイルを付与
+        const stickyStyle = isSticky ? 'position: sticky; top: 0; z-index: 100;' : '';
+
+        html += `<th ${cls} ${isGuaranteed?'colspan="2"':''} style="vertical-align: bottom; padding-bottom: 2px; background-color: ${bgColor}; ${stickyStyle}">
                     <div style="text-align: center; line-height: 1.25;">${displayHTML}</div>
                  </th>`;
     });

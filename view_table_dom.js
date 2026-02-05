@@ -102,16 +102,29 @@ simControlsHtml = `
             </div>`;
     }
 
-    let html = `<div class="table-horizontal-wrapper" style="display: block; width: 100%;">`;
+let html = `<div class="table-horizontal-wrapper" style="display: block; width: 100%;">`;
     const narrowClass = isNarrowMode ? 'narrow-mode' : '';
-    // narrow-mode時は width: 100% (CSS側) と table-layout: fixed を組み合わせて余白をfillerに押し出す
-    const tableStyle = isNarrowMode ? "table-layout: fixed; width: 100%;" : "table-layout: auto; width: auto;";
     
     html += `<table class="${narrowClass}" style="${tableFinalStyle}"><thead>`;
     
-    // サイジング行を一番最初に入れてブラウザに幅を教える
+    // 0. サイジング行（非表示：列幅決定用）
     html += sizingRowHtml;
 
+// 1. 最上部のガチャ名称行（クラスを追加し、個別の sticky 指定を削除）
+html += `
+    <tr class="sticky-row" style="color: #495057;">
+        <th class="col-no" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 150;">NO.</th>
+        <th class="${calcColClass}" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        ${generateNameHeaderHTML(true, '#e9ecef', true)}
+        
+        <th class="col-no" style="background: #eef9ff !important; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">NO.</th>
+        <th class="${calcColClass}" style="background: #eef9ff !important; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        ${generateNameHeaderHTML(false, '#eef9ff', true)}
+        
+        <th class="table-filler" style="background: transparent !important; border: none !important; width: auto;"></th>
+    </tr>`;
+
+    // 2. 操作パネル行（固定しない：SEED変更や各種モード切替ボタン）
     const baseBtnStyle = "font-size: 11px; padding: 2px 4px; min-width: 70px; height: 24px; box-sizing: border-box; text-align: center; cursor: pointer; border-radius: 4px; transition: all 0.2s;";
     const getToggleStyle = (isActive, activeColor) => isActive 
         ? `${baseBtnStyle} background-color: ${activeColor}; color: #fff; border: 1px solid ${activeColor}; font-weight: bold;` 
@@ -121,12 +134,9 @@ simControlsHtml = `
         seed: "#6c757d", add: "#28a745", skdAdd: "#17a2b8", idAdd: "#545b62", reset: "#dc3545",
         width: "#218838", find: "#007bff", sim: "#fd7e14", skd: "#6f42c1", desc: "#20c997"
     };
-
     const separatorHtml = `<span style="border-left: 1px solid #ccc; height: 16px; margin: 0 5px;"></span>`;
     const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
 
-    // ヘッダー1行目（全体が折りたたみの対象）
-    // colspan を -1 して、右端に透明セル(table-filler)を入れる隙間を作ります
     html += `
         <tr>
             <th colspan="${fullTableColSpan - 1}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
@@ -153,29 +163,38 @@ simControlsHtml = `
                 </div>
             </th>
             <th class="table-filler" style="background: transparent !important; border: none !important; width: auto;"></th>
-        </tr>
+        </tr>`;
+
+    // 3. A/Bトラックヘッダー（固定しない）
+    html += `
         <tr>
-            <th class="col-no" style="position: sticky; left: 0; z-index: 50; background: #f8f9fa; border-right: 1px solid #ddd;"></th>
+            <th class="col-no" style="background: #f8f9fa; border-right: 1px solid #ddd;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd !important; font-weight: bold; background-color: #f8f9fa;">A</th>
-            <th class="col-no" style="background-color: #eef9ff !important; border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; background-clip: padding-box;"></th>
-            <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold; background-color: #eef9ff; border-right: 1px solid #ddd !important; background-clip: padding-box;">B</th>
-            <th class="table-filler" style="background: transparent !important; background-color: transparent !important; border: none !important; box-shadow: none !important;"></th>
-        </tr>
-        <tr class="sticky-row">
-            <th class="col-no" style="position: sticky; top: auto; left: 0; z-index: 110; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">NO.</th>
-            <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">SEED</th>
-            ${generateNameHeaderHTML(true)}
-            <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-color: #eef9ff !important; background-clip: padding-box;">NO.</th>
-            <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">SEED</th>
-            ${generateNameHeaderHTML(false)}
+            <th class="col-no" style="background-color: #eef9ff !important; border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important;"></th>
+            <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; font-weight: bold; background-color: #eef9ff; border-right: 1px solid #ddd !important;">B</th>
+            <th class="table-filler" style="background: transparent !important; border: none !important;"></th>
+        </tr>`;
+
+    // 4. ガチャ名称行（固定しない：操作エリアの下に表示される見出し）
+    html += `
+        <tr class="original-title-row">
+            <th class="col-no" style="background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important;">NO.</th>
+            <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important;">SEED</th>
+            ${generateNameHeaderHTML(true, '#f8f9fa', false)}
+            <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-color: #eef9ff !important;">NO.</th>
+            <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important;">SEED</th>
+            ${generateNameHeaderHTML(false, '#eef9ff', false)}
             <th class="table-filler" style="background: transparent; border: none !important;"></th>
-        </tr>
+        </tr>`;
+
+    // 5. 操作ボタン行（固定しない：x, G, addボタンなど）
+    html += `
         <tr class="control-row">
-            <th class="col-no" style="position: sticky; left: 0; z-index: 30; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
-            <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
+            <th class="col-no" style="background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important;"></th>
+            <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important;"></th>
             ${generateControlHeaderHTML(true)}
-            <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-color: #eef9ff !important; background-clip: padding-box;"></th>
-            <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-clip: padding-box;"></th>
+            <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; background-color: #eef9ff !important;"></th>
+            <th class="${calcColClass}" style="background-color: #eef9ff !important; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important;"></th>
             ${generateControlHeaderHTML(false)}
             <th class="table-filler" style="background: transparent; border: none !important;"></th>
         </tr>
