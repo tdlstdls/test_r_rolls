@@ -115,37 +115,102 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
 }
 
 /* =========================================
-   Sticky（固定）表示設定
+   Sticky（固定）表示設定：表示・非表示切り替え
    ========================================= */
-/* ガチャ名称行（縦スクロール固定） */
+
+/* ガチャ名称行（縦スクロール固定）の基本スタイル */
+.sticky-row {
+    position: relative;
+    /* 行自体の背景も念のため透明に */
+    background-color: transparent !important;
+}
+
 .sticky-row th {
-    /* 既存の sticky 設定はそのまま */
+    position: -webkit-sticky !important;
     position: sticky !important;
-    top: 0 !important;
-    z-index: 30 !important;
+    top: 0 !important; 
+    z-index: 30 !important; 
+    background-color: #f8f9fa !important;
+    box-shadow: 0 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd;
+    border: none !important;
     
-    /* 初期状態：非表示 */
-    opacity: 0;
+    /* アニメーション設定 */
+    transition: opacity 0.3s, background-color 0.3s;
+}
+
+/* --- 【当初：スクロール前】の状態 --- */
+/* 行内のすべてのセル(th, td)を対象に透明化を強制します */
+.sticky-row:not(.is-sticky) th,
+.sticky-row:not(.is-sticky) td {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: transparent !important; /* 中身の文字も隠す */
+    border-color: transparent !important; /* 罫線（境界線）を透明化 */
+}
+
+.sticky-row:not(.is-sticky) th * {
+    /* 子要素（リンクやスパン等）も完全に非表示にする */
+    visibility: hidden;
+}
+
+/* ロゴ「R_Rolls」の設定：左揃え・黒字 */
+.sticky-row:not(.is-sticky)::after {
+    content: "R_Rolls";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #333; /* 通常の黒字 */
     pointer-events: none;
-    transition: opacity 0.2s; /* じわっと出したい場合 */
+    z-index: 40;
+    /* 背景をここでも透明に指定 */
+    background-color: transparent !important;
 }
 
-/* JSで付与されるクラス。これが付いた時だけ見えるようにする */
+/* --- 【スクロール後：表示状態】 --- */
 .sticky-row.is-sticky th {
     opacity: 1;
-    pointer-events: auto;
+    color: #333 !important;
+    background-color: #f8f9fa !important; /* Aトラックの基本色 */
+    
+    /* 縦の罫線を表示 */
+    border-right: 1px solid #ddd !important;
+    /* 下の太線（横線）を表示 */
+    border-bottom: 2px solid #ccc !important;
+    
+    /* 影の設定（立体感を出す） */
+    box-shadow: inset 0 -1px 0 0 #ddd;
 }
 
-/* 追加: スクロール検知後に付与する表示用クラス */
-.sticky-row.is-sticky th {
-    opacity: 1;
-    pointer-events: auto;
+/* Bトラック側（track-b クラスを持つセル）の背景色と罫線の調整 */
+.sticky-row.is-sticky th.track-b {
+    background-color: #eef9ff !important; /* Bトラックの水色 */
+    
+    /* Bトラック開始のNO列には左側の縦線も表示する */
+    border-left: 1px solid #ddd !important;
 }
 
-/* 角（NO列かつ名称行）も同様に制御 */
-.sticky-row.is-sticky th.col-no {
-    opacity: 1;
-    pointer-events: auto;
+/* 「SEED」列など特定の列の境界線が消えないよう念のため指定 */
+.sticky-row.is-sticky th.calc-column {
+    border-right: 1px solid #ddd !important;
+}
+
+.sticky-row.is-sticky th * {
+    visibility: visible;
+}
+
+/* 表示状態になったらロゴを消す */
+.sticky-row.is-sticky::after {
+    display: none;
 }
 
 /* =========================================

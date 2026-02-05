@@ -115,11 +115,11 @@ html += `
     <tr class="sticky-row" style="color: #495057;">
         <th class="col-no" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 150;">NO.</th>
         <th class="${calcColClass}" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
-        ${generateNameHeaderHTML(true, '#e9ecef', true)}
+        ${generateNameHeaderHTML(true)}
         
-        <th class="col-no" style="background: #eef9ff !important; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">NO.</th>
-        <th class="${calcColClass}" style="background: #eef9ff !important; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
-        ${generateNameHeaderHTML(false, '#eef9ff', true)}
+        <th class="col-no track-b" style="background: #eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">NO.</th>
+        <th class="${calcColClass} track-b" style="background: #eef9ff; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        ${generateNameHeaderHTML(false)}
         
         <th class="table-filler" style="background: transparent !important; border: none !important; width: auto;"></th>
     </tr>`;

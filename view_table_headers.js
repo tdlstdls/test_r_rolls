@@ -11,8 +11,11 @@
 function generateNameHeaderHTML(isLeftSide) {
     let html = "";
     const bgColor = isLeftSide ? "#f8f9fa" : "#eef9ff";
-    // フィラー領域に色が漏れないよう、背景色と境界線の指定を整理
-    const commonStyle = `background-color: ${bgColor} !important; background-clip: padding-box; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important;`;
+    // 追加: Bトラック用のクラス判定
+    const trackClass = isLeftSide ? "" : "track-b"; 
+    
+    // 修正: background-color と border から !important を削除
+    const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 2px solid #ccc;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
         let id = idWithSuffix.replace(/[gfs]$/, '');
@@ -40,14 +43,14 @@ function generateNameHeaderHTML(isLeftSide) {
         if (isGCol) {
             let gText = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : '7G');
             // G列側にも背景色を明示的に適用し、かつ右端の線を背景が隠さないように設定
-            html += `<th colspan="2" class="gacha-column" style="vertical-align: bottom; padding: 2px; ${commonStyle}">
+            html += `<th colspan="2" class="gacha-column ${trackClass}" style="vertical-align: bottom; padding: 2px; ${commonStyle}">
                         <div style="display:flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap:2px; overflow:hidden;">
                             <div style="font-weight:bold; background:#d0e8ff; border-radius:3px; font-size:8px; padding:0px 2px; width:fit-content;">${gText}</div>
                             <div style="text-align: left; line-height: 1.1; font-size: 0.9em; word-break: break-all;">${displayHTML}</div>
                         </div>
                      </th>`;
         } else {
-            html += `<th class="gacha-column" style="vertical-align: bottom; padding: 4px; ${commonStyle}">
+            html += `<th class="gacha-column ${trackClass}" style="vertical-align: bottom; padding: 4px; ${commonStyle}">
                         <div style="text-align: left; line-height: 1.2;">${displayHTML}</div>
                      </th>`;
         }
