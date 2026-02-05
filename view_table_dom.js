@@ -162,7 +162,7 @@ simControlsHtml = `
             <th class="table-filler" style="background: transparent !important; background-color: transparent !important; border: none !important; box-shadow: none !important;"></th>
         </tr>
         <tr class="sticky-row">
-            <th class="col-no" style="position: sticky; top: 0; left: 0; z-index: 110; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">NO.</th>
+            <th class="col-no" style="position: sticky; top: auto; left: 0; z-index: 110; background: #f8f9fa !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">NO.</th>
             <th class="${calcColClass}" style="border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-clip: padding-box;">SEED</th>
             ${generateNameHeaderHTML(true)}
             <th class="col-no" style="border-left: 1px solid #ddd !important; border-right: 1px solid #ddd !important; border-bottom: 2px solid #ccc !important; background-color: #eef9ff !important; background-clip: padding-box;">NO.</th>
