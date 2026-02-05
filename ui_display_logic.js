@@ -87,19 +87,21 @@ function setupStickyHeaderObserver() {
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            // 要素が画面上部に消えた（isIntersectingがfalse、かつ上方向）ときに表示
-            if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+            // entry.boundingClientRect.top が 0.5px 程度ずれることがあるため
+            // 余裕を持たせた判定に変更
+            const isOffScreen = entry.boundingClientRect.top < -0.5;
+            
+            if (!entry.isIntersecting && isOffScreen) {
                 stickyRow.classList.add('is-sticky');
             } else {
                 stickyRow.classList.remove('is-sticky');
             }
         });
     }, {
-        threshold: [0],
-        rootMargin: '-1px 0px 0px 0px' 
+        threshold: [0, 1], // 完全に隠れた時と少し見えている時の両方を監視
+        rootMargin: '0px 0px 0px 0px' // marginを0に戻し、判定を top 基準に一本化
     });
 
-    // 監視対象：テーブルのヘッダー行(thead)
     const target = table.querySelector('thead');
     if (target) {
         observer.observe(target);
