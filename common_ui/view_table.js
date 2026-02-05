@@ -74,6 +74,11 @@ function generateRollsTable() {
         const container = document.getElementById('rolls-table-container');
         if (container) {
             container.innerHTML = finalContainerHtml;
+            
+            // 【追記】テーブルが新しくなるたびにスクロール監視を再設定する
+            if (typeof setupStickyHeaderObserver === 'function') {
+                setupStickyHeaderObserver();
+            }
         }
 
         const resultDiv = document.getElementById('result');

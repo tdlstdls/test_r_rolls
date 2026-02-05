@@ -9,8 +9,7 @@ let isMasterInfoVisible = false;
 function toggleSeedColumns() {
     showSeedColumns = !showSeedColumns;
     if (typeof generateRollsTable === 'function') {
-        generateRollsTable();
-        setupStickyHeaderObserver(); // 再生成後に監視を再設定
+        generateRollsTable(); // ここで自動的に監視も再設定されるようになります
     }
     updateToggleButtons();
 }
