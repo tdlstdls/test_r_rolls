@@ -198,6 +198,11 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
     background-color: #f8f9fa !important;
 }
 
+/* Bトラックのタイトル行は水色にする */
+.original-title-row th.track-b {
+    background-color: #eef9ff !important;
+}
+
 /* 追加：操作エリアがロゴの上を通るように設定 */
 .operation-panel-row th {
     position: relative; /* z-index を有効にするために必要 */
