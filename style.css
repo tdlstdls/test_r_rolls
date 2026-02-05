@@ -127,7 +127,8 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
     position: -webkit-sticky !important;
     position: sticky !important;
     top: 0 !important; 
-    z-index: 30 !important; 
+    /* スクロール前（ロゴ状態）は低いレイヤーにする */
+    z-index: 5 !important; 
     background-color: #f8f9fa !important;
     transition: opacity 0.3s, background-color 0.3s;
 }
@@ -147,10 +148,11 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
     visibility: hidden;
 }
 
-/* [修正] 左側のNO列(track-bを持たないcol-no)だけを対象にする */
+/* ロゴセルの重なり順を低く固定 */
 .sticky-row:not(.is-sticky) th.col-no:not(.track-b) {
     position: relative; 
-    overflow: visible !important; 
+    overflow: visible !important;
+    z-index: 5 !important; 
 }
 
 /* [修正] 左側のNO列の疑似要素だけにロゴを設定 */
@@ -165,8 +167,41 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
     font-size: 18px;
     color: #333;
     visibility: visible;
-    z-index: 200;
+    z-index: 5;
     pointer-events: none;
+
+}
+
+/* 追加：ロゴの上を通り過ぎるすべてのヘッダー行を前面に出す */
+.operation-panel-row th,
+.track-header-row th,
+.original-title-row th,
+.control-row th {
+    position: relative; 
+    z-index: 25 !important; /* ロゴ (5) より高く、横スクロール固定のNO列 (20) より高く設定 */
+    background-color: inherit;
+}
+
+/* 背景を不透明にして下のロゴを隠す */
+.operation-panel-row th,
+.original-title-row th {
+    background-color: #f8f9fa !important;
+}
+
+/* 追加：操作エリアがロゴの上を通るように設定 */
+.operation-panel-row th {
+    position: relative; /* z-index を有効にするために必要 */
+    z-index: 20;       /* ロゴ (10) より高く設定 */
+    background-color: #f8f9fa !important; /* 背景色で下のロゴを隠す */
+}
+
+/* 追加：ロゴの上を通り過ぎるすべてのヘッダー行をロゴより前面に出す */
+.operation-panel-row th,
+th.track-header,
+.original-title-row th,
+.control-row th {
+    position: relative; /* z-index を有効にする */
+    z-index: 20;       /* ロゴ (10) より高いレイヤー */
 }
 
 /* Bトラック側のNO列(track-b)では疑似要素を表示しないように明示（念のため） */
@@ -185,6 +220,7 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
 }
 
 .sticky-row.is-sticky th {
+    z-index: 300 !important; /* 最前面 */
     opacity: 1;
     color: #333 !important;
     background-color: #f8f9fa !important;

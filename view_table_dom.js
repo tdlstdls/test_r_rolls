@@ -113,12 +113,12 @@ let html = `<div class="table-horizontal-wrapper" style="display: block; width: 
 // 1. 最上部のガチャ名称行（クラスを追加し、個別の sticky 指定を削除）
 html += `
     <tr class="sticky-row" style="color: #495057;">
-        <th class="col-no" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 150;">NO.</th>
-        <th class="${calcColClass}" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        <th class="col-no" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">NO.</th>
+        <th class="${calcColClass}" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>
         ${generateNameHeaderHTML(true)}
         
-        <th class="col-no track-b" style="background: #eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">NO.</th>
-        <th class="${calcColClass} track-b" style="background: #eef9ff; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        <th class="col-no track-b" style="background: #eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">NO.</th>
+        <th class="${calcColClass} track-b" style="background: #eef9ff; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>
         ${generateNameHeaderHTML(false)}
         
         <th class="table-filler" style="background: transparent !important; border: none !important; width: auto;"></th>
@@ -138,8 +138,8 @@ html += `
     const headerBtnAreaStyle = isNarrowMode ? "font-size: 10px; gap: 4px;" : "font-size: 12px; gap: 8px;";
 
     html += `
-        <tr>
-            <th colspan="${fullTableColSpan - 1}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
+    <tr class="operation-panel-row">
+        <th colspan="${fullTableColSpan - 1}" style="background: #f8f9fa; padding: 8px; border-bottom: none; text-align: left;">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; ${headerBtnAreaStyle} margin-bottom: 6px;">
                     <span style="font-weight: bold; font-size: 12px; color: #333;">SEED:</span>
                     <span id="current-seed-display" onclick="copySeedToClipboard()" style="font-weight: bold; color: #555; font-size: 14px; cursor: pointer; padding: 0 5px;" title="クリックでコピー">${currentSeedVal}</span>
@@ -167,6 +167,7 @@ html += `
 
     // 3. A/Bトラックヘッダー（固定しない）
     html += `
+    <tr class="track-header-row">
         <tr>
             <th class="col-no" style="background: #f8f9fa; border-right: 1px solid #ddd;"></th>
             <th class="track-header" colspan="${totalTrackSpan}" style="text-align: center; vertical-align: middle; padding: 4px; border-right: 1px solid #ddd !important; font-weight: bold; background-color: #f8f9fa;">A</th>
