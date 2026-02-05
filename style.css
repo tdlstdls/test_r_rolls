@@ -172,6 +172,12 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
 
 }
 
+/* 追加：少しスクロールしたらロゴを透明にする（重なり防止） */
+body.hide-sticky-logo .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease-out;
+}
+
 /* 追加：ロゴの上を通り過ぎるすべてのヘッダー行を前面に出す */
 .operation-panel-row th,
 .track-header-row th,
@@ -227,6 +233,8 @@ th.track-header,
 /* スクロールして固定ヘッダーになったら元の設定に戻す */
 .sticky-row.is-sticky th.col-no {
     overflow: hidden !important; /* 通常のNO列として見切れるように戻す */
+    z-index: 310 !important; /* 他のヘッダーセル(300)より前面に出して横スクロール時に固定表示を維持 */
+    left: 0 !important;
 }
 
 /* --- 【スクロール後：表示状態】 --- */

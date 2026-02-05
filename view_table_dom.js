@@ -295,3 +295,15 @@ function toggleWidthMode() {
     }
 }
 
+/**
+ * スクロール監視：少しスクロールしたらロゴを消すためのクラス制御
+ * 切り替わり直前の文字重なりを防ぐため
+ */
+window.addEventListener('scroll', () => {
+    // 30px以上スクロールしたらロゴを隠すクラスを付与
+    if (window.scrollY > 30) {
+        document.body.classList.add('hide-sticky-logo');
+    } else {
+        document.body.classList.remove('hide-sticky-logo');
+    }
+}, { passive: true });
