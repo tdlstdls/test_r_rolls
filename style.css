@@ -119,26 +119,33 @@ th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
    ========================================= */
 /* ガチャ名称行（縦スクロール固定） */
 .sticky-row th {
-    position: -webkit-sticky !important;
-    position: sticky !important;
-    top: 0 !important; 
-    /* 優先度を固定列より高い「高」に設定 */
-    z-index: 30 !important; 
-    background-color: #f8f9fa !important;
-    box-shadow: 0 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd;
-    border: none !important;
-}
-
-/* 角（NO列かつ名称行：縦横両方の固定） */
-.sticky-row th.col-no {
-    /* position と top, left を明示 */
+    /* 既存の sticky 設定はそのまま */
     position: sticky !important;
     top: 0 !important;
-    left: 0 !important;
-    /* 優先度を「最高」に設定。これで数値より上に表示されます */
-    z-index: 50 !important; 
-    box-shadow: 1px 2px 0 0 #ccc, inset 0 -1px 0 0 #ddd !important;
-    background-color: #e9ecef !important; /* 目立たせるために色を微調整 */
+    z-index: 30 !important;
+    
+    /* 初期状態：非表示 */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s; /* じわっと出したい場合 */
+}
+
+/* JSで付与されるクラス。これが付いた時だけ見えるようにする */
+.sticky-row.is-sticky th {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 追加: スクロール検知後に付与する表示用クラス */
+.sticky-row.is-sticky th {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 角（NO列かつ名称行）も同様に制御 */
+.sticky-row.is-sticky th.col-no {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 /* =========================================

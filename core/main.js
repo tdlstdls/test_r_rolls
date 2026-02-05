@@ -44,6 +44,19 @@ window.onload = async function() {
     } catch (e) {
         console.error("Initialization Flow Error:", e);
     }
+
+    // 初回描画（テーブル生成）
+        if (typeof onModeChange === 'function') onModeChange();
+
+        // 【追記】スクロール監視の初期化
+        if (typeof setupStickyHeaderObserver === 'function') {
+            setupStickyHeaderObserver();
+        }
+
+        // データ保持用要素(hidden)の値をヘッダー表示に反映
+        if (typeof updateSeedDisplay === 'function') {
+            updateSeedDisplay();
+        }
 };
 
 /**

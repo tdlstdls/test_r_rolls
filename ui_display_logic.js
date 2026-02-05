@@ -8,13 +8,10 @@ let isMasterInfoVisible = false;
  */
 function toggleSeedColumns() {
     showSeedColumns = !showSeedColumns;
-    
-    // テーブル全体を再生成して表示状態を反映
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
+        setupStickyHeaderObserver(); // 再生成後に監視を再設定
     }
-    
-    // ボタンのラベル表示を更新
     updateToggleButtons();
 }
 
@@ -50,9 +47,8 @@ function toggleMasterInfo() {
     // テーブル全体を再生成して表示状態を反映
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
+        setupStickyHeaderObserver(); // 再生成後に監視を再設定
     }
-    
-    // リフレッシュロジックを実行して中身を最新にする
     if (typeof updateMasterInfoView === 'function') {
         updateMasterInfoView();
     }
@@ -69,6 +65,7 @@ function toggleFindInfo() {
     // テーブル全体を再生成してFindエリアの有無を反映
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
+        setupStickyHeaderObserver(); // 再生成後に監視を再設定
     }
     
     // Findボタンの活性化状態を更新
@@ -78,5 +75,34 @@ function toggleFindInfo() {
         } else {
             btn.classList.remove('active');
         }
+    }
+}
+
+/**
+ * 固定ヘッダーの表示・非表示をスクロール位置で切り替える
+ */
+function setupStickyHeaderObserver() {
+    const table = document.querySelector('table');
+    const stickyRow = document.querySelector('.sticky-row');
+    if (!table || !stickyRow) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            // 要素が画面上部に消えた（isIntersectingがfalse、かつ上方向）ときに表示
+            if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
+                stickyRow.classList.add('is-sticky');
+            } else {
+                stickyRow.classList.remove('is-sticky');
+            }
+        });
+    }, {
+        threshold: [0],
+        rootMargin: '-1px 0px 0px 0px' 
+    });
+
+    // 監視対象：テーブルのヘッダー行(thead)
+    const target = table.querySelector('thead');
+    if (target) {
+        observer.observe(target);
     }
 }
