@@ -10,7 +10,7 @@ function generateForecastHeader(slots, status) {
     const pStr = slots.promotedSlots.length > 0 ? slots.promotedSlots.join(", ") : "なし";
 
     return `
-        <div style="font-size: 1.15em; margin-bottom: 5px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.4; text-align: left;">
+        <div style="font-size: 14px; margin-bottom: 5px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.4; text-align: left;">
             <span style="font-weight:bold; color:#e91e63;">(伝説枠)</span>
             <span style="font-family: monospace; margin-right: 10px;">${lStr}</span>
             <span style="font-weight:bold; color:#9c27b0;">(昇格枠)</span>
