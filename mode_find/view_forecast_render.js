@@ -10,28 +10,26 @@ function generateForecastHeader(slots, status) {
     const pStr = slots.promotedSlots.length > 0 ? slots.promotedSlots.join(", ") : "なし";
 
     return `
-        <div style="font-size: 14px; margin-bottom: 5px; word-break: break-all; overflow-wrap: anywhere; line-height: 1.4; text-align: left;">
-            <span style="font-weight:bold; color:#e91e63;">(伝説枠)</span>
-            <span style="font-family: monospace; margin-right: 10px;">${lStr}</span>
-            <span style="font-weight:bold; color:#9c27b0;">(昇格枠)</span>
-            <span style="font-family: monospace;">${pStr}</span>
+        <div style="font-size: 14px; margin-bottom: 5px; line-height: 1.4; text-align: left; word-break: break-word;">
+            <span style="font-weight:bold; color:#e91e63; margin-right: 5px;">(伝説枠)</span><span style="font-family: monospace; margin-right: 10px;">${lStr}</span>
+            <span style="font-weight:bold; color:#9c27b0; margin-right: 5px;">(昇格枠)</span><span style="font-family: monospace;">${pStr}</span>
         </div>
         ${showFindInfo ? `
         <div style="margin: 8px 0; text-align: left;">
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
-                <span onclick="clearAllTargets()" class="text-btn" style="font-size: 1.3em; cursor:pointer;" title="全て非表示">×</span>
+                <span onclick="clearAllTargets()" class="text-btn" style="font-size: 14px; cursor:pointer;" title="全て非表示">×</span>
                 <span class="separator">|</span>
-                <span onclick="toggleLegendTargets()" class="${status.isLegendActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">伝説</span>
+                <span onclick="toggleLegendTargets()" class="${status.isLegendActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">伝説</span>
                 <span class="separator">|</span>
-                <span onclick="toggleLimitedTargets()" class="${status.isLimitedActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">限定</span>
+                <span onclick="toggleLimitedTargets()" class="${status.isLimitedActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">限定</span>
                 <span class="separator">|</span>
-                <span onclick="toggleUberTargets()" class="${status.isUberActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">超激</span>
+                <span onclick="toggleUberTargets()" class="${status.isUberActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">超激</span>
                 <span class="separator">|</span>
-                <span onclick="toggleSuperTargets()" class="${status.isSuperActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">激レア</span>
+                <span onclick="toggleSuperTargets()" class="${status.isSuperActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">激レア</span>
                 <span class="separator">|</span>
-                <span onclick="toggleRareTargets()" class="${status.isRareActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">レア</span>
+                <span onclick="toggleRareTargets()" class="${status.isRareActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">レア</span>
                 <span class="separator">|</span>
-                <span id="toggle-master-info-btn" onclick="toggleMasterInfo()" class="${status.isMasterActive ? 'text-btn active' : 'text-btn'}" style="font-size: 1.15em; cursor:pointer;">マスター</span>
+                <span id="toggle-master-info-btn" onclick="toggleMasterInfo()" class="${status.isMasterActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">マスター</span>
             </div>
             <div style="font-size: 1.0em; color: #666; padding-left: 2px; line-height: 1.5;">
                 ※キャラ名をタップで追跡ON/OFF。×で削除。右のアドレスをタップでルート探索。
@@ -114,12 +112,12 @@ function renderGachaForecastList(config, resultMap, isSelectionMode = false) {
                 else if (data.rarity === 'rare') color = '#2ecc71';  // レア用
                 
                 const bgStyle = data.isActive ? 'background-color: #ffffcc; border-radius: 3px; padding: 0 2px;' : '';
-                return `<span class="next-char-item" style="cursor:pointer; color:${color}; ${bgStyle}" onclick="selectTargetAndHighlight('${data.id}', '${config.id}', null)">${data.name} <span style="font-size:1.0em; font-family:monospace; font-weight:bold;">${firstHit}</span></span>`;
+                return `<span class="next-char-item" style="cursor:pointer; color:${color}; ${bgStyle}" onclick="selectTargetAndHighlight('${data.id}', '${config.id}', null)">${data.name} <span style="font-size:14px; font-family:monospace; font-weight:bold;">${firstHit}</span></span>`;
             }).join('<span style="color:#ccc; margin:0 4px;">,</span> ');
         }
 
         return `
-            <div style="margin-bottom: 8px; font-size: 1.15em; line-height: 1.6;">
+            <div style="margin-bottom: 8px; font-size: 14px; line-height: 1.6;">
                 <span onclick="toggleGachaCollapse('${config.id}')">${toggleBtn}</span>
                 <span style="color: #333; font-weight: bold; cursor:pointer;" onclick="toggleGachaCollapse('${config.id}')">${config.name}</span>
                 <div style="padding-left: 20px; margin-top: 2px;">${itemsHtml}</div>
@@ -130,8 +128,8 @@ function renderGachaForecastList(config, resultMap, isSelectionMode = false) {
     let html = allItems.map(data => renderTargetItem(data, config)).join('');
     return `
         <div style="margin-bottom: 12px;">
-            <div style="font-weight: bold; background: #eee; padding: 3px 6px; margin-bottom: 4px; font-size: 1.05em; border-left: 3px solid #ccc;">${config.name}</div>
-            <div style="font-family: monospace; font-size: 1.15em; padding-left: 5px;">${html}</div>
+            <div style="font-weight: bold; background: #eee; padding: 3px 6px; margin-bottom: 4px; font-size: 14px; border-left: 3px solid #ccc;">${config.name}</div>
+            <div style="font-family: monospace; font-size: 14px; padding-left: 5px;">${html}</div>
         </div>
     `;
 }
@@ -145,24 +143,24 @@ function renderTargetItem(data, config) {
     else if (data.rarity === 'rare') color = '#2ecc71';  // レア用
     
     // キャラ名のサイズ
-    let nameStyle = `font-weight:bold; font-size: 0.95em; cursor:pointer; color:${color};`;
+    let nameStyle = `font-weight:bold; font-size: 14px; cursor:pointer; color:${color};`;
 
     const hitLinks = data.hits.map(addr => {
-        if (addr === "9999+") return `<span style="color:#999; font-weight:normal; font-size: 0.85em;">${addr}</span>`;
+        if (addr === "9999+") return `<span style="color:#999; font-weight:normal; font-size: 14px;">${addr}</span>`;
         const isB = addr.startsWith('B'), rowMatch = addr.match(/\d+/);
         const row = rowMatch ? parseInt(rowMatch[0], 10) : 0;
         const sIdx = (row - 1) * 2 + (isB ? 1 : 0);
         // アドレスのサイズ
-        return `<span class="char-link" style="cursor:pointer; text-decoration:underline; margin-right:8px; font-size: 0.85em;" onclick="onGachaCellClick(${sIdx}, '${config.id}', '${data.name.replace(/'/g, "\\'")}', null, true, '${data.id}')">${addr}</span>`;
+        return `<span class="char-link" style="cursor:pointer; text-decoration:underline; margin-right:8px; font-size: 14px;" onclick="onGachaCellClick(${sIdx}, '${config.id}', '${data.name.replace(/'/g, "\\'")}', null, true, '${data.id}')">${addr}</span>`;
     }).join("");
 
-    const otherBtn = `<span onclick="searchInAllGachas('${data.id}', '${data.name.replace(/'/g, "\\'")}')" style="cursor:pointer; margin-left:8px; color:#009688; font-size:1.0em; text-decoration:underline;" title="他ガチャを検索">other</span>`;
+    const otherBtn = `<span onclick="searchInAllGachas('${data.id}', '${data.name.replace(/'/g, "\\'")}')" style="cursor:pointer; margin-left:8px; color:#009688; font-size:14px; text-decoration:underline;" title="他ガチャを検索">other</span>`;
     
     return `
         <div style="margin-bottom: 4px; line-height: 1.6;">
-            <span onclick="toggleCharVisibility('${data.id}')" style="cursor:pointer; margin-right:8px; color:#999; font-weight:bold; font-size: 1.15em;">×</span>
+            <span onclick="toggleCharVisibility('${data.id}')" style="cursor:pointer; margin-right:8px; color:#999; font-weight:bold; font-size: 14px;">×</span>
             <span style="${nameStyle}" onclick="prioritizeChar('${data.id}')">${data.name}</span>: 
-            <span style="font-size: 1.1em; color: #555;">${hitLinks}${otherBtn}</span>
+            <span style="font-size: 14px; color: #555;">${hitLinks}${otherBtn}</span>
         </div>
     `;
 }

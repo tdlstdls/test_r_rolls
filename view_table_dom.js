@@ -158,7 +158,7 @@ html += `
                     <button id="toggle-schedule-btn" onclick="toggleSchedule()" style="${getToggleStyle(skdActive, colors.skd)}">skd</button>
                     <button id="toggle-description" onclick="toggleDescription()" style="${getToggleStyle(descActive, colors.desc)}">概要</button>
                 </div>
-                <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto;">
+                <div id="result" style="font-size: 11px; white-space: normal; word-break: break-all; max-height: 400px; overflow-y: auto; padding-right: 8px; box-sizing: border-box;">
                     ${simControlsHtml} ${txtRouteHtml} ${simNoticeHtml} ${findAreaHtml || ''} ${masterInfoHtml}
                 </div>
             </th>

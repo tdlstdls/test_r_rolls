@@ -51,8 +51,8 @@ function generateMasterInfoHtml() {
         }
 
         html += `<div style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">`;
-        html += `<h4 style="margin: 0 0 8px 0; font-size: 1em;">
-            <span id="master-toggle-${id}" style="cursor:pointer; font-family:monospace; display: inline-block; width: 20px;" onclick="toggleMasterSection('${id}')">[-]</span>
+        html += `<h4 style="margin: 0 0 8px 0; font-size: 14px;">
+            <span id="master-toggle-${id}" style="cursor:pointer; font-family:monospace; display: inline-block; width: 25px;" onclick="toggleMasterSection('${id}')">[-]</span>
             ${config.name} (ID: ${id})
         </h4>`;
 
@@ -81,7 +81,7 @@ function generateMasterInfoHtml() {
                 return `${idx}&nbsp;${c.name}`;
             }).join(', ');
 
-            html += `<div style="margin-bottom: 3px;">`;
+            html += `<div style="margin-bottom: 3px; font-size: 14px; padding-right: 8px; box-sizing: border-box;">`;
             html += `<strong>${r.label}:</strong> ${rateStr} (${count} cats) `;
             html += `<span style="color: #555; line-height: 1.6;">${listStr}</span>`;
             html += `</div>`;
