@@ -83,21 +83,21 @@ function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, 
     if (simActive) {
         const txtActive = (typeof isTxtMode !== 'undefined' && isTxtMode);
         const txtActiveStyle = txtActive 
-            ? 'background-color: #fd7e14; color: #fff; border: 1px solid #fd7e14; font-weight: bold;' 
+            ? 'background-color: #fd7e14; color: #fff; border: 1px solid #fd7e14; font-weight: normal;' 
             : 'background-color: #fff; color: #fd7e14; border: 1px solid #fd7e14;';
 
 simControlsHtml = `
             <div id="sim-control-wrapper" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 6px; background: #fff; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
-                <button onclick="openSimConfigModal()" style="font-size: 14px; background: #17a2b8; color: white; border: none; padding: 3px 10px; border-radius: 3px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;">テキスト入力</button>
-                <button onclick="backSimConfig()" style="font-size: 14px; min-width: 45px; padding: 2px 5px; display: flex; align-items: center; justify-content: center;">Back</button>
-                <button onclick="clearSimConfig()" style="font-size: 14px; padding: 2px 5px; display: flex; align-items: center; justify-content: center;">Clear</button>
+                <button onclick="openSimConfigModal()" style="font-size: 14px; background: #17a2b8; color: white; border: none; padding: 1px 10px; border-radius: 3px; cursor: pointer; font-weight: normal; display: flex; align-items: center; justify-content: center;">テキスト入力</button>
+                <button onclick="backSimConfig()" style="font-size: 14px; min-width: 45px; padding: 2.5px 10px; display: flex; align-items: center; justify-content: center; font-weight: normal;">Back</button>
+                <button onclick="clearSimConfig()" style="font-size: 14px; padding: 2.5px 10px; display: flex; align-items: center; justify-content: center; font-weight: normal;">Clear</button>
                 <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>
-                <label style="font-size: 0.8em; color: #555;">MaxPlat:</label>
-                <input type="number" id="sim-max-plat" value="${(typeof lastMaxPlat !== 'undefined') ? lastMaxPlat : '0'}" min="0" max="5" style="width: 35px; font-size: 0.9em; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
-                <label style="font-size: 0.8em; color: #555; margin-left: 2px;">MaxG:</label>
-                <input type="number" id="sim-max-guar" value="${(typeof lastMaxGuar !== 'undefined') ? lastMaxGuar : '0'}" min="0" max="5" style="width: 35px; font-size: 0.9em; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
+                <label style="font-size: 14px; color: #555;">MaxPlat:</label>
+                <input type="number" id="sim-max-plat" value="${(typeof lastMaxPlat !== 'undefined') ? lastMaxPlat : '0'}" min="0" max="5" style="width: 35px; font-size: 14px; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
+                <label style="font-size: 14px; color: #555; margin-left: 2px;">MaxG:</label>
+                <input type="number" id="sim-max-guar" value="${(typeof lastMaxGuar !== 'undefined') ? lastMaxGuar : '0'}" min="0" max="5" style="width: 35px; font-size: 14px; padding: 1px 2px; border: 1px solid #ccc; border-radius: 3px;">
                 <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>
-                <button id="toggle-txt-btn" onclick="toggleTxtMode()" style="font-size: 14px; padding: 2px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s; ${txtActiveStyle}; display: flex; align-items: center; justify-content: center;">Txt</button>
+                <button id="toggle-txt-btn" onclick="toggleTxtMode()" style="font-size: 14px; padding: 2.5px 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s; ${txtActiveStyle}; display: flex; align-items: center; justify-content: center;">txt</button>
                 <div id="sim-error-msg" style="font-size: 11px; color: #dc3545; margin-left: 10px; font-weight: bold;"></div>
             </div>`;
     }
