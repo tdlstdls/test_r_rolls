@@ -37,9 +37,14 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
     if (!cell || !cell.roll) return `<td class="gacha-cell">-</td>`;
     
     const rr = cell.roll;
-    const charName = (rr.finalChar && rr.finalChar.name) ? rr.finalChar.name : "データ不足";
+    let charName = (rr.finalChar && rr.finalChar.name) ? rr.finalChar.name : "データ不足";
     const charId = rr.finalChar.id;
     const charIdStr = String(charId);
+
+    // [修正] 狭幅モード時に10文字以上なら省略
+    if (typeof isNarrowMode !== 'undefined' && isNarrowMode && charName.length > 10) {
+        charName = charName.substring(0, 9) + "...";
+    }
 
     // --- 1. 背景色の判定ロジック ---
     let style = '';
@@ -104,7 +109,12 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
     if (rr.isRerolled) {
         const nextIdx = seedIndex + rr.seedsConsumed;
         let destAddr = (rr.isConsecutiveRerollTarget ? 'R' : '') + formatAddress(nextIdx);
-        const oName = (rr.originalChar && rr.originalChar.name) ? rr.originalChar.name : "不明";
+        let oName = (rr.originalChar && rr.originalChar.name) ? rr.originalChar.name : "不明";
+
+        // [修正] 狭幅モード時に10文字以上なら省略
+        if (typeof isNarrowMode !== 'undefined' && isNarrowMode && oName.length > 10) {
+            oName = oName.substring(0, 9) + "...";
+        }
 
         if (showSeedColumns) {
             // SEED表示モード時は、リンク化せず単純なテキスト表示にする

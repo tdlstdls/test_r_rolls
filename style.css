@@ -277,9 +277,9 @@ th.track-header,
     width: 80px !important;
     min-width: 80px !important;
     max-width: 80px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    word-break: break-all;
+    line-height: 1.2;
     flex: none !important;
 }
 
@@ -297,9 +297,6 @@ th.track-header,
 .narrow-mode .char-link {
     display: inline-block;
     max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* 確定枠(G列)の調整 */
