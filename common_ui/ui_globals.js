@@ -35,3 +35,14 @@ let simMaxGuar = 0;
 
 // 超激レア追加シミュレーション用
 let uberAdditionCounts = [];
+
+/**
+ * CSSをドキュメントの<head>に注入する
+ * @param {string} css - 注入するCSS文字列
+ */
+function injectStyles(css) {
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML = css;
+  document.head.appendChild(style);
+}

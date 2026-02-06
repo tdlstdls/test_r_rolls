@@ -1,3 +1,115 @@
+injectStyles(`
+    .sticky-row {
+        position: relative;
+    }
+    .sticky-row th {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 0 !important; 
+        z-index: 5 !important; 
+        background-color: #f8f9fa !important;
+        transition: opacity 0.3s, background-color 0.3s;
+    }
+    .sticky-row:not(.is-sticky) th,
+    .sticky-row:not(.is-sticky) td {
+        background: transparent !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        border-color: transparent !important;
+        color: transparent !important;
+    }
+    .sticky-row:not(.is-sticky) th > * {
+        visibility: hidden;
+    }
+    .sticky-row:not(.is-sticky) th.col-no:not(.track-b) {
+        position: relative; 
+        overflow: visible !important;
+        z-index: 5 !important; 
+    }
+    .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
+        content: "R_Rolls";
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        white-space: nowrap;
+        font-weight: bold;
+        font-size: 18px;
+        color: #333;
+        visibility: visible;
+        z-index: 5;
+        pointer-events: none;
+    }
+    body.hide-sticky-logo .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
+        opacity: 0 !important;
+        transition: opacity 0.2s ease-out;
+    }
+    .operation-panel-row th,
+    .track-header-row th,
+    .original-title-row th,
+    .control-row th {
+        position: relative; 
+        z-index: 25 !important;
+        background-color: inherit;
+    }
+    .operation-panel-row th.col-no,
+    .track-header-row th.col-no,
+    .original-title-row th.col-no,
+    .control-row th.col-no {
+        z-index: 30 !important;
+        position: sticky !important;
+        left: 0 !important;
+    }
+    .operation-panel-row th,
+    .original-title-row th {
+        background-color: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .original-title-row th.track-b {
+        background-color: transparent !important;
+    }
+    .operation-panel-row th {
+        position: relative;
+        z-index: 20;
+        background-color: transparent !important;
+        border: none !important;
+    }
+    .operation-panel-row th,
+    th.track-header,
+    .original-title-row th,
+    .control-row th {
+        position: relative;
+        z-index: 20;
+    }
+    .sticky-row:not(.is-sticky) th.col-no.track-b::after {
+        display: none !important;
+    }
+    .sticky-row.is-sticky th.col-no {
+        overflow: hidden !important;
+        z-index: 310 !important;
+        left: 0 !important;
+    }
+    .sticky-row.is-sticky th.col-no::after {
+        display: none;
+    }
+    .sticky-row.is-sticky th {
+        z-index: 300 !important;
+        opacity: 1;
+        color: #333 !important;
+        background-color: #f8f9fa !important;
+        border-right: 1px solid #ddd !important;
+        border-bottom: 2px solid #ccc !important;
+    }
+    .sticky-row.is-sticky th.track-b {
+        background-color: #eef9ff !important;
+        border-left: 1px solid #ddd !important;
+    }
+    .sticky-row.is-sticky th > * {
+        visibility: visible;
+    }
+`);
+
 /** @file ui_display_logic.js @description 表示要素（SEED列/マスター情報/Find）のトグル管理 */
 
 // マスター情報の表示フラグ（初期値は非表示）

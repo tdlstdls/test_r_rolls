@@ -1,6 +1,34 @@
 /** @file main.js @description アプリ起動時の初期化フロー */
 
 window.onload = async function() {
+    injectStyles(`
+        html, body {
+            height: auto;
+            margin: 0;
+            overflow: visible;
+            -webkit-text-size-adjust: 100%;
+        }
+        body { 
+            font-family: "Helvetica Neue", Arial, sans-serif; 
+            padding: 10px 15px; 
+            box-sizing: border-box; 
+            color: #333; 
+            background-color: #fff; 
+        }
+        .header-row, 
+        .description-box, 
+        #result, 
+        .forecast-summary-container,
+        #table-global-controls {
+            flex-shrink: 1;
+            width: 100%;
+            max-width: 100vw;
+            box-sizing: border-box;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        .hidden { display: none !important; }
+    `);
     console.log("Initializing R_Rolls...");
 
     // 1. 概要表示の初期化

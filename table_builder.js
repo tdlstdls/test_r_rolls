@@ -1,3 +1,37 @@
+injectStyles(`
+    table {
+        border-collapse: separate !important;
+        border-spacing: 0;
+        width: auto;
+        table-layout: auto;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+    }
+
+    th, td {
+        border-right: 1px solid #ddd !important;
+        border-bottom: 1px solid #ddd !important;
+        padding: 6px;
+        text-align: left;
+        white-space: nowrap;
+        box-sizing: border-box;
+        font-size: 13px;
+    }
+
+    th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
+
+    .gacha-column, 
+    .gacha-cell,
+    .calc-column {
+        width: 170px !important;
+        min-width: 170px !important;
+        max-width: 170px !important;
+        white-space: normal;
+        word-break: break-all;
+        line-height: 1.2;
+    }
+`);
+
 /** @file table_builder.js */
 
 function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml, txtRouteHtml = '', simNoticeHtml = '') {

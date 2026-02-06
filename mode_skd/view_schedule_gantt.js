@@ -1,3 +1,26 @@
+injectStyles(`
+    .gantt-outer-wrapper { display: inline-block; max-width: 100%; vertical-align: top; width: 100%; }
+    .gantt-chart-container { border: 1px solid #ccc; background: #fff; font-size: 12px; margin-bottom: 20px; max-width: 100%; }
+    .gantt-scroll-wrapper { overflow-x: auto; position: relative; padding-bottom: 10px; width: 100%; }
+    .gantt-header { display: flex; border-bottom: 1px solid #ccc; background: #f9f9f9; position: sticky; left: 0; z-index: 6; }
+    .gantt-label-col { width: 160px; min-width: 160px; padding: 5px; border-right: 1px solid #ccc; background-color: inherit; position: sticky; left: 0; z-index: 5; display: flex; align-items: center; justify-content: center; font-weight: bold; border-bottom: 1px solid #eee; }
+    .gantt-date-cell { border-right: 1px solid #eee; text-align: center; padding: 5px 0; font-size: 10px; flex-shrink: 0; }
+    .gantt-date-cell.today { background-color: #ffeb3b; }
+    .gantt-date-cell.weekend { background-color: #e0f7fa; }
+    .gantt-body { position: relative; }
+    .gantt-row { display: flex; border-bottom: 1px solid #eee; height: 30px; background-color: #fff; }
+    .gantt-row:hover { filter: brightness(0.95); }
+    .gantt-row .gantt-label-col { font-weight: normal; text-align: center; justify-content: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; line-height: 20px; }
+    .gantt-bar-area { position: relative; height: 100%; flex-grow: 1; }
+    .gantt-bar { position: absolute; top: 5px; height: 20px; background-color: #4caf50; border: 1px solid #4caf50; border-radius: 3px; color: #fff; font-size: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; z-index: 2; }
+    .gantt-bar.g-kyoku { background-color: #e91e63; border-color: #e91e63; }
+    .gantt-bar.g-cho { background-color: #9c27b0; border-color: #9c27b0; }
+    .gantt-bar.g-fest { background-color: #ff9800; border-color: #ff9800; }
+    .gantt-bar.g-collab { background-color: #2196f3; border-color: #2196f3; }
+    .gantt-grid-line { position: absolute; top: 0; bottom: 0; border-right: 1px solid #f5f5f5; z-index: 0; }
+    .gantt-current-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: #ff0000; z-index: 1; opacity: 0.7; pointer-events: none; }
+`);
+
 /** @file view_schedule_gantt.js @description ガントチャートの描画処理 */
 
 function renderGanttChart(data) {

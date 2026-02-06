@@ -1,3 +1,16 @@
+injectStyles(`
+    button { cursor: pointer; padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 14px; }
+    button:hover { background: #0056b3; }
+    button.secondary { background: #6c757d; }
+    button.secondary:hover { background: #545b62; }
+    button.active { background: #28a745; }
+    .text-btn { cursor: pointer; color: #007bff; font-weight: bold; font-size: 0.9em; text-decoration: underline; white-space: nowrap; padding: 2px 4px; user-select: none; }
+    .text-btn:hover { color: #0056b3; background-color: #f0f8ff; border-radius: 3px; }
+    .text-btn.active { color: #28a745; text-decoration: none; border: 1px solid #28a745; border-radius: 3px; padding: 1px 3px; }
+    .separator { color: #ccc; font-size: 0.8em; margin: 0 2px; user-select: none; }
+    .error { color: red; font-weight: bold; }
+`);
+
 /** @file table_controls_templates.js */
 
 function generateSimControlsUI() {
@@ -7,7 +20,8 @@ function generateSimControlsUI() {
     
     return `
     <div id="sim-control-wrapper" style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 6px 0; background: transparent; border: none; margin-bottom: 8px; width: 100%; box-sizing: border-box;">
-        <button onclick="openSimConfigModal()" style="font-size: 14px; background: #17a2b8; color: white; border: none; padding: 1px 10px; border-radius: 3px; cursor: pointer;">テキスト入力</button>
+        <button onclick="openSimConfigModal()" style="font-size: 14px; background: #17a2b8;
+         color: white; border: none; padding: 1px 10px; border-radius: 3px; cursor: pointer;">テキスト入力</button>
         <button onclick="backSimConfig()" style="font-size: 14px; min-width: 45px; padding: 2.5px 10px; cursor: pointer;">Back</button>
         <button onclick="clearSimConfig()" style="font-size: 14px; padding: 2.5px 10px; cursor: pointer;">Clear</button>
         <span style="border-left: 1px solid #ccc; height: 16px; margin: 0 4px;"></span>

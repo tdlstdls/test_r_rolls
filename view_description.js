@@ -1,3 +1,7 @@
+injectStyles(`
+    .description-box { background: #e9ecef; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; }
+`);
+
 /** @file view_description.js @description 使い方ガイド（概要）のHTML生成と初期化を担当 */
 
 /**

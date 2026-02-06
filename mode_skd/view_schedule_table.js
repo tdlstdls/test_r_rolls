@@ -1,3 +1,46 @@
+injectStyles(`
+    #schedule-container { 
+        padding: 20px; 
+        background-color: #fff; 
+        border-top: 1px solid #ddd; 
+        max-width: 100%; 
+        box-sizing: border-box; 
+        flex-grow: 1; 
+        overflow-y: auto; 
+    }
+    .schedule-scroll-wrapper { 
+        overflow-x: auto; 
+        max-height: none; 
+        border: 1px solid #ddd; 
+        max-width: 100%; 
+    }
+    .schedule-table { 
+        width: 100%; 
+        border-collapse: separate; 
+        border-spacing: 0; 
+        margin-top: 0; 
+        font-size: 14px; 
+    }
+    .schedule-table th, 
+    .schedule-table td { 
+        border: 1px solid #ddd !important; 
+        padding: 8px; 
+        text-align: center !important; 
+        white-space: nowrap; 
+    }
+    .schedule-table th { 
+        background-color: #eee; 
+        position: sticky; 
+        top: auto;
+        z-index: 10; 
+    }
+    .schedule-table td:nth-child(3) { 
+        white-space: normal; 
+        text-align: left !important; 
+        min-width: 250px; 
+    }
+`);
+
 /** @file view_schedule_table.js @description リスト形式のスケジュール表描画 */
 
 function renderScheduleTable(tsvContent, containerId) {
