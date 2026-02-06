@@ -201,19 +201,22 @@ body.hide-sticky-logo .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after
 /* 背景を不透明にして下のロゴを隠す */
 .operation-panel-row th,
 .original-title-row th {
-    background-color: #f8f9fa !important;
+    background-color: transparent !important; /* 透明に */
+    border: none !important;                  /* 枠線を消去 */
+    box-shadow: none !important;              /* 影も消去 */
 }
 
 /* Bトラックのタイトル行は水色にする */
 .original-title-row th.track-b {
-    background-color: #eef9ff !important;
+    background-color: transparent !important;
 }
 
 /* 追加：操作エリアがロゴの上を通るように設定 */
 .operation-panel-row th {
-    position: relative; /* z-index を有効にするために必要 */
-    z-index: 20;       /* ロゴ (10) より高く設定 */
-    background-color: #f8f9fa !important; /* 背景色で下のロゴを隠す */
+    position: relative;
+    z-index: 20;
+    background-color: transparent !important; /* 透明に */
+    border: none !important;                  /* 枠線を消去 */
 }
 
 /* 追加：ロゴの上を通り過ぎるすべてのヘッダー行をロゴより前面に出す */

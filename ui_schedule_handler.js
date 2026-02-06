@@ -77,8 +77,14 @@ function toggleSchedule() {
     const scheduleContainer = document.getElementById('schedule-container');
     const resultDiv = document.getElementById('result');
     const mainControls = document.getElementById('main-controls');
+    const descContent = document.getElementById('description-content');
 
     if (isScheduleMode) {
+        // 概要モードがONならOFFにする
+        if (typeof isDescriptionMode !== 'undefined' && isDescriptionMode) {
+            isDescriptionMode = false;
+            if (descContent) descContent.classList.add('hidden');
+        }
         scheduleBtn.classList.add('active');
         if (simWrapper) simWrapper.classList.add('hidden');
         if (tableContainer) tableContainer.classList.add('hidden');
@@ -102,6 +108,8 @@ function toggleSchedule() {
             scheduleContainer.classList.add('hidden');
         }
     }
+    
+    onModeChange();
 }
 
 /**
@@ -113,6 +121,9 @@ function enterScheduleEditMode() {
     if (typeof renderScheduleEditor === 'function') {
         renderScheduleEditor(loadedTsvContent, 'schedule-container');
     }
+
+onModeChange();
+
 }
 
 // スケジュールから開催中・予定のガチャを一括追加

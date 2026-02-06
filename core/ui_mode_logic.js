@@ -156,6 +156,15 @@ function toggleDescription() {
     const scheduleContainer = document.getElementById('schedule-container');
 
     isDescriptionMode = !isDescriptionMode;
+
+    // 他のモードとの排他制御
+    if (isDescriptionMode) {
+        if (typeof isScheduleMode !== 'undefined' && isScheduleMode && typeof toggleSchedule === 'function') {
+            // skdモードが開いていれば閉じる（フラグ操作はtoggleScheduleに任せるか、ここで直接制御）
+            isScheduleMode = false;
+        }
+    }
+
     if (isDescriptionMode) {
         if (typeof isScheduleMode !== 'undefined' && isScheduleMode && typeof toggleSchedule === 'function') {
             toggleSchedule();
@@ -183,6 +192,10 @@ function toggleDescription() {
         if (mainControls) mainControls.classList.remove('hidden');
         if (showResultDisplay && resultDiv) resultDiv.classList.remove('hidden');
     }
+
+    // 状態を反映させるために共通処理を呼び出す
+    onModeChange();
+    
 }
 
 /**
