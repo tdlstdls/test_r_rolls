@@ -19,11 +19,15 @@ function generateSizingRowHTML(totalTrackSpan, noWidth, unitWidth) {
     return html;
 }
 
+/**
+ * 固定ヘッダー（スクロール時に現れる行）のHTML生成
+ * 修正点：ロゴが右側にはみ出せるように設定し、背景色はJSで制御するためインライン指定を最小化
+ */
 function generateStickyHeaderRowHTML(calcColClass) {
     return `
     <tr class="sticky-row" style="color: #495057;">
-        <th class="col-no" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">NO.</th>
-        <th class="${calcColClass}" style="background: #e9ecef; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>
+        <th class="col-no" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; overflow: visible; z-index: 10;">NO.</th>
+        <th class="${calcColClass}" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>
         ${generateNameHeaderHTML(true)}
         <th class="col-no track-b" style="background: transparent; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">NO.</th>
         <th class="${calcColClass} track-b" style="background: transparent; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>

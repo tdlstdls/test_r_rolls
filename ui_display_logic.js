@@ -7,25 +7,19 @@ injectStyles(`
         position: sticky;
         top: 0; 
         z-index: 5; 
-        background-color: #f8f9fa;
+        /* スタイルはJSで動的に制御するため、遷移アニメーションのみ定義 */
         transition: opacity 0.3s, background-color 0.3s;
     }
-    .sticky-row:not(.is-sticky) th,
-    .sticky-row:not(.is-sticky) td {
-        background: transparent;
-        background-color: transparent;
-        box-shadow: none;
-        border-color: transparent;
-        color: transparent;
+    
+    /* ロゴ（R_Rolls）を表示するNOセルの設定：右側へのはみ出しを許可 */
+    .sticky-row th.col-no:not(.track-b) {
+        position: sticky;
+        left: 0;
+        overflow: visible; 
+        z-index: 100;      
     }
-    .sticky-row:not(.is-sticky) th > * {
-        visibility: hidden;
-    }
-    .sticky-row:not(.is-sticky) th.col-no:not(.track-b) {
-        position: relative; 
-        overflow: visible;
-        z-index: 5; 
-    }
+
+    /* ロゴ（R_Rolls）の定義 */
     .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
         content: "R_Rolls";
         position: absolute;
@@ -37,20 +31,27 @@ injectStyles(`
         font-size: 18px;
         color: #333;
         visibility: visible;
-        z-index: 5;
+        z-index: 101;
         pointer-events: none;
     }
+
     body.hide-sticky-logo .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
         opacity: 0;
         transition: opacity 0.2s ease-out;
     }
+
+    /* 固定表示時はロゴを隠す */
+    .sticky-row.is-sticky th.col-no::after {
+        display: none;
+    }
+
+    /* z-index 管理 */
     .operation-panel-row th,
     .track-header-row th,
     .original-title-row th,
     .control-row th {
         position: relative; 
         z-index: 25;
-        background-color: inherit;
     }
     .operation-panel-row th.col-no,
     .track-header-row th.col-no,
@@ -60,74 +61,26 @@ injectStyles(`
         position: sticky;
         left: 0;
     }
-    .operation-panel-row th,
-    .original-title-row th {
-        background-color: transparent;
-        border: none;
-        box-shadow: none;
-    }
-    .original-title-row th.track-b {
-        background-color: transparent;
-    }
-    .operation-panel-row th {
-        position: relative;
-        z-index: 20;
-        background-color: transparent;
-        border: none;
-    }
-    .operation-panel-row th,
-    th.track-header,
-    .original-title-row th,
-    .control-row th {
-        position: relative;
-        z-index: 20;
-    }
-    .sticky-row:not(.is-sticky) th.col-no.track-b::after {
-        display: none;
-    }
-    .sticky-row.is-sticky th.col-no {
-        overflow: hidden;
-        z-index: 310;
-        left: 0;
-    }
-    .sticky-row.is-sticky th.col-no::after {
-        display: none;
-    }
-    .sticky-row.is-sticky th {
-        z-index: 300;
-        opacity: 1;
-        color: #333;
-        background-color: #f8f9fa;
-        border-right: 1px solid #ddd;
-        border-bottom: 2px solid #ccc;
-    }
-    .sticky-row.is-sticky th.track-b {
-        background-color: #eef9ff;
-        border-left: 1px solid #ddd;
-    }
-    .sticky-row.is-sticky th > * {
-        visibility: visible;
-    }
 `);
 
 /** @file ui_display_logic.js @description 表示要素（SEED列/マスター情報/Find）のトグル管理 */
 
-// マスター情報の表示フラグ（初期値は非表示）
+// マスター情報の表示フラグ
 let isMasterInfoVisible = false;
 
 /**
- * SEED詳細列（左側の計算用数値列）の表示/非表示を切り替える
+ * SEED詳細列の表示/非表示を切り替える
  */
 function toggleSeedColumns() {
     showSeedColumns = !showSeedColumns;
     if (typeof generateRollsTable === 'function') {
-        generateRollsTable(); // ここで自動的に監視も再設定されるようになります
+        generateRollsTable(); 
     }
     updateToggleButtons();
 }
 
 /**
- * SEED列切り替えボタンのテキストを現在の状態に合わせて更新する
+ * SEED列切り替えボタンのテキストを更新
  */
 function updateToggleButtons() {
     const btnSeed = document.getElementById('toggle-seed-btn');
@@ -137,12 +90,10 @@ function updateToggleButtons() {
 }
 
 /**
- * ガチャのマスター情報（キャラ一覧リスト）の表示/非表示を切り替える
+ * ガチャのマスター情報の表示/非表示を切り替える
  */
 function toggleMasterInfo() {
     isMasterInfoVisible = !isMasterInfoVisible;
-
-    // マスター表示ボタンの見た目（activeクラス）を更新
     const btn = document.getElementById('toggle-master-info-btn');
     if (btn) {
         if (isMasterInfoVisible) {
@@ -151,14 +102,9 @@ function toggleMasterInfo() {
             btn.classList.remove('active');
         }
     }
-
-    // 【削除】content.style.display = ... の処理は不要になったため削除します
-    // テーブルの再生成時に view_table.js 側のロジックで判定されるためです
-
-    // テーブル全体を再生成して表示状態を反映
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
-        setupStickyHeaderObserver(); // 再生成後に監視を再設定
+        setupStickyHeaderObserver(); 
     }
     if (typeof updateMasterInfoView === 'function') {
         updateMasterInfoView();
@@ -166,20 +112,15 @@ function toggleMasterInfo() {
 }
 
 /**
- * Find（高速予報・ターゲット検索）エリアの表示/非表示を切り替える
+ * Find（ターゲット検索）エリアの表示/非表示を切り替える
  */
 function toggleFindInfo() {
     showFindInfo = !showFindInfo;
-    
     const btn = document.getElementById('toggle-find-info-btn');
-    
-    // テーブル全体を再生成してFindエリアの有無を反映
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
-        setupStickyHeaderObserver(); // 再生成後に監視を再設定
+        setupStickyHeaderObserver(); 
     }
-    
-    // Findボタンの活性化状態を更新
     if (btn) {
         if (showFindInfo) {
             btn.classList.add('active');
@@ -199,19 +140,53 @@ function setupStickyHeaderObserver() {
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            // entry.boundingClientRect.top が 0.5px 程度ずれることがあるため
-            // 余裕を持たせた判定に変更
             const isOffScreen = entry.boundingClientRect.top < -0.5;
+            const isStickyMode = !entry.isIntersecting && isOffScreen;
             
-            if (!entry.isIntersecting && isOffScreen) {
+            if (isStickyMode) {
                 stickyRow.classList.add('is-sticky');
             } else {
                 stickyRow.classList.remove('is-sticky');
             }
+
+            // JSによる条件分岐でのスタイル操作
+            const ths = stickyRow.querySelectorAll('th');
+            ths.forEach(th => {
+                if (isStickyMode) {
+                    // --- 固定表示時（通常のテーブルヘッダー） ---
+                    const isTrackB = th.classList.contains('track-b');
+                    th.style.backgroundColor = isTrackB ? '#eef9ff' : '#f8f9fa';
+                    th.style.color = '#333';
+                    th.style.borderBottom = '2px solid #ccc';
+                    th.style.borderRight = '1px solid #ddd';
+
+                    // BトラックのNOセルにはインラインの左線を戻す
+                    if (th.classList.contains('col-no') && isTrackB) {
+                        th.style.borderLeft = '1px solid #ddd';
+                    }
+
+                    th.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+                    const children = th.querySelectorAll('*');
+                    children.forEach(c => { c.style.visibility = 'visible'; });
+                } else {
+                    // --- 非固定時（ロゴ表示モード） ---
+                    th.style.backgroundColor = 'transparent';
+                    th.style.color = 'transparent'; 
+                    th.style.borderBottomColor = 'transparent';
+                    th.style.borderRightColor = 'transparent';
+                    
+                    // 【修正】BトラックNOセルの左罫線（border-left）も透明にする
+                    th.style.borderLeftColor = 'transparent';
+                    
+                    th.style.boxShadow = 'none';
+                    const children = th.querySelectorAll('*');
+                    children.forEach(c => { c.style.visibility = 'hidden'; });
+                }
+            });
         });
     }, {
-        threshold: [0, 1], // 完全に隠れた時と少し見えている時の両方を監視
-        rootMargin: '0px 0px 0px 0px' // marginを0に戻し、判定を top 基準に一本化
+        threshold: [0, 1],
+        rootMargin: '0px 0px 0px 0px'
     });
 
     const target = table.querySelector('thead');
