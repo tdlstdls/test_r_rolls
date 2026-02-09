@@ -9,6 +9,10 @@ function generateForecastHeader(slots, status) {
     const lStr = slots.legendSlots.length > 0 ? slots.legendSlots.join(", ") : "なし";
     const pStr = slots.promotedSlots.length > 0 ? slots.promotedSlots.join(", ") : "なし";
 
+    // ボタンの共通スタイル定義
+    const btnBaseStyle = "display: inline-block; padding: 2px 8px; margin: 0 2px; border-radius: 4px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; font-size: 13px; transition: all 0.2s;";
+    const activeStyle = "background: #007bff; color: #fff; border-color: #0056b3;";
+
     return `
         <div style="font-size: 14px; margin-bottom: 5px; line-height: 1.4; text-align: left; word-break: break-word;">
             <span style="font-weight:bold; color:#e91e63; margin-right: 5px;">(伝説枠)</span><span style="font-family: monospace; margin-right: 10px;">${lStr}</span>
@@ -16,22 +20,18 @@ function generateForecastHeader(slots, status) {
         </div>
         ${showFindInfo ? `
         <div style="margin: 8px 0; text-align: left;">
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
-                <span onclick="clearAllTargets()" class="text-btn" style="font-size: 14px; cursor:pointer;" title="全て非表示">×</span>
-                <span class="separator">|</span>
-                <span onclick="toggleLegendTargets()" class="${status.isLegendActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">伝説</span>
-                <span class="separator">|</span>
-                <span onclick="toggleLimitedTargets()" class="${status.isLimitedActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">限定</span>
-                <span class="separator">|</span>
-                <span onclick="toggleUberTargets()" class="${status.isUberActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">超激</span>
-                <span class="separator">|</span>
-                <span onclick="toggleSuperTargets()" class="${status.isSuperActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">激レア</span>
-                <span class="separator">|</span>
-                <span onclick="toggleRareTargets()" class="${status.isRareActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">レア</span>
-                <span class="separator">|</span>
-                <span id="toggle-master-info-btn" onclick="toggleMasterInfo()" class="${status.isMasterActive ? 'text-btn active' : 'text-btn'}" style="font-size: 14px; cursor:pointer;">マスター</span>
+            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; flex-wrap: wrap;">
+                <span onclick="clearAllTargets()" class="text-btn" style="${btnBaseStyle} color: #666;" title="全て非表示">×</span>
+                <span class="separator" style="color: #ccc; margin: 0 2px;">|</span>
+                <button onclick="toggleLegendTargets()" style="${btnBaseStyle} ${status.isLegendActive ? activeStyle : ''}">伝説</button>
+                <button onclick="toggleLimitedTargets()" style="${btnBaseStyle} ${status.isLimitedActive ? activeStyle : ''}">限定</button>
+                <button onclick="toggleUberTargets()" style="${btnBaseStyle} ${status.isUberActive ? activeStyle : ''}">超激</button>
+                <button onclick="toggleSuperTargets()" style="${btnBaseStyle} ${status.isSuperActive ? activeStyle : ''}">激レア</button>
+                <button onclick="toggleRareTargets()" style="${btnBaseStyle} ${status.isRareActive ? activeStyle : ''}">レア</button>
+                <span class="separator" style="color: #ccc; margin: 0 2px;">|</span>
+                <button id="toggle-master-info-btn" onclick="toggleMasterInfo()" style="${btnBaseStyle} ${status.isMasterActive ? activeStyle : ''}">マスター</button>
             </div>
-            <div style="font-size: 1.0em; color: #666; padding-left: 2px; line-height: 1.5;">
+            <div style="font-size: 0.9em; color: #666; padding-left: 2px; line-height: 1.5;">
                 ※キャラ名をタップで追跡ON/OFF。×で削除。右のアドレスをタップでルート探索。
             </div>
         </div>` : ''}
