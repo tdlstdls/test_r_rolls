@@ -3,28 +3,28 @@ injectStyles(`
         position: relative;
     }
     .sticky-row th {
-        position: -webkit-sticky !important;
-        position: sticky !important;
-        top: 0 !important; 
-        z-index: 5 !important; 
-        background-color: #f8f9fa !important;
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0; 
+        z-index: 5; 
+        background-color: #f8f9fa;
         transition: opacity 0.3s, background-color 0.3s;
     }
     .sticky-row:not(.is-sticky) th,
     .sticky-row:not(.is-sticky) td {
-        background: transparent !important;
-        background-color: transparent !important;
-        box-shadow: none !important;
-        border-color: transparent !important;
-        color: transparent !important;
+        background: transparent;
+        background-color: transparent;
+        box-shadow: none;
+        border-color: transparent;
+        color: transparent;
     }
     .sticky-row:not(.is-sticky) th > * {
         visibility: hidden;
     }
     .sticky-row:not(.is-sticky) th.col-no:not(.track-b) {
         position: relative; 
-        overflow: visible !important;
-        z-index: 5 !important; 
+        overflow: visible;
+        z-index: 5; 
     }
     .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
         content: "R_Rolls";
@@ -41,7 +41,7 @@ injectStyles(`
         pointer-events: none;
     }
     body.hide-sticky-logo .sticky-row:not(.is-sticky) th.col-no:not(.track-b)::after {
-        opacity: 0 !important;
+        opacity: 0;
         transition: opacity 0.2s ease-out;
     }
     .operation-panel-row th,
@@ -49,31 +49,31 @@ injectStyles(`
     .original-title-row th,
     .control-row th {
         position: relative; 
-        z-index: 25 !important;
+        z-index: 25;
         background-color: inherit;
     }
     .operation-panel-row th.col-no,
     .track-header-row th.col-no,
     .original-title-row th.col-no,
     .control-row th.col-no {
-        z-index: 30 !important;
-        position: sticky !important;
-        left: 0 !important;
+        z-index: 30;
+        position: sticky;
+        left: 0;
     }
     .operation-panel-row th,
     .original-title-row th {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
     }
     .original-title-row th.track-b {
-        background-color: transparent !important;
+        background-color: transparent;
     }
     .operation-panel-row th {
         position: relative;
         z-index: 20;
-        background-color: transparent !important;
-        border: none !important;
+        background-color: transparent;
+        border: none;
     }
     .operation-panel-row th,
     th.track-header,
@@ -83,27 +83,27 @@ injectStyles(`
         z-index: 20;
     }
     .sticky-row:not(.is-sticky) th.col-no.track-b::after {
-        display: none !important;
+        display: none;
     }
     .sticky-row.is-sticky th.col-no {
-        overflow: hidden !important;
-        z-index: 310 !important;
-        left: 0 !important;
+        overflow: hidden;
+        z-index: 310;
+        left: 0;
     }
     .sticky-row.is-sticky th.col-no::after {
         display: none;
     }
     .sticky-row.is-sticky th {
-        z-index: 300 !important;
+        z-index: 300;
         opacity: 1;
-        color: #333 !important;
-        background-color: #f8f9fa !important;
-        border-right: 1px solid #ddd !important;
-        border-bottom: 2px solid #ccc !important;
+        color: #333;
+        background-color: #f8f9fa;
+        border-right: 1px solid #ddd;
+        border-bottom: 2px solid #ccc;
     }
     .sticky-row.is-sticky th.track-b {
-        background-color: #eef9ff !important;
-        border-left: 1px solid #ddd !important;
+        background-color: #eef9ff;
+        border-left: 1px solid #ddd;
     }
     .sticky-row.is-sticky th > * {
         visibility: visible;

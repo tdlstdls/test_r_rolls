@@ -1,47 +1,4 @@
-injectStyles(`
-    #schedule-container { 
-        padding: 20px; 
-        background-color: #fff; 
-        border-top: 1px solid #ddd; 
-        max-width: 100%; 
-        box-sizing: border-box; 
-        flex-grow: 1; 
-        overflow-y: auto; 
-    }
-    .schedule-scroll-wrapper { 
-        overflow-x: auto; 
-        max-height: none; 
-        border: 1px solid #ddd; 
-        max-width: 100%; 
-    }
-    .schedule-table { 
-        width: 100%; 
-        border-collapse: separate; 
-        border-spacing: 0; 
-        margin-top: 0; 
-        font-size: 14px; 
-    }
-    .schedule-table th, 
-    .schedule-table td { 
-        border: 1px solid #ddd !important; 
-        padding: 8px; 
-        text-align: center !important; 
-        white-space: nowrap; 
-    }
-    .schedule-table th { 
-        background-color: #eee; 
-        position: sticky; 
-        top: auto;
-        z-index: 10; 
-    }
-    .schedule-table td:nth-child(3) { 
-        white-space: normal; 
-        text-align: left !important; 
-        min-width: 250px; 
-    }
-`);
-
-/** @file view_schedule_table.js @description リスト形式のスケジュール表描画 */
+/** @file view_schedule_table.js @description リスト形式のスケジュール表描画（スタイル内包型） */
 
 function renderScheduleTable(tsvContent, containerId) {
     const container = document.getElementById(containerId);
@@ -71,16 +28,20 @@ function renderScheduleTable(tsvContent, containerId) {
         if (isEndedA !== isEndedB) return isEndedA ? -1 : 1;
 
         const isSpecialA = isPlatinumOrLegend(a);
-      
         const isSpecialB = isPlatinumOrLegend(b);
         if (isSpecialA !== isSpecialB) return isSpecialA ? 1 : -1; 
 
         return parseInt(a.rawStart) - parseInt(b.rawStart);
     });
+
     const ganttHtml = renderGanttChart(data);
     const hideBtnClass = hideEndedSchedules ? 'text-btn active' : 'text-btn';
 
-    // --- 修正箇所: 変数 html の代入をバッククォートで正しく囲む ---
+    // スタイル定義：テーブル全体とセルの基本設定
+    const tableBaseStyle = "width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 0; font-size: 14px; background-color: #fff;";
+    const cellStyle = "border: 1px solid #ddd; padding: 8px; text-align: center; white-space: nowrap;";
+    const headerStyle = cellStyle + " background-color: #eee; position: sticky; top: 0; z-index: 10; font-weight: bold;";
+
     let html = `
         <div style="margin-bottom: 15px;">
             <button onclick="toggleSchedule()" style="
@@ -102,34 +63,32 @@ function renderScheduleTable(tsvContent, containerId) {
         </div>
         
         ${ganttHtml}
-        <div style="margin-top: 20px;"></div>
-        <div class="schedule-scroll-wrapper">
-        <table class="schedule-table">
         
-        <thead>
-            <tr>
-                <th style="min-width:50px;">自</th>
-                <th style="min-width:50px;">至</th>
-                <th>ガチャ名 / 詳細</th>
-                <th>レア</th>
-                <th>激レア</th>
-                <th>超激</th>
-                <th>伝説</th>
-                <th>確定</th>
-            </tr>
-        </thead>
-        <tbody>
+        <div style="margin-top: 20px;"></div>
+        <div style="overflow-x: auto; border: 1px solid #ddd; max-width: 100%;">
+            <table style="${tableBaseStyle}">
+            <thead>
+                <tr>
+                    <th style="${headerStyle} min-width:50px;">自</th>
+                    <th style="${headerStyle} min-width:50px;">至</th>
+                    <th style="${headerStyle} text-align: left;">ガチャ名 / 詳細</th>
+                    <th style="${headerStyle}">レア</th>
+                    <th style="${headerStyle}">激レア</th>
+                    <th style="${headerStyle}">超激</th>
+                    <th style="${headerStyle}">伝説</th>
+                    <th style="${headerStyle}">確定</th>
+                </tr>
+            </thead>
+            <tbody>
     `;
-    // --- 修正完了 ---
+
     filteredData.forEach((item, index) => {
         let seriesDisplay = item.seriesName ? item.seriesName : "シリーズ不明";
         
-        // 修正点1: ステップアップ（item.stepup）でない場合のみ「[確定]」を付与する
         if (item.guaranteed && !item.stepup && !seriesDisplay.includes("[確定]")) {
             seriesDisplay += " [確定]";
         }
         
-        // ステップアップのラベル追加処理
         if (item.stepup && !seriesDisplay.includes("[StepUp]")) {
             seriesDisplay += " [StepUp]";
         }
@@ -150,10 +109,7 @@ function renderScheduleTable(tsvContent, containerId) {
             });
     
             if (nextSameType) {
-                if (parseInt(nextSameType.rawStart) < yesterdayInt) {
-                    return;
-                }
-
+                if (parseInt(nextSameType.rawStart) < yesterdayInt) return;
                 endStr = `${formatDateJP(nextSameType.rawStart)}<br><span style="font-size:0.85em">${formatTime(nextSameType.startTime)}</span>`;
                 isAppliedNextStart = true;
             }
@@ -170,24 +126,28 @@ function renderScheduleTable(tsvContent, containerId) {
         let legendStyle = ( !isPlatLeg && legendRateVal > 30 ) ? 'color:red; font-weight:bold;' : '';
         const endDateTime = parseDateTime(item.rawEnd, item.endTime);
 
-        // 修正点2: 行のハイライト（row-guaranteed）もステップアップの場合は除外する
-        let rowClass = (now > endDateTime) ? "row-ended" : ((item.guaranteed && !item.stepup) ? "row-guaranteed" : "");
+        // 行のハイライト設定
+        let rowInlineStyle = "";
+        if (now > endDateTime) {
+            rowInlineStyle = "background-color: #f9f9f9; color: #999; opacity: 0.8;"; // 終了分
+        } else if (item.guaranteed && !item.stepup) {
+            rowInlineStyle = "background-color: #fff0f0;"; // 確定枠（薄い赤）
+        }
         
         html += `
-            <tr class="${rowClass}">
-                <td>${startStr}</td>
-                <td>${endStr}</td>
-                <td style="text-align:left; vertical-align: middle;">
+            <tr style="${rowInlineStyle}">
+                <td style="${cellStyle}">${startStr}</td>
+                <td style="${cellStyle}">${endStr}</td>
+                <td style="${cellStyle} text-align: left; white-space: normal; min-width: 250px; vertical-align: middle;">
                     <div style="font-weight:bold; color:#000;">${seriesDisplay} <span style="font-weight:normal; font-size:0.9em; color:#555; user-select: text;">(ID: ${item.id})</span></div>
                     <div style="font-size:0.85em; color:#333; margin-top:2px;">${item.tsvName}</div>
                 </td>
-                <td>${fmtRate(item.rare)}</td>
-                <td>${fmtRate(item.supa)}</td>
-                <td style="${uberStyle}">${fmtRate(item.uber)}</td>
-                <td style="${legendStyle}">${fmtRate(item.legend)}</td>
-                <td style="text-align:center; font-size:1.2em;">
-                    ${(item.guaranteed && !item.stepup) ? // 修正点3: 確定列の赤丸表示もステップアップを除外
-                '<span style="color:red;">●</span>' : '-'}
+                <td style="${cellStyle}">${fmtRate(item.rare)}</td>
+                <td style="${cellStyle}">${fmtRate(item.supa)}</td>
+                <td style="${cellStyle} ${uberStyle}">${fmtRate(item.uber)}</td>
+                <td style="${cellStyle} ${legendStyle}">${fmtRate(item.legend)}</td>
+                <td style="${cellStyle} font-size:1.2em;">
+                    ${(item.guaranteed && !item.stepup) ? '<span style="color:red;">●</span>' : '-'}
                 </td>
             </tr>
         `;
@@ -195,10 +155,16 @@ function renderScheduleTable(tsvContent, containerId) {
 
     html += `</tbody></table></div>`;
 
-    // 編集モードへの移行ボタンを追加
     html += `
         <div style="margin-top: 20px; padding-bottom: 30px; text-align: center;">
-            <button id="enter-edit-mode-btn" class="secondary" onclick="enterScheduleEditMode()" style="padding: 10px 20px; font-size: 14px;">
+            <button id="enter-edit-mode-btn" class="secondary" onclick="enterScheduleEditMode()" style="
+                padding: 10px 20px; 
+                font-size: 14px; 
+                cursor: pointer; 
+                border-radius: 4px; 
+                background-color: #6c757d; 
+                color: white; 
+                border: none;">
                 スケジュールを編集する
             </button>
         </div>

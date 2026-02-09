@@ -166,7 +166,7 @@ function generateTxtRouteView(seeds, initialSeed, highlightMap, guarHighlightMap
         <style>
             .txt-seg-wrapper.is-checked { text-decoration: line-through; opacity: 0.3; }
             .txt-seg-wrapper.is-checked .txt-seg-content span, 
-            .txt-seg-wrapper.is-checked label { color: #888 !important; background: transparent !important; border: none !important; }
+            .txt-seg-wrapper.is-checked label { color: #888; background: transparent; border: none; }
             .detailed-log { font-size: 10px; color: #666; background: #f8f8f8; padding: 8px; margin: 6px 0 10px 15px; border-radius: 4px; border-left: 4px solid #ddd; font-family: 'Consolas', monospace; line-height: 1.5; }
             .detailed-log span { color: #d9534f; font-weight: bold; }
             .detailed-log .seed-val { color: #2e7d32; }

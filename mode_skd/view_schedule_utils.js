@@ -1,4 +1,4 @@
-/** @file view_schedule_utils.js @description スケジュール表示の共通設定とユーティリティ */
+/** @file view_schedule_utils.js @description スケジュール表示の共通設定とユーティリティ（スタイル内包型） */
 
 // 表示状態管理用の変数
 if (typeof hideEndedSchedules === 'undefined') {
@@ -19,6 +19,7 @@ function calcTextWidth(text) {
     let width = 0;
     for (let i = 0; i < text.length; i++) {
         const code = text.charCodeAt(i);
+        // 半角・全角の判定に基づく幅計算
         if ((code >= 0x00 && code < 0x81) || (code === 0xf8f0) || (code >= 0xff61 && code < 0xffa0) || (code >= 0xf8f1 && code < 0xf8f4)) {
             width += 8;
         } else {
@@ -45,11 +46,10 @@ function saveGanttImage() {
     const fullContentWidth = scrollContent.offsetWidth;
 
     // 1. デスクトップ表示用のスタイルを一時的に注入
-    // スマホのメディアクエリによる制限を解除するため、コンテナを全幅固定にする
     const styleOverride = document.createElement('style');
     styleOverride.id = 'gantt-save-override';
     styleOverride.innerHTML = `
-        /* モバイル用の制限を完全に無効化 */
+        /* モバイル用の制限を解除し、全幅で描画するための設定 */
         .gantt-outer-wrapper, .gantt-chart-container, .gantt-scroll-wrapper { 
             width: ${fullContentWidth}px !important;
             max-width: none !important;
@@ -71,7 +71,7 @@ function saveGanttImage() {
             text-align: center !important;
             vertical-align: middle !important;
             font-size: 11px !important;
-            position: static !important; /* 固定列を解除して正しく並べる */
+            position: static !important;
         }
         .gantt-bar { 
             height: 20px !important;
@@ -80,27 +80,22 @@ function saveGanttImage() {
             align-items: center !important;
             justify-content: center !important;
         }
-        .gantt-bar-text {
-            line-height: 20px !important;
-            font-size: 10px !important;
-        }
     `;
     document.head.appendChild(styleOverride);
     
-    // 2. スタイルの保存
+    // 2. 元のスタイルのバックアップ
     const originalOverflow = element.style.overflow;
     const originalWidth = element.style.width;
     const originalMaxWidth = element.style.maxWidth;
     const originalWrapperOverflow = scrollWrapper.style.overflow;
 
-    // 要素の状態を一時変更
+    // 要素の状態を一時変更（キャプチャ用）
     element.style.overflow = 'visible';
     element.style.width = fullContentWidth + 'px';
     element.style.maxWidth = 'none';
     scrollWrapper.style.overflow = 'visible';
 
     // 3. html2canvasでキャプチャ
-    // windowWidthをコンテンツ幅に合わせることで、モバイルブラウザでもデスクトップとして描画させる
     html2canvas(element, {
         width: fullContentWidth,
         windowWidth: fullContentWidth > 1200 ? fullContentWidth : 1200,

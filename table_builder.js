@@ -1,6 +1,6 @@
 injectStyles(`
-    table {
-        border-collapse: separate !important;
+    #rolls-table-container table {
+        border-collapse: separate;
         border-spacing: 0;
         width: auto;
         table-layout: auto;
@@ -8,9 +8,10 @@ injectStyles(`
         backface-visibility: hidden;
     }
 
-    th, td {
-        border-right: 1px solid #ddd !important;
-        border-bottom: 1px solid #ddd !important;
+    #rolls-table-container table th,
+    #rolls-table-container table td {
+        border-right: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
         padding: 6px;
         text-align: left;
         white-space: nowrap;
@@ -18,14 +19,14 @@ injectStyles(`
         font-size: 13px;
     }
 
-    th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
+    #rolls-table-container table th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
 
-    .gacha-column, 
-    .gacha-cell,
-    .calc-column {
-        width: 170px !important;
-        min-width: 170px !important;
-        max-width: 170px !important;
+    #rolls-table-container table .gacha-column, 
+    #rolls-table-container table .gacha-cell,
+    #rolls-table-container table .calc-column {
+        width: 170px;
+        min-width: 170px;
+        max-width: 170px;
         white-space: normal;
         word-break: break-all;
         line-height: 1.2;

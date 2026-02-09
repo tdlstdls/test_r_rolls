@@ -1,6 +1,6 @@
 /** @file schedule_logic.js @description gatya.tsvの解析、日付・時刻計算のユーティリティを担当 @dependency なし */
 
-// YYYYMMDD -> M/D (年は無視、20300101は「永続」)
+/** YYYYMMDD -> M/D (年は無視、20300101は「永続」) */
 function formatDateJP(dateStr) {
     if (!dateStr || dateStr.length < 8) return dateStr;
     if (dateStr === '20300101') {
@@ -11,14 +11,14 @@ function formatDateJP(dateStr) {
     return `${m}/${d}`;
 }
 
-// HHMM -> HH:MM
+/** HHMM -> HH:MM */
 function formatTime(timeStr) {
     if (!timeStr) return "00:00";
     let s = timeStr.toString().padStart(4, '0');
     return `${s.substring(0, 2)}:${s.substring(2, 4)}`;
 }
 
-// YYYYMMDD -> Dateオブジェクト (00:00:00)
+/** YYYYMMDD -> Dateオブジェクト (00:00:00) */
 function parseDateStr(dateStr) {
     if (!dateStr || dateStr.length < 8) return new Date();
     const y = parseInt(dateStr.substring(0, 4), 10);
@@ -27,7 +27,7 @@ function parseDateStr(dateStr) {
     return new Date(y, m, d);
 }
 
-// YYYYMMDD, HHMM -> Dateオブジェクト
+/** YYYYMMDD, HHMM -> Dateオブジェクト */
 function parseDateTime(dateStr, timeStr) {
     const d = parseDateStr(dateStr);
     if (timeStr) {
@@ -39,7 +39,7 @@ function parseDateTime(dateStr, timeStr) {
     return d;
 }
 
-// Date -> YYYYMMDD 数値
+/** Date -> YYYYMMDD 数値 */
 function getDateInt(dateObj) {
     const y = dateObj.getFullYear();
     const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -47,26 +47,27 @@ function getDateInt(dateObj) {
     return parseInt(`${y}${m}${d}`, 10);
 }
 
-// Date -> M/D 文字列
+/** Date -> M/D 文字列 */
 function getShortDateStr(dateObj) {
     return `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
 }
 
-// プラチナ・レジェンド判定
+/** プラチナ・レジェンド判定 */
 function isPlatinumOrLegend(item) {
     const name = (item.seriesName + (item.tsvName || "")).replace(/\s/g, "");
     return name.includes("プラチナガチャ") || name.includes("レジェンドガチャ");
 }
 
-// TSVデータのパース処理
+/** TSVデータのパース処理 */
 function parseGachaTSV(tsv) {
+    if (!tsv) return [];
     const lines = tsv.split('\n');
     const schedule = [];
     lines.forEach(line => {
         if (line.trim().startsWith('[') || !line.trim()) return;
         const cols = line.split('\t');
         if (cols.length < 10) return;
-        if (cols[8] !== '1') return;
+        if (cols[8] !== '1') return; // 有効フラグチェック
 
         const startDateStr = cols[0]; 
         const startTimeStr = cols[1]; 
@@ -74,6 +75,7 @@ function parseGachaTSV(tsv) {
         const endTimeStr   = cols[3]; 
 
         let validBlockIndex = -1;
+        // 有効なデータブロックを探索
         for (let i = 10; i < cols.length; i += 15) {
             const descIndex = i + 14;
             if (descIndex >= cols.length) break;
@@ -115,7 +117,7 @@ function parseGachaTSV(tsv) {
         let seriesName = "";
         let tsvName = detail || "";
 
-        // マスタから名前を引く (接尾辞付きIDで検索)
+        // マスタから名前を引く (接尾辞付きID優先)
         if (typeof gachaMasterData !== 'undefined' && gachaMasterData.gachas[finalId]) {
             seriesName = gachaMasterData.gachas[finalId].name;
         } else if (typeof gachaMasterData !== 'undefined' && gachaMasterData.gachas[gachaId]) {
@@ -125,7 +127,7 @@ function parseGachaTSV(tsv) {
         }
         
         schedule.push({
-            id: finalId, // 接尾辞付きIDを格納
+            id: finalId,
             start: startDateStr,
             end: endDateStr,
             rawStart: startDateStr,
@@ -143,13 +145,12 @@ function parseGachaTSV(tsv) {
         });
     });
 
-    // 重複期間の自動短縮ロジックの修正
+    // 重複期間の自動短縮ロジック
     for (let i = 0; i < schedule.length; i++) {
         const itemA = schedule[i];
         const startA = parseInt(itemA.start);
         const endA = parseInt(itemA.end);
 
-        // 接尾辞を除去したベースIDで比較するように修正
         const baseIdA = itemA.id.replace(/[gf]/, '');
 
         const itemB = schedule.find(target => {
@@ -161,7 +162,6 @@ function parseGachaTSV(tsv) {
         });
 
         if (itemB) {
-            // 後続枠の開始タイミングに合わせて、前の枠を終了させる
             itemA.end = itemB.start;
             itemA.rawEnd = itemB.rawStart;
             itemA.endTime = itemB.startTime;
@@ -172,6 +172,7 @@ function parseGachaTSV(tsv) {
     return schedule;
 }
 
+/** 現在の時刻に基づき、推奨される初期ガチャ状態を返す */
 function findDefaultGachaState(data) {
     const now = new Date();
     let candidates = data.filter(item => {

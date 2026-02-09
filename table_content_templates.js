@@ -5,7 +5,7 @@ function generateTableBodyHTML(numRolls, columnConfigs, tableData, seeds, highli
     for (let i = 0; i < numRolls; i++) {
         html += `<tr>${renderTableRowSide(i, i * 2, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, true)}`;
         html += `${renderTableRowSide(i, i * 2 + 1, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, false)}`;
-        html += `<td class="table-filler" style="border:none !important; background:transparent !important;"></td></tr>`;
+        html += `<td class="table-filler" style="border:none; background:transparent;"></td></tr>`;
     }
     return html;
 }
