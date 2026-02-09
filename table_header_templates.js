@@ -21,7 +21,6 @@ function generateSizingRowHTML(totalTrackSpan, noWidth, unitWidth) {
 
 /**
  * 固定ヘッダー（スクロール時に現れる行）のHTML生成
- * 修正点：ロゴが右側にはみ出せるように設定し、背景色はJSで制御するためインライン指定を最小化
  */
 function generateStickyHeaderRowHTML(calcColClass) {
     return `
@@ -37,8 +36,16 @@ function generateStickyHeaderRowHTML(calcColClass) {
 }
 
 function generateSubHeaderRowsHTML(totalTrackSpan, calcColClass) {
-    const trackH = `<tr><th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd;"></th><th class="track-header" colspan="${totalTrackSpan}" style="text-align:center; background:#f8f9fa; font-weight:bold; border-right: 1px solid #ddd;">A</th><th class="col-no" style="background:#eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd;"></th><th class="track-header" colspan="${totalTrackSpan}" style="text-align:center; background:#eef9ff; font-weight:bold; border-right: 1px solid #ddd;">B</th><th class="table-filler"></th></tr>`;
+    // trackH の table-filler の border をすべて透明(none)に設定
+    const trackH = `<tr>
+        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"></th>
+        <th class="track-header" colspan="${totalTrackSpan}" style="text-align:center; background:#f8f9fa; font-weight:bold; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">A</th>
+        <th class="col-no" style="background:#eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"></th>
+        <th class="track-header" colspan="${totalTrackSpan}" style="text-align:center; background:#eef9ff; font-weight:bold; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">B</th>
+        <th class="table-filler" style="border: none;"></th>
+    </tr>`;
     
+    // titleH の table-filler も同様に border: none に設定
     const titleH = `<tr class="original-title-row">
         <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; border-bottom:2px solid #ccc;">NO.</th>
         <th class="${calcColClass}" style="border-right: 1px solid #ddd; border-bottom:2px solid #ccc;">SEED</th>

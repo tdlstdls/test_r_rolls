@@ -152,6 +152,18 @@ function setupStickyHeaderObserver() {
             // JSによる条件分岐でのスタイル操作
             const ths = stickyRow.querySelectorAll('th');
             ths.forEach(th => {
+                // --- フィラー領域（余白埋め）の条件分岐による制御 ---
+                if (th.classList.contains('table-filler')) {
+                    th.style.border = 'none';
+                    th.style.background = 'transparent';
+                    th.style.backgroundColor = 'transparent';
+                    th.style.boxShadow = 'none';
+                    // 子要素の可視性のみスクロール状態に合わせる
+                    const children = th.querySelectorAll('*');
+                    children.forEach(c => { c.style.visibility = isStickyMode ? 'visible' : 'hidden'; });
+                    return; // フィラーの場合はここで処理を終了
+                }
+
                 if (isStickyMode) {
                     // --- 固定表示時（通常のテーブルヘッダー） ---
                     const isTrackB = th.classList.contains('track-b');
@@ -175,7 +187,7 @@ function setupStickyHeaderObserver() {
                     th.style.borderBottomColor = 'transparent';
                     th.style.borderRightColor = 'transparent';
                     
-                    // 【修正】BトラックNOセルの左罫線（border-left）も透明にする
+                    // BトラックNOセルの左罫線も透明にする
                     th.style.borderLeftColor = 'transparent';
                     
                     th.style.boxShadow = 'none';
