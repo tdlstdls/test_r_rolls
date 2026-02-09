@@ -1,4 +1,27 @@
-/** @file view_table_renderer.js @description 行・セルの描画処理（解説文：最下部注意点統合版） */
+/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示対応版） */
+
+// テーブル全体の罫線とレイアウトを強制するスタイルを注入
+if (typeof injectStyles === 'function') {
+    injectStyles(`
+        #rolls-table-container table {
+            border-collapse: separate !important;
+            border-spacing: 0 !important;
+            border-top: 1px solid #ddd !important;
+            border-left: 1px solid #ddd !important;
+        }
+        #rolls-table-container table th,
+        #rolls-table-container table td {
+            border-right: 1px solid #ddd !important;
+            border-bottom: 1px solid #ddd !important;
+            box-sizing: border-box;
+        }
+        /* Sticky要素（NO列）の境界線と重なりの制御 */
+        #rolls-table-container .col-no {
+            z-index: 10 !important;
+            border-right: 1px solid #ddd !important;
+        }
+    `);
+}
 
 /**
  * 行レンダリング (A/Bサイド別)
@@ -7,7 +30,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
     const rowData = tableData[seedIndex];
     if (!rowData) return ''; 
 
-    // No列の背景色を決定（isLeftSideがfalseならBトラック用カラーに）
+    // No列の背景色を決定
     const rowInfo = rowData.rowInfo || {};
     let noColBgColor = isLeftSide ? '#f8f9fa' : '#eef9ff';
     if (rowInfo.isNormalReroll) {
@@ -18,15 +41,15 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         noColBgColor = '#FFDAB9';
     }
 
-    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5; border-right: 1px solid #ddd;' : ''}">${rowIndex + 1}</td>`;
+    // No列の描画：border: 1px solid #ddd を明示的に追加
+    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; border: 1px solid #ddd; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5;' : ''}">${rowIndex + 1}</td>`;
 
     // 詳細計算セルの描画
     if (typeof generateDetailedCalcCells === 'function') {
         sideHtml += generateDetailedCalcCells(seedIndex, seeds, tableData);
     } else {
         const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
-        // 修正：5列から1列に変更
-        sideHtml += `<td class="${calcColClass}">-</td>`;
+        sideHtml += `<td class="${calcColClass}" style="border: 1px solid #ddd;">-</td>`;
     }
 
     // 各ガチャ列のセルを描画
@@ -35,11 +58,11 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         const suffix = idWithSuffix.match(/[gfs]$/)?.[0] || '';
         const data = rowData.cells ? rowData.cells[colIndex] : null;
 
-        // 通常セルの描画
+        // 通常セルの描画（非確定セル）
         if (typeof generateCell === 'function') {
             sideHtml += generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, isSimulationMode);
         } else {
-            sideHtml += `<td>-</td>`;
+            sideHtml += `<td style="border: 1px solid #ddd;">-</td>`;
         }
 
         // 確定枠セルの描画
@@ -47,7 +70,6 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
             if (data && (data.guaranteed || (data.result && data.result.guaranteed))) {
                 sideHtml += renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap);
             } else {
-                // text-align: left, font-size: 12px
                 sideHtml += `<td class="gacha-cell gacha-column guaranteed-cell" style="border: 1px solid #ddd; background: #eee; text-align:left;">-</td>`;
             }
         }
@@ -59,8 +81,8 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
  * 確定枠セルの詳細描画
  */
 function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap) {
-    // font-size: 12px を指定し、クラス guaranteed-cell を追加
-    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left;';
+    // 罫線を確実にするため border: 1px solid #ddd を含める
+    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left; border: 1px solid #ddd;';
     if (isSimulationMode && guarHighlightMap.get(seedIndex) === id) {
         cellStyle += `background-color: #66b2ff;`;
     } else {
@@ -81,7 +103,6 @@ function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guar
             const escapedName = charName.replace(/'/g, "\\'");
             const finalSeedInProcess = seeds[res.nextRollStartSeedIndex - 1];
             
-            // 修正：SEED表示モード（showSeedColumns）がONの時、確定枠も算出過程ポップアップを表示するように変更
             let clickAction = "";
             if (showSeedColumns) {
                  clickAction = `onclick="if(!event.ctrlKey) showRollProcessPopup(${seedIndex}, '${id}', ${colIndex}, true, ${isAltRoute})"`;
@@ -155,13 +176,13 @@ function generateSeedExplanationHtml() {
                     </p>
                     <ul style="padding-left: 20px;">
                         <li><strong>回避：別のガチャを1回挟む</strong><br>
-                            「キャラ判定(s1)」は波動バスターズやコラボガチャ等では異なるキャラになることがあります。レア被りしそうな場所で、排出されるレアキャラが異なる別のガチャを1回だけ引くことで、(s1)の計算結果が変わり、レア被りを回避して同一トラックを維持できます。
+                            「キャラ判定(s1)」は排出されるレアキャラが異なる別のガチャを1回だけ引くことで、計算結果が変わり、レア被りを回避して同一トラックを維持できます。
                         </li>
                         <li><strong>誘発：あえて同じキャラが出るガチャを選ぶ</strong><br>
-                            逆に、反対側のトラック（B側）に目的のキャラがいる場合は、あえてレア被りが発生するガチャを引くことで、意図的にトラックを切り替えて目的のルートへ合流させることができます。
+                            逆に、あえてレア被りが発生するガチャを引くことで、意図的にトラックを切り替えて目的のルートへ合流させることができます。
                         </li>
                         <li><strong>回避：プラチナチケットの活用</strong><br>
-                            プラチナチケットは「レア被り」という概念がありません。被りが発生する地点でプラチナチケットを使用すれば、再抽選を発生させずに同一トラックを維持して進むことが可能です。
+                            プラチナチケットは「レア被り」が発生しません。再抽選を発生させずに同一トラックを維持して進むことが可能です。
                         </li>
                     </ul>
                 </div>
@@ -169,18 +190,7 @@ function generateSeedExplanationHtml() {
                 <div style="background: #fffbe6; border: 1px solid #ffe58f; padding: 18px; margin-top: 25px; border-radius: 6px; color: #856404; line-height: 1.6;">
                     <strong style="font-size: 1.1em;">⚠️ 【参考表示】および注意点について</strong>
                     <p style="margin-top: 10px;">
-                        連続するロールの前後で別のガチャを引くことにより、レア被りを誘発したり、回避したりすることもできるため、ご自身の計画でガチャを引くと次にどのセルに遷移するかは<strong>「ユーザーご自身で」</strong>ご確認ください。
-                    </p>
-                    <p>
-                        このテーブルでは、ユーザーが選択するルートは考慮されず、機械的に次のような仕様でレア被り時の遷移先セル番地及び再抽選キャラを表示しています：
-                    </p>
-                    <ul style="padding-left: 20px; margin: 10px 0;">
-                        <li>（１）同一トラック・同一ガチャの１つ上のセルと比較して、キャラが一致し、レアリティがレアの場合、レア被りと判定し、遷移先セル番地及び再抽選キャラを表示します。</li>
-                        <li>（２）上記のレアベリにより遷移した遷移先セルにおいて、レア被りによる遷移元とキャラが一致した場合にも、連続レアベリと判定し、遷移先セル番地及び再抽選キャラを表示します。この場合は遷移先セルアドレスの先頭に「R」が表示されます。</li>
-                    </ul>
-                    <hr style="border: 0; border-top: 1px solid #ffe58f; margin: 10px 0;">
-                    <p style="font-size: 0.95em;">
-                        <strong>※注意:</strong> このテーブルの「遷移先アドレス」は、常に同じガチャを引き続けた場合の理論値です。途中でガチャを切り替えた場合の正確な挙動は、シミュレーションモードを活用してご確認ください。（調整中）
+                        このテーブルの「遷移先アドレス」は、常に同じガチャを引き続けた場合の理論値です。途中でガチャを切り替えた場合の正確な挙動は、シミュレーションモードを活用してご確認ください。
                     </p>
                 </div>
             </div>

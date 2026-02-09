@@ -1,4 +1,4 @@
-/** @file view_cell_renderer.js @description 個別セルの描画とレアリティ色の制御（SEED [index] 1列集約版） */
+/** @file view_cell_renderer.js @description 個別セルの描画とレアリティ色の制御（全セル罫線表示・SEED [index] 1列集約版） */
 
 /**
  * テーブル用アドレス（A1, B25等）のフォーマット
@@ -14,47 +14,49 @@ function formatAddress(idx) {
 
 /**
  * SEED値などの詳細セル（左側の列）を生成する
- * 修正：5列から 1列（SEED [index]）に変更
+ * 修正：罫線(border)を追加
  */
 function generateDetailedCalcCells(seedIndex, seeds, tableData) {
     const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
-    if (!showSeedColumns) return `<td class="${calcColClass}"></td>`;
+    const borderStyle = "border: 1px solid #ddd;";
     
-    if (seedIndex >= seeds.length) return `<td class="${calcColClass}">-</td>`;
+    if (!showSeedColumns) return `<td class="${calcColClass}" style="${borderStyle}"></td>`;
+    
+    if (seedIndex >= seeds.length) return `<td class="${calcColClass}" style="${borderStyle}">-</td>`;
 
     const s0 = seeds[seedIndex];
-    // SEED値 [index] の形式で表示（半角スペース入り）
-    return `<td class="${calcColClass}">${s0} [${seedIndex}]</td>`;
+    // SEED値 [index] の形式で表示
+    return `<td class="${calcColClass}" style="${borderStyle}">${s0} [${seedIndex}]</td>`;
 }
 
 /**
  * 通常のガチャ結果セル（1マス分）を生成する
+ * 修正：罫線(border)を style に追加
  */
 function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, isSimulationMode) {
     const rowData = tableData[seedIndex];
     const cell = rowData?.cells?.[colIndex];
     
-    if (!cell || !cell.roll) return `<td class="gacha-cell">-</td>`;
+    const borderStyle = "border: 1px solid #ddd; ";
+    if (!cell || !cell.roll) return `<td class="gacha-cell" style="${borderStyle}">-</td>`;
     
     const rr = cell.roll;
     let charName = (rr.finalChar && rr.finalChar.name) ? rr.finalChar.name : "データ不足";
     const charId = rr.finalChar.id;
     const charIdStr = String(charId);
 
-    // [修正] 狭幅モード時に10文字以上なら省略
+    // 狭幅モード時の名前省略
     if (typeof isNarrowMode !== 'undefined' && isNarrowMode && charName.length > 10) {
         charName = charName.substring(0, 9) + "...";
     }
 
     // --- 1. 背景色の判定ロジック ---
-    let style = '';
+    let bgColorStyle = '';
     const sv = seeds[seedIndex] % 10000;
 
-    // A. ユーザーが「Find」で優先指定したキャラ
     const isPrioritized = (typeof userPrioritizedTargets !== 'undefined') && 
                           (userPrioritizedTargets.includes(charId) || userPrioritizedTargets.includes(charIdStr));
 
-    // B. 限定キャラ判定
     let isLimited = false;
     if (typeof limitedCats !== 'undefined' && Array.isArray(limitedCats)) {
         if (limitedCats.includes(parseInt(charId)) || limitedCats.includes(charIdStr)) {
@@ -63,41 +65,38 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
     }
 
     if (isPrioritized) {
-        style = 'background-color: #6EFF72; font-weight: bold;'; 
+        bgColorStyle = 'background-color: #6EFF72; font-weight: bold;'; 
     } 
-    // C. シミュレーションモードのルートハイライト
     else if (isSimulationMode && highlightMap.get(seedIndex) === id) {
         if (isLimited || rr.rarity === 'uber' || rr.rarity === 'legend') {
-            style = 'background:#32CD32;';
+            bgColorStyle = 'background:#32CD32;';
         } else {
-            style = 'background:#98FB98;';
+            bgColorStyle = 'background:#98FB98;';
         }
     } 
-    // D. 限定キャラの状態色
     else if (isLimited) {
-        style = 'background-color: #66FFFF;';
+        bgColorStyle = 'background-color: #66FFFF;';
     } 
-    // E. レアリティ色分け
     else {
-        if (sv >= 9970) style = 'background-color: #DDA0DD;';
-        else if (sv >= 9940) style = 'background-color: #de59de;';
-        else if (sv >= 9500) style = 'background-color: #FF4C4C;';
-        else if (sv >= 9070) style = 'background-color: #fda34e;';
-        else if (sv >= 6970) style = 'background-color: #ffff33;';
+        if (sv >= 9970) bgColorStyle = 'background-color: #DDA0DD;';
+        else if (sv >= 9940) bgColorStyle = 'background-color: #de59de;';
+        else if (sv >= 9500) bgColorStyle = 'background-color: #FF4C4C;';
+        else if (sv >= 9070) bgColorStyle = 'background-color: #fda34e;';
+        else if (sv >= 6970) bgColorStyle = 'background-color: #ffff33;';
     }
+
+    // 罫線と背景色を統合
+    const finalStyle = borderStyle + bgColorStyle;
 
     // --- 2. クリックイベントの生成 ---
     const escapedName = charName.replace(/'/g, "\\'");
     let clickHandler = "";
 
     if (showSeedColumns) {
-        // SEED表示モードON：算出過程をポップアップ表示
         clickHandler = `onclick="showRollProcessPopup(${seedIndex}, '${id}', ${colIndex})"`;
     } else if (isSimulationMode) {
-        // SIMモード：探索エンジン
         clickHandler = `onclick="onGachaCellClick(${seedIndex}, '${id}', '${escapedName}')"`;
     } else {
-        // 通常モード：SEEDジャンプ
         const nextSeedValue = seeds[seedIndex + rr.seedsConsumed - 1];
         if (nextSeedValue !== undefined) {
             clickHandler = `onclick="updateSeedAndRefresh(${nextSeedValue})"`;
@@ -111,13 +110,11 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
         let destAddr = (rr.isConsecutiveRerollTarget ? 'R' : '') + formatAddress(nextIdx);
         let oName = (rr.originalChar && rr.originalChar.name) ? rr.originalChar.name : "不明";
 
-        // [修正] 狭幅モード時に10文字以上なら省略
         if (typeof isNarrowMode !== 'undefined' && isNarrowMode && oName.length > 10) {
             oName = oName.substring(0, 9) + "...";
         }
 
         if (showSeedColumns) {
-            // SEED表示モード時は、リンク化せず単純なテキスト表示にする
             content = `${oName}<br>${destAddr}${charName}`;
         } else if (!isSimulationMode) {
             const originalJumpSeed = seeds[seedIndex + 1];
@@ -132,6 +129,5 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
         content = charName;
     }
     
-    // [修正] class に gacha-column を追加してヘッダーと幅を同期させる
-    return `<td class="gacha-cell gacha-column" style="${style} cursor:pointer;" ${clickHandler}>${content}</td>`;
+    return `<td class="gacha-cell gacha-column" style="${finalStyle} cursor:pointer;" ${clickHandler}>${content}</td>`;
 }
