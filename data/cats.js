@@ -847,8 +847,20 @@ const cats = [
   { "id": 846, "name": "煉󠄁獄杏寿郎", "rarity": 4 },
   { "id": 847, "name": "ちび鱗滝左近次", "rarity": 3 },
   { "id": 848, "name": "ネコ炭治郎", "rarity": 2 },
-  { "id": 849, "name": "ネコ禰󠄀豆子", "rarity": 1 }
+  { "id": 849, "name": "ネコ禰󠄀豆子", "rarity": 1 },
+  { "id": 850, "name": "undefined", "rarity": 4 },
+  { "id": 851, "name": "undefined", "rarity": 4 },
+  { "id": 852, "name": "undefined", "rarity": 4 },
+  { "id": 853, "name": "undefined", "rarity": 4 },
+  { "id": 854, "name": "undefined", "rarity": 4 },
+  { "id": 855, "name": "undefined", "rarity": 4 },
+  { "id": 856, "name": "undefined", "rarity": 4 },
+  { "id": 857, "name": "undefined", "rarity": 4 },
+  { "id": 858, "name": "undefined", "rarity": 4 },
+  { "id": 859, "name": "undefined", "rarity": 4 },
+  { "id": 860, "name": "undefined", "rarity": 4 },
+  { "id": 861, "name": "undefined", "rarity": 4 },
+  { "id": 862, "name": "undefined", "rarity": 4 }
 
 ]
 
-//840,841,842,843,844,845,846,847

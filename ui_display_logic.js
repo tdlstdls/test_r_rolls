@@ -7,8 +7,8 @@ injectStyles(`
         position: sticky;
         top: 0; 
         z-index: 5; 
-        /* スタイルはJSで動的に制御するため、遷移アニメーションのみ定義 */
-        transition: opacity 0.3s, background-color 0.3s;
+        /* 背景色の遷移アニメーションを削除し、再描画時の背景色の残像（チラつき）を防止 */
+        transition: opacity 0.3s;
     }
     
     /* ロゴ（R_Rolls）を表示するNOセルの設定：右側へのはみ出しを許可 */
@@ -104,7 +104,6 @@ function toggleMasterInfo() {
     }
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
-        setupStickyHeaderObserver(); 
     }
     if (typeof updateMasterInfoView === 'function') {
         updateMasterInfoView();
@@ -119,7 +118,6 @@ function toggleFindInfo() {
     const btn = document.getElementById('toggle-find-info-btn');
     if (typeof generateRollsTable === 'function') {
         generateRollsTable();
-        setupStickyHeaderObserver(); 
     }
     if (btn) {
         if (showFindInfo) {
@@ -136,73 +134,80 @@ function toggleFindInfo() {
 function setupStickyHeaderObserver() {
     const table = document.querySelector('table');
     const stickyRow = document.querySelector('.sticky-row');
-    if (!table || !stickyRow) return;
+    const target = table?.querySelector('thead');
+    if (!table || !stickyRow || !target) return;
 
+    /**
+     * 条件分岐によりインラインスタイルを直接書き換えて表示を制御する
+     */
+    const updateHeaderStyles = (isStickyMode) => {
+        if (isStickyMode) {
+            stickyRow.classList.add('is-sticky');
+        } else {
+            stickyRow.classList.remove('is-sticky');
+        }
+
+        const ths = stickyRow.querySelectorAll('th');
+        ths.forEach(th => {
+            // --- フィラー領域（余白埋め）の制御 ---
+            if (th.classList.contains('table-filler')) {
+                th.style.border = 'none';
+                th.style.background = 'transparent';
+                th.style.backgroundColor = 'transparent';
+                th.style.boxShadow = 'none';
+                const children = th.querySelectorAll('*');
+                children.forEach(c => { c.style.visibility = isStickyMode ? 'visible' : 'hidden'; });
+                return;
+            }
+
+            // --- 条件分岐によるスタイル操作 ---
+            if (isStickyMode) {
+                // 固定表示時：本来の背景色を適用
+                const isTrackB = th.classList.contains('track-b');
+                th.style.backgroundColor = isTrackB ? '#eef9ff' : '#f8f9fa';
+                th.style.color = '#333';
+                th.style.borderBottom = '2px solid #ccc';
+                th.style.borderRight = '1px solid #ddd';
+
+                if (th.classList.contains('col-no') && isTrackB) {
+                    th.style.borderLeft = '1px solid #ddd';
+                } else {
+                    th.style.borderLeft = ''; 
+                }
+
+                th.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+                const children = th.querySelectorAll('*');
+                children.forEach(c => { c.style.visibility = 'visible'; });
+            } else {
+                // ロゴ表示モード：背景色や文字、枠線を透明に上書きしてチラつきを防止
+                th.style.backgroundColor = 'transparent';
+                th.style.color = 'transparent'; 
+                th.style.borderBottomColor = 'transparent';
+                th.style.borderRightColor = 'transparent';
+                th.style.borderLeftColor = 'transparent';
+                th.style.boxShadow = 'none';
+                
+                const children = th.querySelectorAll('*');
+                children.forEach(c => { c.style.visibility = 'hidden'; });
+            }
+        });
+    };
+
+    // 初期状態（再描画時）のスクロール位置を即座に判定して適用
+    const rect = target.getBoundingClientRect();
+    updateHeaderStyles(rect.top < -0.5);
+
+    // 以降の動的なスクロール監視
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const isOffScreen = entry.boundingClientRect.top < -0.5;
             const isStickyMode = !entry.isIntersecting && isOffScreen;
-            
-            if (isStickyMode) {
-                stickyRow.classList.add('is-sticky');
-            } else {
-                stickyRow.classList.remove('is-sticky');
-            }
-
-            // JSによる条件分岐でのスタイル操作
-            const ths = stickyRow.querySelectorAll('th');
-            ths.forEach(th => {
-                // --- フィラー領域（余白埋め）の条件分岐による制御 ---
-                if (th.classList.contains('table-filler')) {
-                    th.style.border = 'none';
-                    th.style.background = 'transparent';
-                    th.style.backgroundColor = 'transparent';
-                    th.style.boxShadow = 'none';
-                    // 子要素の可視性のみスクロール状態に合わせる
-                    const children = th.querySelectorAll('*');
-                    children.forEach(c => { c.style.visibility = isStickyMode ? 'visible' : 'hidden'; });
-                    return; // フィラーの場合はここで処理を終了
-                }
-
-                if (isStickyMode) {
-                    // --- 固定表示時（通常のテーブルヘッダー） ---
-                    const isTrackB = th.classList.contains('track-b');
-                    th.style.backgroundColor = isTrackB ? '#eef9ff' : '#f8f9fa';
-                    th.style.color = '#333';
-                    th.style.borderBottom = '2px solid #ccc';
-                    th.style.borderRight = '1px solid #ddd';
-
-                    // BトラックのNOセルにはインラインの左線を戻す
-                    if (th.classList.contains('col-no') && isTrackB) {
-                        th.style.borderLeft = '1px solid #ddd';
-                    }
-
-                    th.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
-                    const children = th.querySelectorAll('*');
-                    children.forEach(c => { c.style.visibility = 'visible'; });
-                } else {
-                    // --- 非固定時（ロゴ表示モード） ---
-                    th.style.backgroundColor = 'transparent';
-                    th.style.color = 'transparent'; 
-                    th.style.borderBottomColor = 'transparent';
-                    th.style.borderRightColor = 'transparent';
-                    
-                    // BトラックNOセルの左罫線も透明にする
-                    th.style.borderLeftColor = 'transparent';
-                    
-                    th.style.boxShadow = 'none';
-                    const children = th.querySelectorAll('*');
-                    children.forEach(c => { c.style.visibility = 'hidden'; });
-                }
-            });
+            updateHeaderStyles(isStickyMode);
         });
     }, {
         threshold: [0, 1],
         rootMargin: '0px 0px 0px 0px'
     });
 
-    const target = table.querySelector('thead');
-    if (target) {
-        observer.observe(target);
-    }
+    observer.observe(target);
 }
