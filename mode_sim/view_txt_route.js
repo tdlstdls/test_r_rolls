@@ -1,10 +1,10 @@
-/** @file view_txt_route.js @description 計算ロジック解説テキスト・詳細計算過程ダンプ・コンパクト表示（フォントサイズ拡大版） */
+/** @file view_txt_route.js @description 計算ロジック解説テキスト・詳細計算過程ダンプ・コンパクト表示（コマンド形式ヘッダー版） */
 
 // 計算過程表示モードの状態保持
 let isDetailedLogMode = false;
 
 /**
- * 現在のシミュレーションルートを生成して返す（14px拡大表示形式）
+ * 現在のシミュレーションルートを生成して返す（コマンド形式ヘッダー・14px版）
  * @param {Array} seeds - 乱数シード配列
  * @param {number} initialSeed - 開始前シード値
  * @param {Object} highlightMap - 通常枠のハイライト用
@@ -23,6 +23,14 @@ function generateTxtRouteView(seeds, initialSeed, highlightMap, guarHighlightMap
             </div>
         `;
     }
+
+    // ルートテキストの整形 (s-を削除し、-を半角スペースに変換)
+    let formattedConfig = configValue;
+    if (formattedConfig.startsWith('s-')) {
+        formattedConfig = formattedConfig.substring(2);
+    }
+    formattedConfig = formattedConfig.replace(/-/g, ' ');
+    const grCommandLine = `gr ${initialSeed} ${formattedConfig}`;
 
     const segments = parseSimConfig(configValue);
     let currentIdx = 0;
@@ -83,7 +91,6 @@ function generateTxtRouteView(seeds, initialSeed, highlightMap, guarHighlightMap
             const rr = rollWithSeedConsumptionFixed(currentIdx, config, seeds, drawContext, 'sim');
             if (rr.seedsConsumed === 0) break;
 
-            // キャラ名の色決定
             let charName = rr.finalChar ? rr.finalChar.name : "不明";
             let cid = Number(rr.charId);
             let color = "black";
@@ -187,7 +194,9 @@ function generateTxtRouteView(seeds, initialSeed, highlightMap, guarHighlightMap
             </div>
             <div id="txt-route-display" style="background:#fff; border:1px solid #eee; font-family: 'Consolas', monospace; font-size:14px; padding:15px; max-height:600px; overflow-y:auto; line-height:1.7;">
                 ${calculationGuideHtml}
-                <div style="margin-bottom:12px; color:#555; font-weight: bold;">開始前シード: ${initialSeed}</div>
+                <div style="margin-bottom:15px; color:#555; font-weight: bold; line-height: 1.5;">
+                    <span style="color:#333;">${grCommandLine}</span>
+                </div>
                 ${segmentHtmlBlocks.join('')}
                 ${footerHtml}
             </div>
