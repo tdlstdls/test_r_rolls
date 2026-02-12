@@ -1,71 +1,68 @@
-/** @file view_table_headers.js @description テーブルヘッダー詳細描画（ボタン小型化・統一版） */
+/** @file view_table_headers.js @description テーブルヘッダー詳細描画（行数圧縮・表示形式最適化版） */
 
 /**
- * 名称ヘッダーの生成 (名称右に11G表示ラベル付与)
+ * 名称ヘッダーの生成 (ID 名称 [11G] 日付 を1つのフローで描画)
  * @param {boolean} isLeftSide - Aトラック(左側)かどうか
- */
-
-/**
- * 名称ヘッダーの生成 (右側の縦線表示を強化)
  */
 function generateNameHeaderHTML(isLeftSide) {
     let html = "";
     const bgColor = isLeftSide ? "#f8f9fa" : "#eef9ff";
-    // 追加: Bトラック用のクラス判定
     const trackClass = isLeftSide ? "" : "track-b"; 
-    
-    // 修正: background-color と border から !important を削除
     const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 2px solid #ccc;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
-        let id = idWithSuffix.replace(/[gfs]$/, '');
+        let idFromSuffix = idWithSuffix.replace(/[gfs]$/, '');
         const suffix = idWithSuffix.match(/[gfs]$/)?.[0] || '';
         const isGCol = suffix !== '';
-        const config = gachaMasterData.gachas[id];
+        const config = gachaMasterData.gachas[idFromSuffix];
         if (!config) return;
 
-        const options = (typeof getGachaSelectorOptions === 'function') ? getGachaSelectorOptions(id) : [];
-        const currentOpt = options.find(o => String(o.value) === id);
+        const options = (typeof getGachaSelectorOptions === 'function') ? getGachaSelectorOptions(idFromSuffix) : [];
+        const currentOpt = options.find(o => String(o.value) === idFromSuffix);
         let label = currentOpt ? currentOpt.label : config.name;
         
+        // 1. メタデータの抽出
+        const idMatch = label.match(/\((\d+)[gfs]?\)/);
+        const displayId = idMatch ? idMatch[1] : idFromSuffix;
+        
+        const dateMatch = label.match(/(\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)/);
+        let displayDate = dateMatch ? dateMatch[1] : "";
+        
+        // 2. 名称のクレンジング (メタデータを除去して純粋な名前を取り出す)
+        const metaRegex = /(?:\[確定\])?\s*(?:\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)?\s*\(\d+[gfs]?\)\s*(?:\[\d+G\])?/;
+        const nameParts = label.split(metaRegex).map(p => p.trim()).filter(p => p);
+        let displayName = nameParts.length > 1 ? nameParts.reverse().join(' ') : (nameParts[0] || config.name);
+
+        // 3. 特例処理 (プラチナ・レジェンドは日程非表示)
+        const isSpecial = displayName.includes("プラチナガチャ") || displayName.includes("レジェンドガチャ");
+        if (isSpecial) displayDate = "";
+
+        // 4. ラベル・追加情報の生成
+        const gText = isGCol ? ` [${(suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : '7G')}]` : "";
         const addCount = uberAdditionCounts[index] || 0;
-        let addStr = addCount > 0 ? ` <span style="color:#d9534f; font-weight:normal; font-size:0.8em;">(add:${addCount})</span>` : "";
+        const addStr = addCount > 0 ? ` <span style="color:#d9534f; font-weight:normal; font-size:0.85em;">(add:${addCount})</span>` : "";
 
-        let displayHTML = "";
-        const spaceIdx = label.indexOf(' ');
-        if (spaceIdx !== -1) {
-            const p1 = label.substring(0, spaceIdx), p2 = label.substring(spaceIdx + 1);
-            displayHTML = `<span style="font-size:0.85em; color:#666;">${p1}</span><br><span style="font-weight:bold;">${p2}${addStr}</span>`;
-        } else {
-            displayHTML = `<span>${label}${addStr}</span>`;
-        }
+        // 5. 表示HTMLの組み立て
+        // divによる強制改行をなくし、名前の直後に日付を配置することで、長い名前の時も2行に収める
+        const nameAndIdHTML = `<span style="font-weight:bold;">${displayId} ${displayName}${gText}${addStr}</span>`;
+        const dateHTML = displayDate ? `<span style="font-size:0.85em; color:#666; font-weight:normal; margin-left:6px; white-space:nowrap;">${displayDate}</span>` : "";
 
-        if (isGCol) {
-            let gText = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : '7G');
-            // G列側にも背景色を明示的に適用し、かつ右端の線を背景が隠さないように設定
-            html += `<th colspan="2" class="gacha-column ${trackClass}" style="vertical-align: bottom; padding: 2px; ${commonStyle}">
-                        <div style="display:flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap:2px; overflow:hidden;">
-                            <div style="font-weight:bold; background:#d0e8ff; border-radius:3px; font-size:8px; padding:0px 2px; width:fit-content;">${gText}</div>
-                            <div style="text-align: left; line-height: 1.1; font-size: 0.9em; word-break: break-all;">${displayHTML}</div>
-                        </div>
-                     </th>`;
-        } else {
-            html += `<th class="gacha-column ${trackClass}" style="vertical-align: bottom; padding: 4px; ${commonStyle}">
-                        <div style="text-align: left; line-height: 1.2;">${displayHTML}</div>
-                     </th>`;
-        }
+        const colspan = isGCol ? 'colspan="2"' : '';
+        html += `<th ${colspan} class="gacha-column ${trackClass}" style="vertical-align: top; padding: 4px 6px; ${commonStyle}">
+                    <div style="text-align: left; line-height: 1.2; word-break: break-all;">
+                        ${nameAndIdHTML}${dateHTML}
+                    </div>
+                 </th>`;
     });
     return html;
 }
 
 /**
- * 操作ヘッダーの生成 (背景色の漏れ防止と重複関数の統合)
+ * 操作ヘッダーの生成 (既存のロジックを維持)
  */
 function generateControlHeaderHTML(isInteractive) {
     let html = "";
-    // isInteractive が true なら左側(#f8f9fa)、false なら右側(#eef9ff)
     const bgColor = isInteractive ? "#f8f9fa" : "#eef9ff";
-    // 背景色が境界線を上書きせず、かつフィラーに漏れないよう設定
     const commonStyle = `background-color: ${bgColor} !important; background-clip: padding-box; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
@@ -100,7 +97,6 @@ function generateControlHeaderHTML(isInteractive) {
         controlArea = `<div style="display:flex; justify-content:flex-start; align-items:center; gap:2px; flex-wrap:wrap;">${pullDownBtn}${gBtn}${addBtn}${addSelect}${delBtn}</div>`;
 
         if (isGCol) {
-            // colspan="2" の時も commonStyle を適用
             html += `<th colspan="2" class="gacha-column" style="padding: 2px; ${commonStyle}">${controlArea}</th>`;
         } else {
             html += `<th class="gacha-column" style="padding: 2px; ${commonStyle}">${controlArea}</th>`;
