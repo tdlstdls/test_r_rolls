@@ -28,15 +28,16 @@ function generateSizingRowHTML(totalTrackSpan, noWidth, unitWidth) {
 
 /**
  * 固定ヘッダー（スクロール時に上部に固定される行）の生成
+ * z-index を 100 に引き上げ、データ行の番号（z-index: 5~10）より前面に来るように修正
  */
 function generateStickyHeaderRowHTML(calcColClass) {
     return `
     <tr class="sticky-row" style="color: #495057;">
-        <th class="col-no" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; overflow: visible; z-index: 10;">NO.</th>
-        <th class="${calcColClass}" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>
+        <th class="col-no" style="background-color: #f8f9fa; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; overflow: visible; z-index: 100;">NO.</th>
+        <th class="${calcColClass}" style="background-color: #f8f9fa; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
         ${generateNameHeaderHTML(true)}
-        <th class="col-no track-b" style="background: transparent; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">NO.</th>
-        <th class="${calcColClass} track-b" style="background: transparent; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px;">SEED</th>
+        <th class="col-no track-b" style="background-color: #eef9ff; background-clip: padding-box; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">NO.</th>
+        <th class="${calcColClass} track-b" style="background-color: #eef9ff; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
         ${generateNameHeaderHTML(false)}
         <th class="table-filler" style="background: transparent; border: none; width: auto;"></th>
     </tr>`;
