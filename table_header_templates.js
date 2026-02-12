@@ -28,16 +28,17 @@ function generateSizingRowHTML(totalTrackSpan, noWidth, unitWidth) {
 
 /**
  * 固定ヘッダー（スクロール時に上部に固定される行）の生成
- * z-index を 100 に引き上げ、データ行の番号（z-index: 5~10）より前面に来るように修正
+ * 【修正】z-index を 110 に引き上げました。
+ * これにより、データ行の固定列（z-index: 100）よりも常に前面に表示されます。
  */
 function generateStickyHeaderRowHTML(calcColClass) {
     return `
     <tr class="sticky-row" style="color: #495057;">
-        <th class="col-no" style="background-color: #f8f9fa; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; overflow: visible; z-index: 100;">NO.</th>
-        <th class="${calcColClass}" style="background-color: #f8f9fa; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        <th class="col-no" style="background-color: #f8f9fa; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; overflow: visible; z-index: 110;">NO.</th>
+        <th class="${calcColClass}" style="background-color: #f8f9fa; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 110;">SEED</th>
         ${generateNameHeaderHTML(true)}
-        <th class="col-no track-b" style="background-color: #eef9ff; background-clip: padding-box; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">NO.</th>
-        <th class="${calcColClass} track-b" style="background-color: #eef9ff; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 100;">SEED</th>
+        <th class="col-no track-b" style="background-color: #eef9ff; background-clip: padding-box; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 110;">NO.</th>
+        <th class="${calcColClass} track-b" style="background-color: #eef9ff; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ccc; font-size: 11px; z-index: 110;">SEED</th>
         ${generateNameHeaderHTML(false)}
         <th class="table-filler" style="background: transparent; border: none; width: auto;"></th>
     </tr>`;
@@ -47,33 +48,42 @@ function generateStickyHeaderRowHTML(calcColClass) {
  * サブヘッダー行（トラック名、タイトル、操作パネル）の生成
  */
 function generateSubHeaderRowsHTML(totalTrackSpan, calcColClass) {
-    // 1. トラック名表示行（A / B）
+    /**
+     * 条件分岐1: トラック名表示行（A / B）
+     * 固定列との交差部分に対し、データ行（z-index: 100）より高い 110 を設定
+     */
     const trackH = `<tr>
-        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"></th>
+        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; z-index: 110;"></th>
         <th class="track-header" colspan="${totalTrackSpan}" style="text-align:center; background:#f8f9fa; font-weight:bold; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">A</th>
-        <th class="col-no" style="background:#eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;"></th>
+        <th class="col-no" style="background:#eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; z-index: 110;"></th>
         <th class="track-header" colspan="${totalTrackSpan}" style="text-align:center; background:#eef9ff; font-weight:bold; border-right: 1px solid #ddd; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd;">B</th>
         <th class="table-filler" style="border: none; background: transparent;"></th>
     </tr>`;
     
-    // 2. ガチャ名称タイトル行
+    /**
+     * 条件分岐2: ガチャ名称タイトル行
+     * 同様に NO/SEED セルの z-index を 110 に設定し、データ行による上書きを防止
+     */
     const titleH = `<tr class="original-title-row">
-        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; border-bottom:2px solid #ccc;">NO.</th>
-        <th class="${calcColClass}" style="border-right: 1px solid #ddd; border-bottom:2px solid #ccc;">SEED</th>
+        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; border-bottom:2px solid #ccc; z-index: 110;">NO.</th>
+        <th class="${calcColClass}" style="background:#f8f9fa; border-right: 1px solid #ddd; border-bottom:2px solid #ccc; z-index: 110;">SEED</th>
         ${generateNameHeaderHTML(true)}
-        <th class="col-no" style="border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom:2px solid #ccc; background:#eef9ff;">NO.</th>
-        <th class="${calcColClass}" style="background:#eef9ff; border-right: 1px solid #ddd; border-bottom:2px solid #ccc;">SEED</th>
+        <th class="col-no" style="border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom:2px solid #ccc; background:#eef9ff; z-index: 110;">NO.</th>
+        <th class="${calcColClass}" style="background:#eef9ff; border-right: 1px solid #ddd; border-bottom:2px solid #ccc; z-index: 110;">SEED</th>
         ${generateNameHeaderHTML(false)}
         <th class="table-filler" style="border: none; background: transparent;"></th>
     </tr>`;
     
-    // 3. 操作用ボタン・セレクトボックス行
+    /**
+     * 条件分岐3: 操作用ボタン・セレクトボックス行
+     * 操作行においても固定列が最前面に来るよう z-index: 110 を適用
+     */
     const ctrlH = `<tr class="control-row">
-        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd;"></th>
-        <th class="${calcColClass}" style="border-right: 1px solid #ddd;"></th>
+        <th class="col-no" style="background:#f8f9fa; border-right: 1px solid #ddd; z-index: 110;"></th>
+        <th class="${calcColClass}" style="background:#f8f9fa; border-right: 1px solid #ddd; z-index: 110;"></th>
         ${generateControlHeaderHTML(true)}
-        <th class="col-no" style="background:#eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd;"></th>
-        <th class="${calcColClass}" style="background:#eef9ff; border-right: 1px solid #ddd;"></th>
+        <th class="col-no" style="background:#eef9ff; border-left: 1px solid #ddd; border-right: 1px solid #ddd; z-index: 110;"></th>
+        <th class="${calcColClass}" style="background:#eef9ff; border-right: 1px solid #ddd; z-index: 110;"></th>
         ${generateControlHeaderHTML(false)}
         <th class="table-filler" style="border: none; background: transparent;"></th>
     </tr>`;

@@ -22,11 +22,12 @@ if (typeof injectStyles === 'function') {
 
         /**
          * 条件分岐: データエリアの左端（NO列）にのみ左罫線を適用
-         * これにより、.col-no を持たない操作パネル行（SEED変更等）の左側の線が消えます
+         * 【修正】z-index を 100 に統一。
+         * これにより、ヘッダーの Tier 1 (110) よりは背面に、一般セルよりは前面に配置されます。
          */
         #rolls-table-container .col-no {
             border-left: 1px solid #ddd;
-            z-index: 10;
+            z-index: 100; 
         }
     `);
 }
@@ -46,19 +47,25 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
     const rowData = tableData[seedIndex];
     if (!rowData) return ''; 
 
-    // No列の背景色を決定 (再抽選等の状態に応じて変化)
+    // --- 条件分岐: No列の背景色を決定 (再抽選等の状態に応じて変化) ---
     const rowInfo = rowData.rowInfo || {};
     let noColBgColor = isLeftSide ? '#f8f9fa' : '#eef9ff';
     if (rowInfo.isNormalReroll) {
-        noColBgColor = '#FFFF00';
+        noColBgColor = '#FFFF00'; // レア被り時
     } else if (rowInfo.isCrossReroll) {
-        noColBgColor = '#FFA500';
+        noColBgColor = '#FFA500'; // トラック跨ぎ発生時
     } else if (rowInfo.isActualReroll) {
-        noColBgColor = '#FFDAB9';
+        noColBgColor = '#FFDAB9'; // 複雑な再抽選実行時
     }
 
-    // No列の描画 (左端の境界線を含む)
-    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; border-left: 1px solid #ddd; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5;' : ''}">${rowIndex + 1}</td>`;
+    // --- 条件分岐: 左側(Aトラック)のみ左端に固定するスタイルを適用 ---
+    // 【修正】z-index を 100 に設定。
+    // 水平スクロールでキャラ名の上に表示されつつ、垂直スクロールでヘッダー(110)の下に潜り込むTier 2の設定です。
+    const stickyStyle = isLeftSide ? 'position: -webkit-sticky; position: sticky; left: 0; z-index: 100;' : '';
+    const borderStyles = 'border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; border-left: 1px solid #ddd;';
+    
+    // No列の描画
+    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; ${borderStyles} ${stickyStyle}">${rowIndex + 1}</td>`;
 
     // 詳細計算セルの描画 (SEED列)
     if (typeof generateDetailedCalcCells === 'function') {

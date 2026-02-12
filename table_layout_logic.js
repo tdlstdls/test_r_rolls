@@ -1,5 +1,11 @@
+/** @file table_layout_logic.js */
+
 injectStyles(`
-    /* NO列（Sticky列）の基本レイアウト設定 */
+    /* * 【重要】NO列（Sticky列）の基本レイアウト設定 
+     * 水平スクロール時に一般のキャラ名セルよりも前面に来るよう、ベースの z-index を 100 に設定。
+     * これによりデータ行の固定列は Tier 2 (100) となり、
+     * ヘッダー行で指定した Tier 1 (110) の下に正しく潜り込みます。
+     */
     #rolls-table-container .col-no {
         position: -webkit-sticky;
         position: sticky;
@@ -7,9 +13,10 @@ injectStyles(`
         width: 30px;
         min-width: 30px;
         max-width: 30px;
-        z-index: 20; 
+        z-index: 100; /* データ行としての優先度を 100 に統一 */
         background-color: #f8f9fa;
         text-align: center;
+        /* 右側の境界線がスクロール時に背後のコンテンツと混ざらないよう、box-shadowでクッキリ表示 */
         box-shadow: 1px 0 0 #ddd;
         overflow: hidden;
     }
@@ -39,6 +46,7 @@ injectStyles(`
         min-width: 30px;
         max-width: 30px;
         padding: 2px 0;
+        z-index: 100; /* モードに関わらず固定列の優先度を維持 */
     }
     #rolls-table-container .narrow-mode .char-link {
         display: inline-block;
@@ -67,8 +75,6 @@ injectStyles(`
         pointer-events: none;
     }
 `);
-
-/** @file table_layout_logic.js */
 
 /**
  * テーブルのレイアウト設定を取得する
