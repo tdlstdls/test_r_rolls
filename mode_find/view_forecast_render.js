@@ -9,9 +9,14 @@ function generateForecastHeader(slots, status) {
     const lStr = slots.legendSlots.length > 0 ? slots.legendSlots.join(", ") : "なし";
     const pStr = slots.promotedSlots.length > 0 ? slots.promotedSlots.join(", ") : "なし";
 
-    // ボタンの共通スタイル定義
-    const btnBaseStyle = "display: inline-block; padding: 2px 8px; margin: 0 2px; border-radius: 4px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; font-size: 13px; transition: all 0.2s;";
+    // ボタンの共通スタイル定義：文字色を #333 に設定して視認性を確保
+    const btnBaseStyle = "display: inline-block; padding: 2px 8px; margin: 0 2px; border-radius: 4px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; font-size: 13px; color: #333; transition: all 0.2s;";
+    
+    // アクティブ（ON）時のスタイル：背景を青、文字を白にする
     const activeStyle = "background: #007bff; color: #fff; border-color: #0056b3;";
+    
+    // 非アクティブ（OFF）時のスタイル：背景を薄グレー、文字を黒に近い色にして視認性を維持
+    const inactiveStyle = "background: #f8f9fa; color: #333; border-color: #ccc;";
 
     return `
         <div style="font-size: 14px; margin-bottom: 5px; line-height: 1.4; text-align: left; word-break: break-word;">
@@ -23,13 +28,13 @@ function generateForecastHeader(slots, status) {
             <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px; flex-wrap: wrap;">
                 <span onclick="clearAllTargets()" class="text-btn" style="${btnBaseStyle} color: #666;" title="全て非表示">×</span>
                 <span class="separator" style="color: #ccc; margin: 0 2px;">|</span>
-                <button onclick="toggleLegendTargets()" style="${btnBaseStyle} ${status.isLegendActive ? activeStyle : ''}">伝説</button>
-                <button onclick="toggleLimitedTargets()" style="${btnBaseStyle} ${status.isLimitedActive ? activeStyle : ''}">限定</button>
-                <button onclick="toggleUberTargets()" style="${btnBaseStyle} ${status.isUberActive ? activeStyle : ''}">超激</button>
-                <button onclick="toggleSuperTargets()" style="${btnBaseStyle} ${status.isSuperActive ? activeStyle : ''}">激レア</button>
-                <button onclick="toggleRareTargets()" style="${btnBaseStyle} ${status.isRareActive ? activeStyle : ''}">レア</button>
+                <button onclick="toggleLegendTargets()" style="${btnBaseStyle} ${status.isLegendActive ? activeStyle : inactiveStyle}">伝説</button>
+                <button onclick="toggleLimitedTargets()" style="${btnBaseStyle} ${status.isLimitedActive ? activeStyle : inactiveStyle}">限定</button>
+                <button onclick="toggleUberTargets()" style="${btnBaseStyle} ${status.isUberActive ? activeStyle : inactiveStyle}">超激</button>
+                <button onclick="toggleSuperTargets()" style="${btnBaseStyle} ${status.isSuperActive ? activeStyle : inactiveStyle}">激レア</button>
+                <button onclick="toggleRareTargets()" style="${btnBaseStyle} ${status.isRareActive ? activeStyle : inactiveStyle}">レア</button>
                 <span class="separator" style="color: #ccc; margin: 0 2px;">|</span>
-                <button id="toggle-master-info-btn" onclick="toggleMasterInfo()" style="${btnBaseStyle} ${status.isMasterActive ? activeStyle : ''}">マスター</button>
+                <button id="toggle-master-info-btn" onclick="toggleMasterInfo()" style="${btnBaseStyle} ${status.isMasterActive ? activeStyle : inactiveStyle}">マスター</button>
             </div>
             <div style="font-size: 0.9em; color: #666; padding-left: 2px; line-height: 1.5;">
                 ※キャラ名をタップで追跡ON/OFF。×で削除。右のアドレスをタップでルート探索。
@@ -108,8 +113,8 @@ function renderGachaForecastList(config, resultMap, isSelectionMode = false) {
                 if (data.isLegend) color = '#9c27b0';
                 else if (data.isLimited) color = '#007bff';
                 else if (data.rarity === 'uber') color = '#dc3545';
-                else if (data.rarity === 'super') color = '#e67e22'; // 激レア用
-                else if (data.rarity === 'rare') color = '#2ecc71';  // レア用
+                else if (data.rarity === 'super') color = '#e67e22'; 
+                else if (data.rarity === 'rare') color = '#2ecc71';  
                 
                 const bgStyle = data.isActive ? 'background-color: #ffffcc; border-radius: 3px; padding: 0 2px;' : '';
                 return `<span class="next-char-item" style="cursor:pointer; color:${color}; ${bgStyle}" onclick="selectTargetAndHighlight('${data.id}', '${config.id}', null)">${data.name} <span style="font-size:14px; font-family:monospace; font-weight:bold;">${firstHit}</span></span>`;
@@ -139,10 +144,9 @@ function renderTargetItem(data, config) {
     if (data.isLegend) color = '#9c27b0';
     else if (data.isLimited) color = '#007bff';
     else if (data.rarity === 'uber') color = '#dc3545';
-    else if (data.rarity === 'super') color = '#e67e22'; // 激レア用
-    else if (data.rarity === 'rare') color = '#2ecc71';  // レア用
+    else if (data.rarity === 'super') color = '#e67e22'; 
+    else if (data.rarity === 'rare') color = '#2ecc71';  
     
-    // キャラ名のサイズ
     let nameStyle = `font-weight:bold; font-size: 14px; cursor:pointer; color:${color};`;
 
     const hitLinks = data.hits.map(addr => {
@@ -150,7 +154,6 @@ function renderTargetItem(data, config) {
         const isB = addr.startsWith('B'), rowMatch = addr.match(/\d+/);
         const row = rowMatch ? parseInt(rowMatch[0], 10) : 0;
         const sIdx = (row - 1) * 2 + (isB ? 1 : 0);
-        // アドレスのサイズ
         return `<span class="char-link" style="cursor:pointer; text-decoration:underline; margin-right:8px; font-size: 14px;" onclick="onGachaCellClick(${sIdx}, '${config.id}', '${data.name.replace(/'/g, "\\'")}', null, true, '${data.id}')">${addr}</span>`;
     }).join("");
 
