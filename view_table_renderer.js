@@ -1,4 +1,4 @@
-/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示対応版） */
+/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・確定枠表示仕様変更版） */
 
 // テーブル全体の罫線とレイアウトを強制するスタイルを注入
 if (typeof injectStyles === 'function') {
@@ -79,15 +79,11 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
 
 /**
  * 確定枠セルの詳細描画
+ * 修正：フォントを通常（非太字・黒）、背景を一律白に設定
  */
 function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap) {
-    // 罫線を確実にするため border: 1px solid #ddd を含める
-    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left; border: 1px solid #ddd;';
-    if (isSimulationMode && guarHighlightMap.get(seedIndex) === id) {
-        cellStyle += `background-color: #66b2ff;`;
-    } else {
-        cellStyle += `background-color: #eef7ff;`;
-    }
+    // 罫線を確実にするため border: 1px solid #ddd を含め、背景色を一律白(#ffffff)に設定
+    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left; border: 1px solid #ddd; background-color: #ffffff;';
 
     const gMain = data.guaranteed || (data.result ? data.result.guaranteed : null);
     const gAlt = data.alternativeGuaranteed || (data.result ? data.result.alternativeGuaranteed : null);
@@ -112,9 +108,10 @@ function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guar
                 clickAction = (res.nextRollStartSeedIndex >= 0 ? `onclick="if(!event.ctrlKey) updateSeedAndRefresh(${finalSeedInProcess})"` : "");
             }
 
+            // 修正：font-weight を normal に、color を #000 (黒) に変更
             return `
             <div ${clickAction} style="cursor:pointer; padding:4px; ${verifiedStyle} ${isAltRoute ? 'border-bottom:1px dashed #ccc;' : ''}">
-                <span class="cell-addr">${addr})</span><span class="char-link" style="font-weight:bold; color:#0056b3;">${charName}</span>
+                <span class="cell-addr">${addr})</span><span class="char-link" style="font-weight:normal; color:#000;">${charName}</span>
             </div>`;
         };
         gContent = gAlt ? buildGHtml(gAlt, true) + buildGHtml(gMain, false) : buildGHtml(gMain, false);
