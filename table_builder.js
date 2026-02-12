@@ -1,3 +1,5 @@
+/** @file table_builder.js @description テーブル構築およびスタイル定義（最上部境界線の調整版） */
+
 injectStyles(`
     #rolls-table-container table {
         border-collapse: separate;
@@ -26,7 +28,7 @@ injectStyles(`
     #rolls-table-container table th:not(.table-filler) { 
         background-color: #f8f9fa; 
         font-weight: bold; 
-        border-top: 1px solid #ddd; 
+        /* 最上部の不要な横線を排除するため、全ヘッダーへの一律な border-top 指定を廃止しました */
     }
 
     #rolls-table-container table .gacha-column, 
@@ -40,8 +42,6 @@ injectStyles(`
         line-height: 1.2;
     }
 `);
-
-/** @file table_builder.js */
 
 function buildTableDOM(numRolls, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, findAreaHtml, masterInfoHtml, txtRouteHtml = '', simNoticeHtml = '') {
     const totalTrackSpan = calculateTotalTrackSpan();

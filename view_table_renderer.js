@@ -1,4 +1,4 @@
-/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・確定枠表示仕様変更版） */
+/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・操作パネル境界線最適化版） */
 
 // テーブル全体の罫線とレイアウトを制御するスタイルを注入
 if (typeof injectStyles === 'function') {
@@ -6,14 +6,12 @@ if (typeof injectStyles === 'function') {
         #rolls-table-container table {
             border-collapse: separate;
             border-spacing: 0;
-            /* テーブル全体の左・上の外枠を定義 */
-            border-top: 1px solid #ddd;
-            border-left: 1px solid #ddd;
+            /* テーブル全体の外枠（上・左）を完全に除去し、セル単位の制御に委ねる */
+            border: none;
         }
 
         /**
-         * 条件分岐: フィラー（.table-filler）以外のセルにのみ罫線を適用
-         * !important を使用せず、:not 疑似クラスによる論理制御で余白部分の罫線を排除します
+         * 条件分岐: フィラー（.table-filler）以外のセルにのみ右と下の罫線を適用
          */
         #rolls-table-container table th:not(.table-filler),
         #rolls-table-container table td:not(.table-filler) {
@@ -22,22 +20,33 @@ if (typeof injectStyles === 'function') {
             box-sizing: border-box;
         }
 
-        /* Sticky要素（NO列）の境界線と重なりの制御 */
+        /**
+         * 条件分岐: データエリアの左端（NO列）にのみ左罫線を適用
+         * これにより、.col-no を持たない操作パネル行（SEED変更等）の左側の線が消えます
+         */
         #rolls-table-container .col-no {
+            border-left: 1px solid #ddd;
             z-index: 10;
-            border-right: 1px solid #ddd;
         }
     `);
 }
 
 /**
  * 行レンダリング (A/Bサイド別)
+ * @param {number} rowIndex - 表示上の行番号
+ * @param {number} seedIndex - 計算用のシードインデックス
+ * @param {Array} columnConfigs - ガチャ列の設定
+ * @param {Array} tableData - シミュレーション結果データ
+ * @param {Array} seeds - シード値の配列
+ * @param {Object} highlightMap - 通常ハイライト用マップ
+ * @param {Object} guarHighlightMap - 確定枠ハイライト用マップ
+ * @param {boolean} isLeftSide - Aトラック(左側)かどうか
  */
 function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds, highlightMap, guarHighlightMap, isLeftSide) {
     const rowData = tableData[seedIndex];
     if (!rowData) return ''; 
 
-    // No列の背景色を決定
+    // No列の背景色を決定 (再抽選等の状態に応じて変化)
     const rowInfo = rowData.rowInfo || {};
     let noColBgColor = isLeftSide ? '#f8f9fa' : '#eef9ff';
     if (rowInfo.isNormalReroll) {
@@ -48,15 +57,15 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         noColBgColor = '#FFDAB9';
     }
 
-    // No列の描画
-    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; border: 1px solid #ddd; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5;' : ''}">${rowIndex + 1}</td>`;
+    // No列の描画 (左端の境界線を含む)
+    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; border-left: 1px solid #ddd; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5;' : ''}">${rowIndex + 1}</td>`;
 
-    // 詳細計算セルの描画
+    // 詳細計算セルの描画 (SEED列)
     if (typeof generateDetailedCalcCells === 'function') {
         sideHtml += generateDetailedCalcCells(seedIndex, seeds, tableData);
     } else {
         const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
-        sideHtml += `<td class="${calcColClass}" style="border: 1px solid #ddd;">-</td>`;
+        sideHtml += `<td class="${calcColClass}" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">-</td>`;
     }
 
     // 各ガチャ列のセルを描画
@@ -69,7 +78,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         if (typeof generateCell === 'function') {
             sideHtml += generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, isSimulationMode);
         } else {
-            sideHtml += `<td style="border: 1px solid #ddd;">-</td>`;
+            sideHtml += `<td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">-</td>`;
         }
 
         // 確定枠セルの描画
@@ -77,7 +86,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
             if (data && (data.guaranteed || (data.result && data.result.guaranteed))) {
                 sideHtml += renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap);
             } else {
-                sideHtml += `<td class="gacha-cell gacha-column guaranteed-cell" style="border: 1px solid #ddd; background: #eee; text-align:left;">-</td>`;
+                sideHtml += `<td class="gacha-cell gacha-column guaranteed-cell" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; background: #eee; text-align:left;">-</td>`;
             }
         }
     });
@@ -88,7 +97,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
  * 確定枠セルの詳細描画
  */
 function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap) {
-    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left; border: 1px solid #ddd; background-color: #ffffff;';
+    let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; background-color: #ffffff;';
 
     const gMain = data.guaranteed || (data.result ? data.result.guaranteed : null);
     const gAlt = data.alternativeGuaranteed || (data.result ? data.result.alternativeGuaranteed : null);
