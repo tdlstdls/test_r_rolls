@@ -8,8 +8,12 @@ injectStyles(`
         backface-visibility: hidden;
     }
 
-    #rolls-table-container table th,
-    #rolls-table-container table td {
+    /**
+     * 条件分岐: フィラー（.table-filler）以外のセルにのみ基本スタイルと罫線を適用
+     * !important を使用せず、論理的なセレクタによって余白部分の装飾を排除します
+     */
+    #rolls-table-container table th:not(.table-filler),
+    #rolls-table-container table td:not(.table-filler) {
         border-right: 1px solid #ddd;
         border-bottom: 1px solid #ddd;
         padding: 6px;
@@ -19,7 +23,11 @@ injectStyles(`
         font-size: 13px;
     }
 
-    #rolls-table-container table th { background-color: #f8f9fa; font-weight: bold; border-top: 1px solid #ddd; }
+    #rolls-table-container table th:not(.table-filler) { 
+        background-color: #f8f9fa; 
+        font-weight: bold; 
+        border-top: 1px solid #ddd; 
+    }
 
     #rolls-table-container table .gacha-column, 
     #rolls-table-container table .gacha-cell,

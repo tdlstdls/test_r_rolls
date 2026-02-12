@@ -1,64 +1,69 @@
 injectStyles(`
-    .col-no {
-        position: -webkit-sticky !important;
-        position: sticky !important;
-        left: 0 !important;
-        width: 30px !important;
-        min-width: 30px !important;
-        max-width: 30px !important;
-        z-index: 20 !important; 
+    /* NO列（Sticky列）の基本レイアウト設定 */
+    #rolls-table-container .col-no {
+        position: -webkit-sticky;
+        position: sticky;
+        left: 0;
+        width: 30px;
+        min-width: 30px;
+        max-width: 30px;
+        z-index: 20; 
         background-color: #f8f9fa;
-        text-align: center !important;
+        text-align: center;
         box-shadow: 1px 0 0 #ddd;
         overflow: hidden;
     }
-    .narrow-mode {
-        table-layout: fixed !important;
-        font-size: 11px !important;
+
+    /* 狭幅モード（モバイル/圧縮表示）時のレイアウト制御 */
+    #rolls-table-container .narrow-mode {
+        table-layout: fixed;
+        font-size: 11px;
     }
-    .narrow-mode .gacha-column,
-    .narrow-mode .gacha-cell,
-    .narrow-mode .calc-column,
-    .narrow-mode th.gacha-column,
-    .narrow-mode td.gacha-cell {
-        width: 80px !important;
-        min-width: 80px !important;
-        max-width: 80px !important;
-        white-space: normal !important;
+    #rolls-table-container .narrow-mode .gacha-column,
+    #rolls-table-container .narrow-mode .gacha-cell,
+    #rolls-table-container .narrow-mode .calc-column,
+    #rolls-table-container .narrow-mode th.gacha-column,
+    #rolls-table-container .narrow-mode td.gacha-cell {
+        width: 80px;
+        min-width: 80px;
+        max-width: 80px;
+        white-space: normal;
         word-break: break-all;
         line-height: 1.2;
-        flex: none !important;
+        flex: none;
     }
-    .narrow-mode .col-no,
-    .narrow-mode th.col-no,
-    .narrow-mode td.col-no {
-        width: 30px !important;
-        min-width: 30px !important;
-        max-width: 30px !important;
-        padding: 2px 0 !important;
+    #rolls-table-container .narrow-mode .col-no,
+    #rolls-table-container .narrow-mode th.col-no,
+    #rolls-table-container .narrow-mode td.col-no {
+        width: 30px;
+        min-width: 30px;
+        max-width: 30px;
+        padding: 2px 0;
     }
-    .narrow-mode .char-link {
+    #rolls-table-container .narrow-mode .char-link {
         display: inline-block;
         max-width: 100%;
     }
-    .narrow-mode .guaranteed-cell {
-        padding: 1px !important;
+    #rolls-table-container .narrow-mode .guaranteed-cell {
+        padding: 1px;
     }
-    .narrow-mode .guaranteed-cell .char-link {
-        display: inline !important;
-        white-space: normal !important;
+    #rolls-table-container .narrow-mode .guaranteed-cell .char-link {
+        display: inline;
+        white-space: normal;
     }
-    .table-filler,
-    th.table-filler,
-    td.table-filler {
-        width: auto !important;
-        min-width: 0 !important;
-        max-width: none !important;
-        border: none !important;
-        background: transparent !important; 
-        background-color: transparent !important;
-        box-shadow: none !important;
-        outline: none !important;
+
+    /* フィラー（画面右端を埋める空白）のスタイル設定 */
+    #rolls-table-container .table-filler,
+    #rolls-table-container th.table-filler,
+    #rolls-table-container td.table-filler {
+        width: auto;
+        min-width: 0;
+        max-width: none;
+        border: none;
+        background: transparent; 
+        background-color: transparent;
+        box-shadow: none;
+        outline: none;
         pointer-events: none;
     }
 `);
@@ -81,7 +86,7 @@ function getTableLayoutSettings(totalTrackSpan) {
         const isNarrowerThanWindow = totalContentWidth < (winWidth - 40);
         tableFinalStyle = `table-layout: fixed; width: ${isNarrowerThanWindow ? '100%' : 'max-content'}; border-spacing: 0;`;
     } else {
-        tableFinalStyle = "table-layout: auto; width: 100%; border-spacing: 0;";
+        tableFinalStyle = "table-layout: auto; width: 100%; border-spacing: 0; border-collapse: separate;";
     }
 
     return { tableFinalStyle, noWidth, unitWidth };

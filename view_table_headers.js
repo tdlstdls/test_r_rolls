@@ -8,6 +8,7 @@ function generateNameHeaderHTML(isLeftSide) {
     let html = "";
     const bgColor = isLeftSide ? "#f8f9fa" : "#eef9ff";
     const trackClass = isLeftSide ? "" : "track-b"; 
+    // インラインスタイルの優先度を活かしつつ、!important なしで柔軟性を確保
     const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 2px solid #ccc;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
@@ -28,12 +29,12 @@ function generateNameHeaderHTML(isLeftSide) {
         const dateMatch = label.match(/(\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)/);
         let displayDate = dateMatch ? dateMatch[1] : "";
         
-        // 2. 名称のクレンジング (メタデータを除去して純粋な名前を取り出す)
+        // 2. 名称のクレンジング
         const metaRegex = /(?:\[確定\])?\s*(?:\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)?\s*\(\d+[gfs]?\)\s*(?:\[\d+G\])?/;
         const nameParts = label.split(metaRegex).map(p => p.trim()).filter(p => p);
         let displayName = nameParts.length > 1 ? nameParts.reverse().join(' ') : (nameParts[0] || config.name);
 
-        // 3. 特例処理 (プラチナ・レジェンドは日程非表示)
+        // 3. 特例処理
         const isSpecial = displayName.includes("プラチナガチャ") || displayName.includes("レジェンドガチャ");
         if (isSpecial) displayDate = "";
 
@@ -43,7 +44,6 @@ function generateNameHeaderHTML(isLeftSide) {
         const addStr = addCount > 0 ? ` <span style="color:#d9534f; font-weight:normal; font-size:0.85em;">(add:${addCount})</span>` : "";
 
         // 5. 表示HTMLの組み立て
-        // divによる強制改行をなくし、名前の直後に日付を配置することで、長い名前の時も2行に収める
         const nameAndIdHTML = `<span style="font-weight:bold;">${displayId} ${displayName}${gText}${addStr}</span>`;
         const dateHTML = displayDate ? `<span style="font-size:0.85em; color:#666; font-weight:normal; margin-left:6px; white-space:nowrap;">${displayDate}</span>` : "";
 
@@ -58,12 +58,13 @@ function generateNameHeaderHTML(isLeftSide) {
 }
 
 /**
- * 操作ヘッダーの生成 (既存のロジックを維持)
+ * 操作ヘッダーの生成
  */
 function generateControlHeaderHTML(isInteractive) {
     let html = "";
     const bgColor = isInteractive ? "#f8f9fa" : "#eef9ff";
-    const commonStyle = `background-color: ${bgColor} !important; background-clip: padding-box; border-right: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important;`;
+    // 修正：!important を除去し、他の CSS ルールとの詳細度競合を解消しました
+    const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
         let id = idWithSuffix.replace(/[gfs]$/, '');

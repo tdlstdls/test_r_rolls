@@ -1,24 +1,31 @@
 /** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・確定枠表示仕様変更版） */
 
-// テーブル全体の罫線とレイアウトを強制するスタイルを注入
+// テーブル全体の罫線とレイアウトを制御するスタイルを注入
 if (typeof injectStyles === 'function') {
     injectStyles(`
         #rolls-table-container table {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-            border-top: 1px solid #ddd !important;
-            border-left: 1px solid #ddd !important;
+            border-collapse: separate;
+            border-spacing: 0;
+            /* テーブル全体の左・上の外枠を定義 */
+            border-top: 1px solid #ddd;
+            border-left: 1px solid #ddd;
         }
-        #rolls-table-container table th,
-        #rolls-table-container table td {
-            border-right: 1px solid #ddd !important;
-            border-bottom: 1px solid #ddd !important;
+
+        /**
+         * 条件分岐: フィラー（.table-filler）以外のセルにのみ罫線を適用
+         * !important を使用せず、:not 疑似クラスによる論理制御で余白部分の罫線を排除します
+         */
+        #rolls-table-container table th:not(.table-filler),
+        #rolls-table-container table td:not(.table-filler) {
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
             box-sizing: border-box;
         }
+
         /* Sticky要素（NO列）の境界線と重なりの制御 */
         #rolls-table-container .col-no {
-            z-index: 10 !important;
-            border-right: 1px solid #ddd !important;
+            z-index: 10;
+            border-right: 1px solid #ddd;
         }
     `);
 }
@@ -41,7 +48,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         noColBgColor = '#FFDAB9';
     }
 
-    // No列の描画：border: 1px solid #ddd を明示的に追加
+    // No列の描画
     let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; border: 1px solid #ddd; ${isLeftSide ? 'position: sticky; left: 0; z-index: 5;' : ''}">${rowIndex + 1}</td>`;
 
     // 詳細計算セルの描画
@@ -79,10 +86,8 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
 
 /**
  * 確定枠セルの詳細描画
- * 修正：フォントを通常（非太字・黒）、背景を一律白に設定
  */
 function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap) {
-    // 罫線を確実にするため border: 1px solid #ddd を含め、背景色を一律白(#ffffff)に設定
     let cellStyle = 'white-space: normal; word-break: break-all; vertical-align: middle; padding: 0; text-align: left; border: 1px solid #ddd; background-color: #ffffff;';
 
     const gMain = data.guaranteed || (data.result ? data.result.guaranteed : null);
@@ -108,7 +113,6 @@ function renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guar
                 clickAction = (res.nextRollStartSeedIndex >= 0 ? `onclick="if(!event.ctrlKey) updateSeedAndRefresh(${finalSeedInProcess})"` : "");
             }
 
-            // 修正：font-weight を normal に、color を #000 (黒) に変更
             return `
             <div ${clickAction} style="cursor:pointer; padding:4px; ${verifiedStyle} ${isAltRoute ? 'border-bottom:1px dashed #ccc;' : ''}">
                 <span class="cell-addr">${addr})</span><span class="char-link" style="font-weight:normal; color:#000;">${charName}</span>
