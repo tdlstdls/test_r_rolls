@@ -129,10 +129,10 @@ function generateControlHeaderHTML(isInteractive) {
                 <span style="margin-right:2px;">ガチャ切替</span>▼${select}
             </div>`;
         
-        // 確定ステップ選択ボタンの構築
+        // 確定ステップ選択ボタン
         let gLabel = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : (suffix === 's' ? '7G' : '確定'));
         const gBtn = `
-            <div style="position:relative; min-width:32px; height:18px; border:1px solid #999; background:#fff; ${btnCommonStyle}">
+            <div style="position:relative; min-width:32px; height:18px; border:1px solid #999; background:#fff; color:#333; ${btnCommonStyle}">
                 ${gLabel}
                 <select onchange="updateGachaStep(this, ${index})" style="width:100%; height:100%; opacity:0; position:absolute; left:0; top:0; cursor:pointer;">
                     <option value="" ${suffix===''?'selected':''}>-</option>
@@ -142,17 +142,25 @@ function generateControlHeaderHTML(isInteractive) {
                 </select>
             </div>`;
         
+        // 超激レア追加選択 (addボタン: 1クリックでプルダウンが立ち上がる構造)
         const curAdd = uberAdditionCounts[index] || 0;
         const addLabel = curAdd > 0 ? `+${curAdd}` : `add`;
-        const addBtn = `<button id="add-trigger-${index}" onclick="showAddInput(${index})" style="${btnCommonStyle} min-width:26px; color:#d9534f; border:1px solid #d9534f; background:#fff;">${addLabel}</button>`;
+        const addBtn = `
+            <div style="position:relative; min-width:26px; height:18px; color:#d9534f; border:1px solid #d9534f; background:#fff; ${btnCommonStyle}">
+                ${addLabel}
+                <select onchange="updateUberAddition(this, ${index})" style="width:100%; height:100%; opacity:0; position:absolute; left:0; top:0; cursor:pointer;">
+                    ${(function(){
+                        let ops = "";
+                        for(let k=0; k<=20; k++) ops += `<option value="${k}" ${k===curAdd?'selected':''}>${k}</option>`;
+                        return ops;
+                    })()}
+                </select>
+            </div>`;
         
-        let addSelect = `<span id="add-select-wrapper-${index}" style="display:none;"><select class="uber-add-select" onchange="updateUberAddition(this, ${index})" style="width:32px; font-size:9px; height:18px;">`;
-        for(let k=0; k<=20; k++) addSelect += `<option value="${k}" ${k===curAdd?'selected':''}>${k}</option>`;
-        addSelect += `</select></span>`;
+        // 【重要】×ボタン: 白背景に対して文字色(color:#333)を明示的に指定して可視化
+        const delBtn = `<button class="remove-btn" onclick="removeGachaColumn(${index})" style="${btnCommonStyle} min-width:18px; padding:0 4px; border:1px solid #ccc; background:#fff; color:#333; font-weight:bold;">×</button>`;
         
-        const delBtn = `<button class="remove-btn" onclick="removeGachaColumn(${index})" style="${btnCommonStyle} min-width:18px; padding:0 4px; border:1px solid #ccc; background:#fff;">×</button>`;
-        
-        const controlArea = `<div style="display:flex; justify-content:flex-start; align-items:center; gap:3px; flex-wrap:wrap;">${pullDownBtn}${gBtn}${addBtn}${addSelect}${delBtn}</div>`;
+        const controlArea = `<div style="display:flex; justify-content:flex-start; align-items:center; gap:3px; flex-wrap:wrap;">${pullDownBtn}${gBtn}${addBtn}${delBtn}</div>`;
 
         if (isGCol) {
             html += `<th colspan="2" class="gacha-column" style="padding: 4px 2px; ${commonStyle}">${controlArea}</th>`;
