@@ -7,18 +7,50 @@ function showIdInput() {
     const trigger = document.getElementById('add-id-trigger');
     if (!trigger) return;
 
+    // 二重発火防止のためonclickを一旦無効化
     trigger.onclick = null;
+    
+    // 入力欄を挿入
     trigger.innerHTML = `<input type="text" id="direct-id-input" placeholder="ID" style="width:50px; font-size:10px; border:none; outline:none; padding:0; margin:0; background:transparent; color:white; text-align:center;" onkeydown="if(event.key==='Enter') applyDirectId()">`;
     
-    const input = document.getElementById('direct-id-input');
-    input.focus();
+    // ガイド用ポップアップ（ツールチップ）の作成
+    const tooltip = document.createElement('div');
+    tooltip.id = 'id-input-guide-popup';
+    tooltip.innerText = '↑こちらにガチャIDを入力してください';
+    tooltip.style.cssText = `
+        position: absolute;
+        background: #333;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        white-space: nowrap;
+        z-index: 2000;
+        margin-top: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        pointer-events: none;
+    `;
+    
+    // ボタンの位置に合わせてポップアップを配置
+    const rect = trigger.getBoundingClientRect();
+    tooltip.style.left = `${rect.left + window.scrollX}px`;
+    tooltip.style.top = `${rect.bottom + window.scrollY}px`;
+    document.body.appendChild(tooltip);
 
-    input.onblur = () => { 
-        setTimeout(() => { 
-            trigger.innerText = 'IDで追加';
-            trigger.onclick = showIdInput; 
-        }, 200); 
-    };
+    const input = document.getElementById('direct-id-input');
+    if (input) {
+        input.focus();
+        // フォーカスが外れたら元に戻し、ポップアップも削除
+        input.onblur = () => { 
+            setTimeout(() => { 
+                trigger.innerText = 'IDで追加';
+                trigger.onclick = showIdInput; 
+                if (tooltip.parentNode) {
+                    tooltip.parentNode.removeChild(tooltip);
+                }
+            }, 200); 
+        };
+    }
 }
 
 /**
@@ -42,20 +74,16 @@ function applyDirectId() {
 
 /**
  * プルダウンから選択されたガチャに更新する
- * @param {HTMLSelectElement} el - セレクトボックス要素
- * @param {number} index - 更新対象の列インデックス
  */
 function updateGachaSelection(el, index) {
     if (!el || index === undefined) return;
     const newBaseId = el.value;
     if (!newBaseId) return;
 
-    // 現在の列のサフィックス（g, f, s等）を取得して維持する
     const oldIdWithSuffix = tableGachaIds[index] || "";
     const suffixMatch = oldIdWithSuffix.match(/[gfs]$/);
     const suffix = suffixMatch ? suffixMatch[0] : '';
 
-    // 新しいIDに既存のサフィックスを結合して配列を更新
     tableGachaIds[index] = newBaseId + suffix;
 
     if (typeof updateUrlParams === 'function') updateUrlParams();
@@ -65,17 +93,14 @@ function updateGachaSelection(el, index) {
 }
 
 /**
- * ガチャ列の確定ステップをプルダウン選択により更新する
- * @param {HTMLSelectElement} el - セレクトボックス要素
- * @param {number} index - 対象の列インデックス
+ * ガチャ列の確定ステップを更新する
  */
 function updateGachaStep(el, index) {
     if (!el || index === undefined) return;
-    const newSuffix = el.value; // '', 'g', 'f', 's'
+    const newSuffix = el.value; 
     let idWithSuffix = tableGachaIds[index];
     if (!idWithSuffix) return;
 
-    // ID部分を抽出し、新しいサフィックスを付与する
     let baseId = idWithSuffix.replace(/[gfs]$/, '');
     tableGachaIds[index] = baseId + newSuffix;
 
@@ -95,7 +120,6 @@ function removeGachaColumn(index) {
     }
     tableGachaIds.splice(index, 1);
     
-    // 超激レア追加カウントも同期して削除
     if (typeof uberAdditionCounts !== 'undefined' && Array.isArray(uberAdditionCounts)) {
         uberAdditionCounts.splice(index, 1);
     }
@@ -107,7 +131,7 @@ function removeGachaColumn(index) {
 }
 
 /**
- * デフォルトの列追加（末尾の列をコピー）
+ * デフォルトの列追加
  */
 function addGachaColumn() {
     const lastId = tableGachaIds.length > 0 ? tableGachaIds[tableGachaIds.length - 1] : "349";
@@ -152,7 +176,7 @@ function updateUberAddition(el, index) {
 }
 
 /**
- * 列内の「add」ボタンクリック時に数値選択用プルダウンを表示する
+ * 数値選択用プルダウンを表示する
  */
 function showAddInput(index) {
     const wrapper = document.getElementById(`add-select-wrapper-${index}`);
@@ -186,7 +210,7 @@ function toggleWidthMode() {
     }
 }
 
-// スクロール監視：ヘッダーのロゴ表示制御
+// スクロール監視
 window.addEventListener('scroll', () => {
     if (window.scrollY > 30) {
         document.body.classList.add('hide-sticky-logo');

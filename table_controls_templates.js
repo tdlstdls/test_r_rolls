@@ -38,8 +38,10 @@ function generateOperationPanelRowHTML(fullTableColSpan, simControlsHtml, findAr
     const seedVal = document.getElementById('seed')?.value || '-';
     const findActive = (typeof showFindInfo !== 'undefined' && showFindInfo);
     const colors = { seed: "#6c757d", add: "#28a745", skdAdd: "#17a2b8", idAdd: "#545b62", reset: "#dc3545", width: "#218838", find: "#007bff", sim: "#fd7e14", skd: "#6f42c1", desc: "#20c997" };
-    const btnStyle = "font-size: 14px; padding: 2px 4px; min-width: 70px; height: 24px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;";
-    const getTgl = (active, color) => active ? `${btnStyle} background:${color}; color:#fff; font-weight:bold;` : `${btnStyle} background:#fff; color:${color}; border:1px solid ${color};`;
+    
+    // ボタンのスタイル定義
+    const btnStyle = "font-size: 14px; padding: 2px 4px; min-width: 70px; height: 24px; cursor: pointer; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; vertical-align: middle;";
+    const getTgl = (active, color) => active ? `${btnStyle} background:${color}; color:#fff; font-weight:bold; border:none;` : `${btnStyle} background:#fff; color:${color}; border:1px solid ${color};`;
     const separator = `<span style="margin: 0 4px; color: #aaa; font-size: 14px;">｜</span>`;
 
     return `
@@ -53,7 +55,9 @@ function generateOperationPanelRowHTML(fullTableColSpan, simControlsHtml, findAr
                     <span style="font-size: 14px; color: #555; margin-left: 4px;">列操作：</span>
                     <button onclick="addGachaColumn()" style="${getTgl(true, colors.add)}">＋列を追加</button>
                     <button style="${getTgl(true, colors.skdAdd)}" onclick="addGachasFromSchedule()">skdで追加</button>
-                    <button id="add-id-trigger" onclick="showIdInput()" style="${getTgl(true, colors.idAdd)}">IDで追加</button>
+                    
+                    <span id="add-id-trigger" onclick="showIdInput()" style="${getTgl(true, colors.idAdd)} user-select: none;">IDで追加</span>
+                    
                     <button onclick="resetToFirstGacha()" style="${getTgl(true, colors.reset)}">×右列一括</button>
                     <button id="toggle-width-btn" onclick="toggleWidthMode()" style="${getTgl(isNarrowMode, colors.width)}">狭幅表示</button>
                     
