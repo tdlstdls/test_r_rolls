@@ -1,11 +1,9 @@
-/** @file ui_table_handler.js @description テーブルヘッダー詳細描画（透過バグ修正・UX向上版） */
+/** @file ui_table_handler.js @description テーブルヘッダー詳細描画（表示条件分岐・UX向上版） */
 
 // ヘッダーのインタラクションを高めるためのスタイル注入
 if (typeof injectStyles === 'function') {
     injectStyles(`
-        /* * 【修正】ガチャヘッダーの重ね合わせとホバー時の透過防止設定
-         * 1. z-index: 110 (Tier 1) を設定し、データ行(100)よりも前面に表示。
-         */
+        /* ガチャヘッダーの重ね合わせとホバー時の透過防止設定 */
         #rolls-table-container th.gacha-column.clickable-header {
             cursor: pointer;
             transition: background-color 0.2s ease;
@@ -13,22 +11,19 @@ if (typeof injectStyles === 'function') {
             z-index: 110; 
         }
 
-        /* * 固定行（sticky-row）内での固定表示設定 */
+        /* 固定行（sticky-row）内での固定表示設定 */
         #rolls-table-container .sticky-row th.gacha-column.clickable-header {
             position: -webkit-sticky;
             position: sticky;
             top: 0;
         }
 
-        /* * 【重要修正】ホバー時の透過防止
-         * background-color を書き換えるとインラインの背景色が消えて透過してしまうため、
-         * box-shadow (inset) を使用して、元の色の上にハイライトを重ねます。
-         */
+        /* ホバー時の透過防止 */
         #rolls-table-container th.gacha-column.clickable-header:hover {
             box-shadow: inset 0 0 0 999px rgba(0, 123, 255, 0.1);
         }
         
-        /* ヘッダー内の透明なセレクトボックス（クリックイベント受信用） */
+        /* ヘッダー内の透明なセレクトボックス */
         .header-select-overlay {
             width: 100%;
             height: 100%;
@@ -43,10 +38,11 @@ if (typeof injectStyles === 'function') {
 }
 
 /**
- * 名称ヘッダーの生成 (ヘッダー全体をクリック可能なプルダウンとして構築)
+ * 名称ヘッダーの生成 (表示条件分岐版)
  * @param {boolean} isLeftSide - Aトラック(左側)かどうか
+ * @param {boolean} isSticky - 固定ヘッダー（最上部）かどうか。デフォルトは true（非表示）
  */
-function generateNameHeaderHTML(isLeftSide) {
+function generateNameHeaderHTML(isLeftSide, isSticky = true) {
     let html = "";
     const bgColor = isLeftSide ? "#f8f9fa" : "#eef9ff";
     const trackClass = isLeftSide ? "" : "track-b"; 
@@ -63,24 +59,36 @@ function generateNameHeaderHTML(isLeftSide) {
         const currentOpt = options.find(o => String(o.value) === idFromSuffix);
         let label = currentOpt ? currentOpt.label : config.name;
         
-        // メタデータの抽出
+        // 1. メタデータの抽出
         const idMatch = label.match(/\((\d+)[gfs]?\)/);
         const displayId = idMatch ? idMatch[1] : idFromSuffix;
         const dateMatch = label.match(/(\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)/);
         let displayDate = dateMatch ? dateMatch[1] : "";
         
-        // 名称のクレンジング
+        // 2. 名称のクレンジング (前後にある▽▼や空白を徹底的に除去)
         const metaRegex = /(?:\[確定\])?\s*(?:\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)?\s*\(\d+[gfs]?\)\s*(?:\[\d+G\])?/;
         const nameParts = label.split(metaRegex).map(p => p.trim()).filter(p => p);
         let displayName = nameParts.length > 1 ? nameParts.reverse().join(' ') : (nameParts[0] || config.name);
+        displayName = displayName.trim().replace(/^[▽▼]+|[▽▼]+$/g, '').trim(); 
 
         if (displayName.includes("プラチナガチャ") || displayName.includes("レジェンドガチャ")) displayDate = "";
 
+        // 3. ラベル情報の生成
         const gText = isGCol ? ` [${(suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : '7G')}]` : "";
         const addCount = uberAdditionCounts[index] || 0;
         const addStr = addCount > 0 ? ` <span style="color:#d9534f; font-weight:normal; font-size:0.85em;">+${addCount}</span>` : "";
 
-        // 透明なセレクトボックス
+        // 4. 【論理式による表示判定】
+        // 固定ヘッダー（isSticky=true）でない場合のみ、日付とグレーの▽を表示する
+        const dateHTML = (!isSticky && displayDate) 
+            ? `<span style="font-size:0.85em; color:#666; font-weight:normal; margin-left:6px; white-space:nowrap;">${displayDate}</span>` 
+            : "";
+        
+        const arrowHTML = (!isSticky)
+            ? `<div style="position: absolute; right: 4px; top: 4px; font-size: 8px; color: #aaa; pointer-events: none;">▽</div>`
+            : "";
+
+        // 5. 透明なセレクトボックスの構築
         let selectHTML = `<select class="header-select-overlay" onchange="updateGachaSelection(this, ${index})" title="クリックしてガチャを切り替え">`;
         options.forEach(opt => {
             selectHTML += `<option value="${opt.value}" ${String(opt.value) === idFromSuffix ? 'selected' : ''}>${opt.label}</option>`;
@@ -88,12 +96,12 @@ function generateNameHeaderHTML(isLeftSide) {
         selectHTML += `</select>`;
 
         const nameAndIdHTML = `<span style="font-weight:bold;">${displayId} ${displayName}${gText}${addStr}</span>`;
-        const dateHTML = displayDate ? `<span style="font-size:0.85em; color:#666; font-weight:normal; margin-left:6px; white-space:nowrap;">${displayDate}</span>` : "";
 
+        // 6. HTML組み立て
         const colspan = isGCol ? 'colspan="2"' : '';
         html += `<th ${colspan} class="gacha-column ${trackClass} clickable-header" style="vertical-align: top; padding: 0; ${commonStyle}">
                     ${selectHTML}
-                    <div style="position: absolute; right: 4px; top: 4px; font-size: 8px; color: #aaa; pointer-events: none;">▼</div>
+                    ${arrowHTML}
                     <div style="text-align: left; line-height: 1.2; word-break: break-all; padding: 4px 6px; pointer-events: none;">
                         ${nameAndIdHTML}${dateHTML}
                     </div>
@@ -142,7 +150,7 @@ function generateControlHeaderHTML(isInteractive) {
                 </select>
             </div>`;
         
-        // 超激レア追加選択 (addボタン: 1クリックでプルダウンが立ち上がる構造)
+        // 超激レア追加選択
         const curAdd = uberAdditionCounts[index] || 0;
         const addLabel = curAdd > 0 ? `+${curAdd}` : `add`;
         const addBtn = `
@@ -157,7 +165,7 @@ function generateControlHeaderHTML(isInteractive) {
                 </select>
             </div>`;
         
-        // 【重要】×ボタン: 白背景に対して文字色(color:#333)を明示的に指定して可視化
+        // ×ボタン
         const delBtn = `<button class="remove-btn" onclick="removeGachaColumn(${index})" style="${btnCommonStyle} min-width:18px; padding:0 4px; border:1px solid #ccc; background:#fff; color:#333; font-weight:bold;">×</button>`;
         
         const controlArea = `<div style="display:flex; justify-content:flex-start; align-items:center; gap:3px; flex-wrap:wrap;">${pullDownBtn}${gBtn}${addBtn}${delBtn}</div>`;

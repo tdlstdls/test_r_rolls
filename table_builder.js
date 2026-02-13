@@ -1,4 +1,4 @@
-/** @file table_builder.js @description テーブル構築およびスタイル定義（最上部境界線の調整版） */
+/** @file table_builder.js @description テーブル構築およびスタイル定義（最上部境界線および列固定の調整版） */
 
 injectStyles(`
     #rolls-table-container table {
@@ -12,7 +12,6 @@ injectStyles(`
 
     /**
      * 条件分岐: フィラー（.table-filler）以外のセルにのみ基本スタイルと罫線を適用
-     * !important を使用せず、論理的なセレクタによって余白部分の装飾を排除します
      */
     #rolls-table-container table th:not(.table-filler),
     #rolls-table-container table td:not(.table-filler) {
@@ -28,7 +27,6 @@ injectStyles(`
     #rolls-table-container table th:not(.table-filler) { 
         background-color: #f8f9fa; 
         font-weight: bold; 
-        /* 最上部の不要な横線を排除するため、全ヘッダーへの一律な border-top 指定を廃止しました */
     }
 
     #rolls-table-container table .gacha-column, 
@@ -40,6 +38,39 @@ injectStyles(`
         white-space: normal;
         word-break: break-all;
         line-height: 1.2;
+    }
+
+    /**
+     * NO列の横方向固定 (Sticky Column)
+     */
+    /* Aトラック・Bトラック共通のNO列スタイル */
+    #rolls-table-container table .col-no {
+        position: sticky;
+        left: 0;
+        z-index: 20; /* 通常のボディセルより前面 */
+        background-clip: padding-box;
+    }
+
+    /* AトラックのNO列の背景色 */
+    #rolls-table-container table th.col-no:not(.track-b),
+    #rolls-table-container table td.col-no:not(.track-b) {
+        background-color: #f8f9fa !important;
+    }
+
+    /* BトラックのNO列の背景色 */
+    #rolls-table-container table th.col-no.track-b,
+    #rolls-table-container table td.col-no.track-b {
+        background-color: #eef9ff !important;
+    }
+
+    /* ヘッダー内かつNO列のセル: 縦固定(110)よりもさらに前面にする */
+    #rolls-table-container table thead th.col-no {
+        z-index: 130;
+    }
+
+    /* スクロール時に境界線が消えないための調整 */
+    #rolls-table-container table .col-no {
+        border-right: 1px solid #ddd !important;
     }
 `);
 

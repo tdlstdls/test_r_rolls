@@ -3,13 +3,13 @@
 /**
  * 名称ヘッダーの生成 (ID 名称 [11G] 日付 を1つのフローで描画)
  * @param {boolean} isLeftSide - Aトラック(左側)かどうか
+ * @param {boolean} isSticky - 固定ヘッダー（スクロール用）かどうか
  */
-function generateNameHeaderHTML(isLeftSide) {
+function generateNameHeaderHTML(isLeftSide, isSticky = false) {
     let html = "";
     const bgColor = isLeftSide ? "#f8f9fa" : "#eef9ff";
     const trackClass = isLeftSide ? "" : "track-b"; 
-    // インラインスタイルの優先度を活かしつつ、!important なしで柔軟性を確保
-    const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 2px solid #ccc;`;
+    const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 2px solid #ccc; position: relative;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {
         let idFromSuffix = idWithSuffix.replace(/[gfs]$/, '');
@@ -29,10 +29,11 @@ function generateNameHeaderHTML(isLeftSide) {
         const dateMatch = label.match(/(\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)/);
         let displayDate = dateMatch ? dateMatch[1] : "";
         
-        // 2. 名称のクレンジング
+        // 2. 名称のクレンジング (データ由来の▽や▼を除去)
         const metaRegex = /(?:\[確定\])?\s*(?:\d{1,2}\/\d{1,2}~(?:\d{1,2}\/\d{1,2})?)?\s*\(\d+[gfs]?\)\s*(?:\[\d+G\])?/;
         const nameParts = label.split(metaRegex).map(p => p.trim()).filter(p => p);
         let displayName = nameParts.length > 1 ? nameParts.reverse().join(' ') : (nameParts[0] || config.name);
+        displayName = displayName.replace(/[▽▼]$/, '').trim();
 
         // 3. 特例処理
         const isSpecial = displayName.includes("プラチナガチャ") || displayName.includes("レジェンドガチャ");
@@ -43,13 +44,24 @@ function generateNameHeaderHTML(isLeftSide) {
         const addCount = uberAdditionCounts[index] || 0;
         const addStr = addCount > 0 ? ` <span style="color:#d9534f; font-weight:normal; font-size:0.85em;">(add:${addCount})</span>` : "";
 
-        // 5. 表示HTMLの組み立て
-        const nameAndIdHTML = `<span style="font-weight:bold;">${displayId} ${displayName}${gText}${addStr}</span>`;
+        // 5. ▽の削除
+        const arrowHTML = "";
+
+        // 6. 切り替え用透明セレクトボックス
+        let select = `<select onchange="updateGachaSelection(this, ${index})" style="width:100%; height:100%; opacity:0; position:absolute; left:0; top:0; cursor:pointer; z-index:2;">`;
+        options.forEach(opt => {
+            select += `<option value="${opt.value}" ${String(opt.value) === idFromSuffix ? 'selected' : ''}>${opt.label}</option>`;
+        });
+        select += `</select>`;
+
+        // 7. 表示HTMLの組み立て
+        const nameAndIdHTML = `<span style="font-weight:bold;">${displayId} ${displayName}${gText}${addStr}${arrowHTML}</span>`;
         const dateHTML = displayDate ? `<span style="font-size:0.85em; color:#666; font-weight:normal; margin-left:6px; white-space:nowrap;">${displayDate}</span>` : "";
 
         const colspan = isGCol ? 'colspan="2"' : '';
         html += `<th ${colspan} class="gacha-column ${trackClass}" style="vertical-align: top; padding: 4px 6px; ${commonStyle}">
-                    <div style="text-align: left; line-height: 1.2; word-break: break-all;">
+                    ${select}
+                    <div style="text-align: left; line-height: 1.2; word-break: break-all; position: relative; z-index: 1;">
                         ${nameAndIdHTML}${dateHTML}
                     </div>
                  </th>`;
@@ -63,7 +75,6 @@ function generateNameHeaderHTML(isLeftSide) {
 function generateControlHeaderHTML(isInteractive) {
     let html = "";
     const bgColor = isInteractive ? "#f8f9fa" : "#eef9ff";
-    // 修正：!important を除去し、他の CSS ルールとの詳細度競合を解消しました
     const commonStyle = `background-color: ${bgColor}; background-clip: padding-box; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;`;
 
     tableGachaIds.forEach((idWithSuffix, index) => {

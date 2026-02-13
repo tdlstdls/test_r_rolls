@@ -1,35 +1,4 @@
-/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・z-index Tier管理版） */
-
-// テーブル全体の罫線とレイアウトを制御するスタイルを注入
-if (typeof injectStyles === 'function') {
-    injectStyles(`
-        #rolls-table-container table {
-            border-collapse: separate;
-            border-spacing: 0;
-            /* テーブル全体の外枠をセル単位の制御に委ねる */
-            border: none;
-        }
-
-        /**
-         * 条件分岐: フィラー（.table-filler）以外のセルにのみ右と下の罫線を適用
-         */
-        #rolls-table-container table th:not(.table-filler),
-        #rolls-table-container table td:not(.table-filler) {
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            box-sizing: border-box;
-        }
-
-        /**
-         * 【修正】Tier 2: データ行の左端（NO列）
-         * z-index を 100 に設定し、一般セル(auto)より前面、固定ヘッダー(110)より背面に配置。
-         */
-        #rolls-table-container .col-no {
-            border-left: 1px solid #ddd;
-            z-index: 100; 
-        }
-    `);
-}
+/** @file view_table_renderer.js @description 行・セルの描画処理（データ生成特化版） */
 
 /**
  * 行レンダリング (A/Bサイド別)
@@ -46,9 +15,12 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
     const rowData = tableData[seedIndex];
     if (!rowData) return ''; 
 
-    // --- 条件分岐: No列の背景色を決定 (再抽選等の状態に応じて変化) ---
+    // --- 条件分岐: No列の背景色を決定 ---
     const rowInfo = rowData.rowInfo || {};
+    // Aトラック(左)は薄いグレー、Bトラック(右)は薄い水色をデフォルトに設定
     let noColBgColor = isLeftSide ? '#f8f9fa' : '#eef9ff';
+    
+    // 再抽選等の特殊状態がある場合は、その色を優先（必要に応じてここも調整可能）
     if (rowInfo.isNormalReroll) {
         noColBgColor = '#FFFF00'; // レア被り時
     } else if (rowInfo.isCrossReroll) {
@@ -57,20 +29,20 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         noColBgColor = '#FFDAB9'; // 複雑な再抽選実行時
     }
 
-    // --- 条件分岐: 左側(Aトラック)のみ左端に固定するスタイルを適用 ---
-    // 【修正】z-index を 100 に統一。
-    // 水平スクロールでキャラ名の上に表示されつつ、垂直スクロールでヘッダー(110)の下に潜り込むTier 2の設定です。
-    const stickyStyle = isLeftSide ? 'position: -webkit-sticky; position: sticky; left: 0; z-index: 100;' : '';
+    // --- レイアウト制御 ---
     const borderStyles = 'border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; border-left: 1px solid #ddd;';
     
+    // Bトラックの場合は class に "track-b" を追加して CSS 側と同期させる
+    const trackClass = isLeftSide ? '' : 'track-b';
+    
     // No列の描画
-    let sideHtml = `<td class="col-no" style="background: ${noColBgColor}; ${borderStyles} ${stickyStyle}">${rowIndex + 1}</td>`;
+    let sideHtml = `<td class="col-no ${trackClass}" style="background: ${noColBgColor}; ${borderStyles}">${rowIndex + 1}</td>`;
 
     // 詳細計算セルの描画 (SEED列)
     if (typeof generateDetailedCalcCells === 'function') {
         sideHtml += generateDetailedCalcCells(seedIndex, seeds, tableData);
     } else {
-        const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
+        const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'} ${trackClass}`;
         sideHtml += `<td class="${calcColClass}" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">-</td>`;
     }
 
@@ -80,14 +52,12 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
         const suffix = idWithSuffix.match(/[gfs]$/)?.[0] || '';
         const data = rowData.cells ? rowData.cells[colIndex] : null;
 
-        // 通常セルの描画（非確定セル）
         if (typeof generateCell === 'function') {
             sideHtml += generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, isSimulationMode);
         } else {
             sideHtml += `<td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">-</td>`;
         }
 
-        // 確定枠セルの描画
         if (suffix) {
             if (data && (data.guaranteed || (data.result && data.result.guaranteed))) {
                 sideHtml += renderGuaranteedCell(seedIndex, id, suffix, data, seeds, colIndex, guarHighlightMap);
@@ -172,10 +142,10 @@ function generateSeedExplanationHtml() {
                         <div style="background: #fff; border: 1px solid #ddd; padding: 15px; margin: 15px 0; border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);">
                             <strong style="color: #d9534f; font-size: 1.1em;">▼ 連鎖するレア被り（R表示）の例</strong>
                             <ol style="margin-top: 10px; padding-left: 25px;">
-                                <li><strong>地点A1</strong>: 通常は「ねこ占い師」だが、直前と被ったため再抽選。結果 <strong>「ネコ魔女」</strong> に決定。</li>
-                                <li><strong>移動先B2</strong>: 奇数消費によりB2へ移動。しかしB2の本来の通常キャラがたまたま <strong>「ネコ魔女」</strong> だった。</li>
-                                <li><strong>判定</strong>: 移動先でも「直前に確定した最終キャラ」と被ったため、B2でも即座に再抽選が実行されます。</li>
-                                <li><strong>表示</strong>: この場合、連鎖を意味する <strong>「R」</strong> が付与され、さらにトラックがA4へ戻る現象が発生します（RA4）。</li>
+                                <li><strong>地点A1</strong>: 通常は「ねこ占い師」だが、直前と被ったため再抽選. 結果 <strong>「ネコ魔女」</strong> に決定.</li>
+                                <li><strong>移動先B2</strong>: 奇数消費によりB2へ移動. しかしB2의本来の通常キャラがたまたま <strong>「ネコ魔女」</strong> だった.</li>
+                                <li><strong>判定</strong>: 移動先でも「直前に確定した最終キャラ」と被ったため、B2でも即座に再抽選が実行されます.</li>
+                                <li><strong>表示</strong>: この場合、連鎖を意味する <strong>「R」</strong> が付与され、さらにトラックがA4へ戻る現象が発生します（RA4）.</li>
                             </ol>
                         </div>
                     </li>
