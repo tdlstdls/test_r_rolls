@@ -1,4 +1,4 @@
-/** @file view_cell_renderer.js @description 個別セルの描画とレアリティ色の制御（全セル罫線表示・SEED [index] 1列集約版） */
+/** @file view_cell_renderer.js @description 個別セルの描画とレアリティ色の制御（Tier 3：背面レイヤー定義版） */
 
 /**
  * テーブル用アドレス（A1, B25等）のフォーマット
@@ -14,49 +14,52 @@ function formatAddress(idx) {
 
 /**
  * SEED値などの詳細セル（左側の列）を生成する
- * 修正：罫線(border)を追加
+ * 【修正】罫線は view_table_renderer.js の共通CSSで制御されるため、インライン指定を削除。
  */
 function generateDetailedCalcCells(seedIndex, seeds, tableData) {
     const calcColClass = `calc-column ${showSeedColumns ? '' : 'hidden'}`;
-    const borderStyle = "border: 1px solid #ddd;";
     
-    if (!showSeedColumns) return `<td class="${calcColClass}" style="${borderStyle}"></td>`;
+    // 表示フラグがオフの場合は非表示用のクラスのみ返却
+    if (!showSeedColumns) return `<td class="${calcColClass}"></td>`;
     
-    if (seedIndex >= seeds.length) return `<td class="${calcColClass}" style="${borderStyle}">-</td>`;
+    // データ範囲外の処理
+    if (seedIndex >= seeds.length) return `<td class="${calcColClass}">-</td>`;
 
     const s0 = seeds[seedIndex];
     // SEED値 [index] の形式で表示
-    return `<td class="${calcColClass}" style="${borderStyle}">${s0} [${seedIndex}]</td>`;
+    return `<td class="${calcColClass}">${s0} [${seedIndex}]</td>`;
 }
 
 /**
  * 通常のガチャ結果セル（1マス分）を生成する
- * 修正：罫線(border)を style に追加
+ * 【修正】Tier 3 セルとして定義。z-index は指定せず、上位レイヤー（固定列/ヘッダー）の下に潜り込むようにします。
  */
 function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, isSimulationMode) {
     const rowData = tableData[seedIndex];
     const cell = rowData?.cells?.[colIndex];
     
-    const borderStyle = "border: 1px solid #ddd; ";
-    if (!cell || !cell.roll) return `<td class="gacha-cell" style="${borderStyle}">-</td>`;
+    // データがない場合の空セル返却
+    if (!cell || !cell.roll) return `<td class="gacha-cell">-</td>`;
     
     const rr = cell.roll;
     let charName = (rr.finalChar && rr.finalChar.name) ? rr.finalChar.name : "データ不足";
     const charId = rr.finalChar.id;
     const charIdStr = String(charId);
 
-    // 狭幅モード時の名前省略
+    // 狭幅モード時の名前省略ロジック
     if (typeof isNarrowMode !== 'undefined' && isNarrowMode && charName.length > 10) {
         charName = charName.substring(0, 9) + "...";
     }
 
-    // --- 1. 背景色の判定ロジック ---
+    // --- 1. 背景色の判定ロジック（レアリティとシード値に基づく） ---
     let bgColorStyle = '';
     const sv = seeds[seedIndex] % 10000;
 
+    // ユーザー優先ターゲットの判定
     const isPrioritized = (typeof userPrioritizedTargets !== 'undefined') && 
                           (userPrioritizedTargets.includes(charId) || userPrioritizedTargets.includes(charIdStr));
 
+    // 限定キャラの判定
     let isLimited = false;
     if (typeof limitedCats !== 'undefined' && Array.isArray(limitedCats)) {
         if (limitedCats.includes(parseInt(charId)) || limitedCats.includes(charIdStr)) {
@@ -64,46 +67,48 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
         }
     }
 
+    // 背景色スタイルの構築
     if (isPrioritized) {
         bgColorStyle = 'background-color: #6EFF72; font-weight: bold;'; 
     } 
     else if (isSimulationMode && highlightMap.get(seedIndex) === id) {
         if (isLimited || rr.rarity === 'uber' || rr.rarity === 'legend') {
-            bgColorStyle = 'background:#32CD32;';
+            bgColorStyle = 'background:#32CD32;'; // シミュレーション中の当たり
         } else {
-            bgColorStyle = 'background:#98FB98;';
+            bgColorStyle = 'background:#98FB98;'; // 通常ハイライト
         }
     } 
     else if (isLimited) {
-        bgColorStyle = 'background-color: #66FFFF;';
+        bgColorStyle = 'background-color: #66FFFF;'; // 限定
     } 
     else {
-        if (sv >= 9970) bgColorStyle = 'background-color: #DDA0DD;';
-        else if (sv >= 9940) bgColorStyle = 'background-color: #de59de;';
-        else if (sv >= 9500) bgColorStyle = 'background-color: #FF4C4C;';
-        else if (sv >= 9070) bgColorStyle = 'background-color: #fda34e;';
-        else if (sv >= 6970) bgColorStyle = 'background-color: #ffff33;';
+        // レアリティごとの色分け (SEED値に基づく)
+        if (sv >= 9970) bgColorStyle = 'background-color: #DDA0DD;';      // 伝説相当
+        else if (sv >= 9940) bgColorStyle = 'background-color: #de59de;'; // 超激相当（高確率）
+        else if (sv >= 9500) bgColorStyle = 'background-color: #FF4C4C;'; // 超激
+        else if (sv >= 9070) bgColorStyle = 'background-color: #fda34e;'; // 激レア
+        else if (sv >= 6970) bgColorStyle = 'background-color: #ffff33;'; // レア
     }
 
-    // 罫線と背景色を統合
-    const finalStyle = borderStyle + bgColorStyle;
-
-    // --- 2. クリックイベントの生成 ---
+    // --- 2. クリックイベント（詳細ポップアップ or シード更新） ---
     const escapedName = charName.replace(/'/g, "\\'");
     let clickHandler = "";
 
     if (showSeedColumns) {
+        // SEED表示中は算出過程のポップアップを表示
         clickHandler = `onclick="showRollProcessPopup(${seedIndex}, '${id}', ${colIndex})"`;
     } else if (isSimulationMode) {
+        // シミュレーション中はルート更新イベント
         clickHandler = `onclick="onGachaCellClick(${seedIndex}, '${id}', '${escapedName}')"`;
     } else {
+        // 通常モードはクリックでその地点へジャンプ
         const nextSeedValue = seeds[seedIndex + rr.seedsConsumed - 1];
         if (nextSeedValue !== undefined) {
             clickHandler = `onclick="updateSeedAndRefresh(${nextSeedValue})"`;
         }
     }
 
-    // --- 3. セル内コンテンツの構築 ---
+    // --- 3. セル内コンテンツの構築（再抽選/ルート移行表示の制御） ---
     let content = "";
     if (rr.isRerolled) {
         const nextIdx = seedIndex + rr.seedsConsumed;
@@ -115,19 +120,23 @@ function generateCell(seedIndex, id, colIndex, tableData, seeds, highlightMap, i
         }
 
         if (showSeedColumns) {
+            // 詳細表示時：元のキャラ名 + 移動先 + 決定キャラ名
             content = `${oName}<br>${destAddr}${charName}`;
         } else if (!isSimulationMode) {
+            // 通常時：元の地点と最終地点の両方をリンクとして表示
             const originalJumpSeed = seeds[seedIndex + 1];
             let oHtml = `<span class="char-link" onclick="event.stopPropagation(); updateSeedAndRefresh(${originalJumpSeed})">${oName}</span>`;
             const finalJumpSeed = seeds[seedIndex + rr.seedsConsumed - 1];
             let fHtml = `<span class="char-link" onclick="event.stopPropagation(); updateSeedAndRefresh(${finalJumpSeed})">${destAddr}${charName}</span>`;
             content = `${oHtml}<br>${fHtml}`;
         } else {
+            // シミュレーション時
             content = `${oName}<br>${destAddr}${charName}`;
         }
     } else {
+        // 通常表示
         content = charName;
     }
     
-    return `<td class="gacha-cell gacha-column" style="${finalStyle} cursor:pointer;" ${clickHandler}>${content}</td>`;
+    return `<td class="gacha-cell gacha-column" style="${bgColorStyle} cursor:pointer;" ${clickHandler}>${content}</td>`;
 }

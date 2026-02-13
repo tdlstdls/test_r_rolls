@@ -1,4 +1,4 @@
-/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・操作パネル境界線最適化版） */
+/** @file view_table_renderer.js @description 行・セルの描画処理（全セル罫線表示・z-index Tier管理版） */
 
 // テーブル全体の罫線とレイアウトを制御するスタイルを注入
 if (typeof injectStyles === 'function') {
@@ -6,7 +6,7 @@ if (typeof injectStyles === 'function') {
         #rolls-table-container table {
             border-collapse: separate;
             border-spacing: 0;
-            /* テーブル全体の外枠（上・左）を完全に除去し、セル単位の制御に委ねる */
+            /* テーブル全体の外枠をセル単位の制御に委ねる */
             border: none;
         }
 
@@ -21,9 +21,8 @@ if (typeof injectStyles === 'function') {
         }
 
         /**
-         * 条件分岐: データエリアの左端（NO列）にのみ左罫線を適用
-         * 【修正】z-index を 100 に統一。
-         * これにより、ヘッダーの Tier 1 (110) よりは背面に、一般セルよりは前面に配置されます。
+         * 【修正】Tier 2: データ行の左端（NO列）
+         * z-index を 100 に設定し、一般セル(auto)より前面、固定ヘッダー(110)より背面に配置。
          */
         #rolls-table-container .col-no {
             border-left: 1px solid #ddd;
@@ -59,7 +58,7 @@ function renderTableRowSide(rowIndex, seedIndex, columnConfigs, tableData, seeds
     }
 
     // --- 条件分岐: 左側(Aトラック)のみ左端に固定するスタイルを適用 ---
-    // 【修正】z-index を 100 に設定。
+    // 【修正】z-index を 100 に統一。
     // 水平スクロールでキャラ名の上に表示されつつ、垂直スクロールでヘッダー(110)の下に潜り込むTier 2の設定です。
     const stickyStyle = isLeftSide ? 'position: -webkit-sticky; position: sticky; left: 0; z-index: 100;' : '';
     const borderStyles = 'border-bottom: 1px solid #ddd; border-right: 1px solid #ddd; border-left: 1px solid #ddd;';
