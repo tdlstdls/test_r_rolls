@@ -1,4 +1,4 @@
-/** @file view_table_headers.js @description テーブルヘッダー詳細描画（透過バグ修正・UX向上版） */
+/** @file ui_table_handler.js @description テーブルヘッダー詳細描画（透過バグ修正・UX向上版） */
 
 // ヘッダーのインタラクションを高めるためのスタイル注入
 if (typeof injectStyles === 'function') {
@@ -129,8 +129,18 @@ function generateControlHeaderHTML(isInteractive) {
                 <span style="margin-right:2px;">ガチャ切替</span>▼${select}
             </div>`;
         
-        let gLabel = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : (suffix === 's' ? '7G' : 'G'));
-        const gBtn = `<button onclick="toggleGStep(${index})" style="${btnCommonStyle} min-width:24px; border:1px solid #999; background:#fff;">${gLabel}</button>`;
+        // 確定ステップ選択ボタンの構築
+        let gLabel = (suffix === 'g') ? '11G' : (suffix === 'f' ? '15G' : (suffix === 's' ? '7G' : '確定'));
+        const gBtn = `
+            <div style="position:relative; min-width:32px; height:18px; border:1px solid #999; background:#fff; ${btnCommonStyle}">
+                ${gLabel}
+                <select onchange="updateGachaStep(this, ${index})" style="width:100%; height:100%; opacity:0; position:absolute; left:0; top:0; cursor:pointer;">
+                    <option value="" ${suffix===''?'selected':''}>-</option>
+                    <option value="g" ${suffix==='g'?'selected':''}>11G</option>
+                    <option value="f" ${suffix==='f'?'selected':''}>15G</option>
+                    <option value="s" ${suffix==='s'?'selected':''}>7G</option>
+                </select>
+            </div>`;
         
         const curAdd = uberAdditionCounts[index] || 0;
         const addLabel = curAdd > 0 ? `+${curAdd}` : `add`;

@@ -65,19 +65,19 @@ function updateGachaSelection(el, index) {
 }
 
 /**
- * ガチャ列の確定ステップ（無し -> 11G -> 15G -> 7G）を切り替える
+ * ガチャ列の確定ステップをプルダウン選択により更新する
+ * @param {HTMLSelectElement} el - セレクトボックス要素
  * @param {number} index - 対象の列インデックス
  */
-function toggleGStep(index) {
+function updateGachaStep(el, index) {
+    if (!el || index === undefined) return;
+    const newSuffix = el.value; // '', 'g', 'f', 's'
     let idWithSuffix = tableGachaIds[index];
     if (!idWithSuffix) return;
 
+    // ID部分を抽出し、新しいサフィックスを付与する
     let baseId = idWithSuffix.replace(/[gfs]$/, '');
-    let suffix = idWithSuffix.match(/[gfs]$/)?.[0] || '';
-
-    // サイクル: 無し('') -> g (11G) -> f (15G) -> s (7G) -> 無し('')
-    const nextSuffixMap = { '': 'g', 'g': 'f', 'f': 's', 's': '' };
-    tableGachaIds[index] = baseId + nextSuffixMap[suffix];
+    tableGachaIds[index] = baseId + newSuffix;
 
     if (typeof updateUrlParams === 'function') updateUrlParams();
     if (typeof resetAndGenerateTable === 'function') {
